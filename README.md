@@ -1,4 +1,4 @@
-The MAD (National Instruments) Data AcQuisition library for MATLAB.
+National Instruments (MA)Data AcQuisition library for MATLAB.
 
 Added GUI options:
 - Monitor
