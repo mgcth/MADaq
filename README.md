@@ -1,15 +1,17 @@
-The MAD National Instruments data AcQuisition library for MATLAB.
+The MAD (National Instruments) Data AcQuisition library for MATLAB.
 
-Adding GUI options:
+Added GUI options:
+- Monitor
+- Data logger
+- Impact test
+- Periodic
+- Stepped sine
+- Multisine
 
-1) Monitor
-2) Data logger
-3) Impact test
-4) Periodic
-5) Stepped sine
-6) Multisine
-
-Menu bar with:
+Added menu bar with:
 - File
   - About
   - Help
+
+Removed button:
+- Monitor
