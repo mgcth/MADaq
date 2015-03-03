@@ -1,1 +1,1 @@
-Adding GUI options.
+National Instruments data acquisition library for MATLAB.
