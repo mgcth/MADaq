@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 14-Apr-2014 09:59:38
+% Last Modified by GUIDE v2.5 03-Mar-2015 11:29:36
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -163,7 +163,7 @@ function loadButton_Callback(hObject, eventdata, handles)
     selection = '';
     raw = {};
             
-    %   Input dialog for file selection
+    %   Input dialog for menuAbout selection
     while (~loadFile)
         d = dir(directory);
         str = {d.name};
@@ -241,16 +241,30 @@ function loadButton_Callback(hObject, eventdata, handles)
             else
                 set(handles.durationTime, 'String', '');
             end
+            % % MG 2015-03-03 (mod start)
+            % Set all radion buttons to zero first
+            set(handles.monitor, 'Value', 0);
+            set(handles.standardTest, 'Value', 0);
+            set(handles.impactTest, 'Value', 0);
+            set(handles.periodic, 'Value', 0);
+            set(handles.steppedSine, 'Value', 0);
+            set(handles.multisine, 'Value', 0);
+            
+            % Set the one to use to one
             if (raw{10,1})
+                set(handles.monitor, 'Value', 1);
+            elseif (raw{10,2})
                 set(handles.standardTest, 'Value', 1);
-            else
-                set(handles.standardTest, 'Value', 0);
-            end
-            if (raw{10,2})
+            elseif (raw{10,3})
                 set(handles.impactTest, 'Value', 1);
-            else
-                set(handles.impactTest, 'Value', 0);
+            elseif (raw{10,4})
+                set(handles.periodic, 'Value', 1);
+            elseif (raw{10,5})
+                set(handles.steppedSine, 'Value', 1);
+            elseif (raw{10,6})
+                set(handles.multisine, 'Value', 1);
             end
+            % % MG (mod end)
         end
         
         %   Get channels
@@ -363,8 +377,14 @@ function saveButton_Callback(hObject, eventdata, handles)
         %disp(get(handles.sampleFrequency, 'String'));
         output{9, 1} = 'Duration';
         output{9, 2} = get(handles.durationTime, 'String');
-        output{10, 1} = get(handles.standardTest, 'Value');
-        output{10, 2} = get(handles.impactTest, 'Value');
+        % % MG 2015-03-03 (mod start)
+        output{10, 1} = get(handles.monitor, 'Value');
+        output{10, 2} = get(handles.standardTest, 'Value');
+        output{10, 3} = get(handles.impactTest, 'Value');
+        output{10, 4} = get(handles.periodic, 'Value');
+        output{10, 5} = get(handles.steppedSine, 'Value');
+        output{10, 6} = get(handles.multisine, 'Value');
+        % % MG (mod end)
         output{11, 1} = '###';
         
         offset = 11; %Last entry of header
@@ -1247,21 +1267,21 @@ function previewAdHocLog (hObject, eventData, handles)
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         save(matFile, 'Header', 'Data');
-%         fclose(file);
+%         fclose(menuAbout);
 %         delete(binFile);
 % 
 %         j = length(preview.logging.files);
 %         for i = 1:(j - 1)
 %             binFile = [dataDir, '/channel', num2str(i), '.bin'];
 %             matFile = [dataDir, '/channel', num2str(i), '.mat'];
-%             file = fopen(binFile, 'r');
-%             Data = fread(file, 'double');
+%             menuAbout = fopen(binFile, 'r');
+%             Data = fread(menuAbout, 'double');
 %             Header = preview.logging.MHEADER(i);
 %             Header.NoValues = length(Data);
 %             Header.xStart = 0;
 %             Header.xIncrement = 1. / actualFs;
 %             save(matFile, 'Header', 'Data');
-%             fclose(file);
+%             fclose(menuAbout);
 %             delete(binFile);
 %         end
     set(preview.adHocLog, 'String', 'Start free logging');
@@ -1339,29 +1359,29 @@ function previewAdHocLog (hObject, eventData, handles)
 %               Convert .bin-files to .mat-files
 %             binFile = [dataDir, '/time.bin'];
 %             matFile = [dataDir, '/time.mat'];
-%             file = fopen(binFile, 'r');
-%             Data = fread(file, 'double');
+%             menuAbout = fopen(binFile, 'r');
+%             Data = fread(menuAbout, 'double');
 %             Header.NoValues = length(Data);
 %             Header.xStart = 0;
 %             Header.xIncrement = 1 / actualFs;
 %             Header.Unit = 's';
 %             save(matFile, 'Header', 'Data');
-%             fclose(file);
+%             fclose(menuAbout);
 %             delete(binFile);
 % 
 %             j = length(preview.logging.files);
 %             for i = 1:(j - 1)
 %                 binFile = [dataDir, '/channel', num2str(i), '.bin'];
 %                 matFile = [dataDir, '/channel', num2str(i), '.mat'];
-%                 file = fopen(binFile, 'r');
-%                 Data = fread(file, 'double');
+%                 menuAbout = fopen(binFile, 'r');
+%                 Data = fread(menuAbout, 'double');
 %                 Header = preview.logging.MHEADER(i);
 %                 Header.NoValues = length(Data);
 %                 Header.xStart = 0;
 %                 Header.xIncrement = 1 / actualFs;
 %                 Header.Unit = 's';
 %                 save(matFile, 'Header', 'Data');
-%                 fclose(file);
+%                 fclose(menuAbout);
 %                 delete(binFile);
 %             end
 %             
@@ -1413,139 +1433,157 @@ function figure1_CloseRequestFcn(hObject, eventData, handles)
 % Hint: delete(hObject) closes the figure
 delete(hObject);
 
-% % --- Executes on button press in startButton.
-% function startButton_Callback(hObject, eventdata, handles)
-% % hObject    handle to startButton (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-%     %   Add imp-check
-%     impact = 0;
-%     if get(handles.impactTest,'Value')
-%         choice = questdlg(  'Remember that the impact hammer should be connected to first channel in array, do you want to continue?', ...
-%                             'Impact test', ...
-%                             'Yes','No','No');
-%         if strcmp(choice, 'No')
-%             return
-%         end
-%         
-%         impact = 1;
-%     end
-% 
-%     set(handles.statusStr, 'String', 'Setting up logging ...');
-%     drawnow();
-%     
-%     dateString = datestr(now,'mm-dd-yyyy_HH-MM-SS');
-% 
-%     %   Setup session
-%     logging.session = daq.createSession('ni');
-%     
-%     items = get(handles.sampleFrequency, 'String');
-%     f = freqConverter(items{get(handles.sampleFrequency, 'Value')});
-%     logging.session.Rate = f;
-% 
-%     logging.session.DurationInSeconds = str2double(get(handles.durationTime, 'String'));
-% 
-%     %   Add channels
-%     data = get(handles.channelsTable, 'data');
-%     [m n] = size(data);
-%     j = 1;
-%     
-%     for i = 1:m
-% 
-%         channelData.index = i;
-%         channelData.active = data{i, 1};
-%         channelData.channel = data{i, 2};
-%         %channelData.signal = data{i, 3};
-%         channelData.coupling = data{i, 4};
-%         channelData.voltage = data{i, 5};
-%         %channelData.sensorType = data{i, 7};
-%         channelData.sensitivity = data{i, 9};
-%         
-%         %   Check if channel is ok, if so, then add channel to
-%         %   monitor
-%         configOk =  channelData.active && ...
-%                     ~isnan(channelData.voltage) && ...
-%                     ~isnan(channelData.sensitivity);
-%                     %strcmp(channelData.signal, 'Input') && ...
-%                     
-%                     %~strcmp(channelData.sensorType, ' ') && ...
-%                     
-% 
-%         if (configOk)
-%             %   Add channel to session
-%             chan = textscan(channelData.channel, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
-%             
-%             if strcmp(channelData.coupling, 'IEPE')
-%                 logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
-%             else
-%                 analogChan = logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
-%                 %analogChan.EnhancedAliasRejectionEnable = lowFreq;
-% 
-%                 if strcmp(channelData.coupling, 'AC')
-%                     analogChan.Coupling = 'AC';
-%                 elseif strcmp(channelData.coupling, 'DC')
-%                     analogChan.Coupling = 'DC';
-%                 end
-%             end
-%             
-%             %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
-%             %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
-%             
-%             %   Setup header
-%             logging.MHEADER(j).SeqNo = j;
-%             logging.MHEADER(j).RespId = channelData.channel;
-%             logging.MHEADER(j).Date = datestr(now,'mm-dd-yyyy HH:MM:SS');
-%             logging.MHEADER(j).Title = get(handles.title1, 'String');
-%             logging.MHEADER(j).Title2 = get(handles.title2, 'String');
-%             logging.MHEADER(j).Title3 = get(handles.title3, 'String');
-%             logging.MHEADER(j).Title4 = get(handles.title4, 'String');
-%             logging.MHEADER(j).Label = data{i, 3};
-%             %   Added by Kent 17-02-2014
-%             logging.MHEADER(j).SensorManufacturer = data{i, 6};
-%             logging.MHEADER(j).SensorModel = data{i, 7};
-%             logging.MHEADER(j).SensorSerialNumber = data{i, 8};
-%             logging.MHEADER(j).SensorSensitivity = data{i, 9};
-%             %   %   %   %   %   %   %   %   %
-%             logging.MHEADER(j).Unit = data{i, 10};   
-%             logging.MHEADER(j).Dof = data{i, 11};
-%             logging.MHEADER(j).Dir = data{i, 12};
-%             %   logging.MHEADER(j).Sensitivity = data{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
-%             logging.MHEADER(j).FunctionType = 1;
-%             
-%             %   Increment channels counter
-%             j = j + 1;
-%         end
-%     end
-% 
-%     %   Check if any channels was added to the session
-%     if (isempty(logging.session.Channels))
-%         msgbox('No channels in session, might be because no channels have been activated yet.','No channels in session');
-%         logging.session.release();
-%         delete(logging.session);
-%         
-%         set(handles.statusStr, 'String', 'Logging failed ...');
-%         drawnow();
-% 
-%     %   Else start logging data
-%     else
-%         set(handles.statusStr, 'String', 'Logging data from sensors ...');
-%         drawnow();
-%         
-%         %   Sync and reject alias if low freqency
-%         try logging.session.AutoSyncDSA = true; catch, end
-% 
-%         try
-%             lowFreq = f < 1000;
-%             for i = 1:length(logging.session.Channels)
-%                 logging.session.Channels(i).EnhancedAliasRejectionEnable = lowFreq;
-%             end
-%         catch
-%             lowFreq = 0;
-%         end
-% 
-%         disp(['SyncDSA: ', num2str(logging.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
-% 
+% --- Executes on button press in startButton.
+function startButton_Callback(hObject, eventdata, handles)
+% hObject    handle to startButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% For standardTest
+%if handles.standardTest.Value == 1
+% TA (start mod)
+       global DATAcontainer
+       CHdata = get(handles.channelsTable, 'data');
+       channelData.active = CHdata{1, 1};
+       Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
+       if Chact==0,error('Seems that no channels are active');end
+       [uv,sv]=memory;
+       memmax=sv.PhysicalMemory.Available;
+       ntmax=round(memmax/4/Chact/2);% Don't use more that half of available memory
+       DATAcontainer.nt=0;
+       DATAcontainer.t=zeros(ntmax,1);;
+       DATAcontainer.data=zeros(ntmax,Chact);
+       DATAcontainer.ntmax=ntmax;
+% TA (end)
+
+    %   Add imp-check
+    impact = 0;
+    if get(handles.impactTest,'Value')
+        choice = questdlg(  'Remember that the impact hammer should be connected to first channel in array, do you want to continue?', ...
+                            'Impact test', ...
+                            'Yes','No','No');
+        if strcmp(choice, 'No')
+            return
+        end
+        
+        impact = 1;
+    end
+
+    set(handles.statusStr, 'String', 'Setting up logging ...');
+    drawnow();
+    
+    dateString = datestr(now,'mm-dd-yyyy_HH-MM-SS');
+
+    %   Setup session
+    logging.session = daq.createSession('ni');
+    
+    items = get(handles.sampleFrequency, 'String');
+    f = freqConverter(items{get(handles.sampleFrequency, 'Value')});
+    logging.session.Rate = f;
+
+    logging.session.DurationInSeconds = str2double(get(handles.durationTime, 'String'));
+
+    %   Add channels
+    data = get(handles.channelsTable, 'data');
+    [m n] = size(data);
+    j = 1;
+    
+    for i = 1:m
+
+        channelData.index = i;
+        channelData.active = data{i, 1};
+        channelData.channel = data{i, 2};
+        %channelData.signal = data{i, 3};
+        channelData.coupling = data{i, 4};
+        channelData.voltage = data{i, 5};
+        %channelData.sensorType = data{i, 7};
+        channelData.sensitivity = data{i, 9};
+        
+        %   Check if channel is ok, if so, then add channel to
+        %   monitor
+        configOk =  channelData.active && ...
+                    ~isnan(channelData.voltage) && ...
+                    ~isnan(channelData.sensitivity);
+                    %strcmp(channelData.signal, 'Input') && ...
+                    
+                    %~strcmp(channelData.sensorType, ' ') && ...
+                    
+
+        if (configOk)
+            %   Add channel to session
+            chan = textscan(channelData.channel, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
+            
+            if strcmp(channelData.coupling, 'IEPE')
+                logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
+            else
+                analogChan = logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
+                %analogChan.EnhancedAliasRejectionEnable = lowFreq;
+
+                if strcmp(channelData.coupling, 'AC')
+                    analogChan.Coupling = 'AC';
+                elseif strcmp(channelData.coupling, 'DC')
+                    analogChan.Coupling = 'DC';
+                end
+            end
+            
+            %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
+            %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
+            
+            %   Setup header
+            logging.MHEADER(j).SeqNo = j;
+            logging.MHEADER(j).RespId = channelData.channel;
+            logging.MHEADER(j).Date = datestr(now,'mm-dd-yyyy HH:MM:SS');
+            logging.MHEADER(j).Title = get(handles.title1, 'String');
+            logging.MHEADER(j).Title2 = get(handles.title2, 'String');
+            logging.MHEADER(j).Title3 = get(handles.title3, 'String');
+            logging.MHEADER(j).Title4 = get(handles.title4, 'String');
+            logging.MHEADER(j).Label = data{i, 3};
+            %   Added by Kent 17-02-2014
+            logging.MHEADER(j).SensorManufacturer = data{i, 6};
+            logging.MHEADER(j).SensorModel = data{i, 7};
+            logging.MHEADER(j).SensorSerialNumber = data{i, 8};
+            logging.MHEADER(j).SensorSensitivity = data{i, 9};
+            %   %   %   %   %   %   %   %   %
+            logging.MHEADER(j).Unit = data{i, 10};   
+            logging.MHEADER(j).Dof = data{i, 11};
+            logging.MHEADER(j).Dir = data{i, 12};
+            %   logging.MHEADER(j).Sensitivity = data{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
+            logging.MHEADER(j).FunctionType = 1;
+            
+            %   Increment channels counter
+            j = j + 1;
+        end
+    end
+
+    %   Check if any channels was added to the session
+    if (isempty(logging.session.Channels))
+        msgbox('No channels in session, might be because no channels have been activated yet.','No channels in session');
+        logging.session.release();
+        delete(logging.session);
+        
+        set(handles.statusStr, 'String', 'Logging failed ...');
+        drawnow();
+
+    %   Else start logging data
+    else
+        set(handles.statusStr, 'String', 'Logging data from sensors ...');
+        drawnow();
+        
+        %   Sync and reject alias if low freqency
+        try logging.session.AutoSyncDSA = true; catch, end
+
+        try
+            lowFreq = f < 1000;
+            for i = 1:length(logging.session.Channels)
+                logging.session.Channels(i).EnhancedAliasRejectionEnable = lowFreq;
+            end
+        catch
+            lowFreq = 0;
+        end
+
+        disp(['SyncDSA: ', num2str(logging.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
+
+% TA (start mod)
 %         %   Make files for data collection
 %         homeDir = char(java.lang.System.getProperty('user.home'));
 %         dataDir = [homeDir, '/DataLogger/', dateString];
@@ -1557,19 +1595,24 @@ delete(hObject);
 %             logFile = [dataDir, '/channel', num2str(i), '.bin'];
 %             logging.files(i + 1) = fopen(logFile, 'a');
 %         end
-%                 
-%         %   Add listener
+% TA (end mod)
+                
+        %   Add listener
+% TA (start mod)
 %         logging.eventListener = addlistener(logging.session, 'DataAvailable', @(src, event) logData(src, event, logging.files));
-% 
-%         %   Start logging
-%         logging.session.startForeground();
-%         
-%         %   Get actual rate
-%         actualFs = logging.session.Rate;
-%         
-%         %   Will remain here until data logging is finished ...
-%         
-%         %   Close open output.bin file and open it again for reading data
+        logging.eventListener = addlistener(logging.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+% TA (end mod)
+
+        %   Start logging
+        logging.session.startForeground();
+        
+        %   Get actual rate
+        actualFs = logging.session.Rate;
+        
+        %   Will remain here until data logging is finished ...
+        
+        %   Close open output.bin file and open it again for reading data
+% TA (start mod)
 %         for i = 1:length(logging.files)
 %             fclose(logging.files(i));
 %         end
@@ -1590,7 +1633,9 @@ delete(hObject);
 %         end
 %         fclose(file);
 %         delete(binFile);
-%                 
+% TA (end mod)
+                
+        
 %         for i = 1:(j - 1)
 %             binFile = [dataDir, '/channel', num2str(i), '.bin'];
 %             matFile = [dataDir, '/channel', num2str(i), '.mat'];
@@ -1616,30 +1661,31 @@ delete(hObject);
 %                 delete(binFile);
 %             end
 %         end
-%         
-%         if impact
-%             Data = outData;
-%             Header = outHeader;
-%             save([dataDir,'/data.imptime'], 'Data', 'Header', '-mat');
-%         end
-%         
-%         %   Clean-up
-%         logging.session.release();
-%         delete(logging.session);
-%         
-%         %   Clear DAQ
-%         daq.reset;
-%  
-%         set(handles.statusStr, 'String', 'READY ...');
-%         drawnow();
-%         
-% % TA (start mod)
-%        global DATAcontainer
-%        ts=timeseries(DATAcontainer.data,DATAcontainer.t);
-%        assignin('base','logdata',ts);  
-% % TA (end)
-% 
-%     end
+        
+        %if impact
+        %    Data = outData;
+        %    Header = outHeader;
+        %    save([dataDir,'/data.imptime'], 'Data', 'Header', '-mat');
+        %end
+        
+        %   Clean-up
+        logging.session.release();
+        delete(logging.session);
+        
+        %   Clear DAQ
+        daq.reset;
+ 
+        set(handles.statusStr, 'String', 'READY!  DAQ data available at workbench.');
+        drawnow();
+        
+% TA (start mod)
+       Nt=DATAcontainer.nt;
+       DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
+% TA (end)
+
+    end
+
+%end
     
 %   Handles the streaming of data to disk
 function logData(src, event, fileDescriptor)
@@ -1669,7 +1715,26 @@ function clearButton_Callback(hObject, eventdata, handles)
     data = cell(0, 0);
     set(handles.channelsTable, 'data', data);
 
+% % MG 2015-03-03 (mod start)
+% --- Executes on button press in monitor.
+function monitor_Callback(hObject, eventdata, handles)
+% hObject    handle to monitor (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
+% Hint: get(hObject,'Value') returns toggle state of monitor
+    val = get(hObject,'Value');
+    if (val)
+        set(handles.standardTest, 'Value', 0);
+        set(handles.impactTest, 'Value', 0);
+        set(handles.periodic, 'Value', 0);
+        set(handles.steppedSine, 'Value', 0);
+        set(handles.multisine, 'Value', 0);
+    else
+        set(handles.monitor, 'Value', 1);
+    end
+   
+    
 % --- Executes on button press in standardTest.
 function standardTest_Callback(hObject, eventdata, handles)
 % hObject    handle to standardTest (see GCBO)
@@ -1679,9 +1744,13 @@ function standardTest_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of standardTest
     val = get(hObject,'Value');
     if (val)
+        set(handles.monitor, 'Value', 0);
         set(handles.impactTest, 'Value', 0);
+        set(handles.periodic, 'Value', 0);
+        set(handles.steppedSine, 'Value', 0);
+        set(handles.multisine, 'Value', 0);
     else
-        set(handles.impactTest, 'Value', 1);
+        set(handles.standardTest, 'Value', 1);
     end
 
 % --- Executes on button press in impactTest.
@@ -1693,10 +1762,71 @@ function impactTest_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of impactTest
     val = get(hObject,'Value');
     if (val)
+        set(handles.monitor, 'Value', 0);
         set(handles.standardTest, 'Value', 0);
+        set(handles.periodic, 'Value', 0);
+        set(handles.steppedSine, 'Value', 0);
+        set(handles.multisine, 'Value', 0);
     else
-        set(handles.standardTest, 'Value', 1);
+        set(handles.impactTest, 'Value', 1);
     end
+    
+% --- Executes on button press in periodic.
+function periodic_Callback(hObject, eventdata, handles)
+% hObject    handle to monitor (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of periodic
+    val = get(hObject,'Value');
+    if (val)
+        set(handles.monitor, 'Value', 0);
+        set(handles.standardTest, 'Value', 0);
+        set(handles.impactTest, 'Value', 0);
+        set(handles.steppedSine, 'Value', 0);
+        set(handles.multisine, 'Value', 0);
+    else
+        set(handles.periodic, 'Value', 1);
+    end
+
+% --- Executes on button press in steppedSine.
+function steppedSine_Callback(hObject, eventdata, handles)
+% hObject    handle to monitor (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of steppedSine
+    val = get(hObject,'Value');
+    if (val)
+        set(handles.monitor, 'Value', 0);
+        set(handles.standardTest, 'Value', 0);
+        set(handles.impactTest, 'Value', 0);
+        set(handles.periodic, 'Value', 0);
+        set(handles.multisine, 'Value', 0);
+    else
+        set(handles.steppedSine, 'Value', 1);
+    end
+ 
+% --- Executes on button press in multisine.
+function multisine_Callback(hObject, eventdata, handles)
+% hObject    handle to monitor (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of multisine
+    h = msgbox('Function not yet implemented.');
+    set(handles.multisine, 'Value', 0);
+%     val = get(hObject,'Value');
+%     if (val)
+%         set(handles.monitor, 'Value', 0);
+%         set(handles.standardTest, 'Value', 0);
+%         set(handles.impactTest, 'Value', 0);
+%         set(handles.periodic, 'Value', 0);
+%         set(handles.steppedSine, 'Value', 0);
+%     else
+%         set(handles.multisine, 'Value', 1);
+%     end
+% % MG (mod end)
     
 function out_freq = freqConverter (freq)
 
@@ -1723,3 +1853,24 @@ function out_freq = freqConverter (freq)
     else
         out_freq = 0;
     end
+
+
+% --------------------------------------------------------------------
+function menuAbout_Callback(hObject, eventdata, handles)
+% hObject    handle to menuAbout (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function menuItemAbout_Callback(hObject, eventdata, handles)
+% hObject    handle to menuItemAbout (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    h = msgbox('iDaq Structural Dyanmics (iDaqSD) version 0.1. Developed at University of Southern Denmark and Chalmers University of Technology.');
+
+% --------------------------------------------------------------------
+function menuItemHelp_Callback(hObject, eventdata, handles)
+% hObject    handle to menuItemHelp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    h = msgbox('Visit https://github.com/mgcth/idaq_sd/wiki for more information.');
