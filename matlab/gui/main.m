@@ -1421,7 +1421,7 @@ function closePreview (currentHandle, events, handles)
         end
     end
         
-    set(handles.previewButton, 'String', 'Start monitor');
+    %set(handles.previewButton, 'String', 'Start monitor');
     drawnow();
 
 % --- Executes when user attempts to close figure1.
