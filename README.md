@@ -8,3 +8,8 @@ Adding GUI options:
 4) Periodic
 5) Stepped sine
 6) Multisine
+
+Menu bar with:
+- File
+  - About
+  - Help
