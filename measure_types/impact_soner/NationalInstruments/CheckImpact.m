@@ -1,0 +1,1 @@
+function CheckImpact(src,event)
