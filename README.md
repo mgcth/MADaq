@@ -1,3 +1,4 @@
+National Instruments data acquisition library for MATLAB.
 
 Adding GUI options:
 
