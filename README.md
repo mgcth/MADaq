@@ -8,7 +8,7 @@ Added GUI options:
 - Stepped sine
 - Multisine
 
-Added menu bar with:
+Added menu bar:
 - File
   - About
   - Help
