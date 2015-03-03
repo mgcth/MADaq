@@ -1654,7 +1654,7 @@ if handles.monitor.Value == 1 % if monitor
             preview.eventListener = addlistener(preview.session, 'DataAvailable', @plotPreview);
                                                     
             %   Start monitoring
-            set(handles.previewButton, 'String', 'Stop monitor');
+            set(handles.startButton, 'String', 'Stop monitor');
             
 %             try preview.session.AutoSyncDSA = true; catch, end
 %             disp(['DSA enabled: ', num2str(preview.session.AutoSyncDSA)]);
@@ -1667,6 +1667,7 @@ if handles.monitor.Value == 1 % if monitor
         
     else
         closePreview (hObject, eventdata, handles);
+        set(handles.startButton, 'String', 'Start measurement');
     end
     
 elseif handles.standardTest.Value == 1 % if standard test
