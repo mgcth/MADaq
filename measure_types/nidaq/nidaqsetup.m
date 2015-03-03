@@ -15,8 +15,8 @@ if nargin>1
     Ch.On=XLSset(6:5+NCh,7);
     Ch.Name=XLSset(6:5+NCh,11);
     [num,txt,XLScal]=xlsread(XLSetFile,'Calibration');
-    Ch.SNos=XLScal(4:56,5);
-    Ch.cals=XLScal(4:56,7);
+    Ch.SNos=XLScal(4:41,5);
+    Ch.cals=XLScal(4:41,9);
     DAQ.XLScal=XLScal;
     DAQ.XLSset=XLSset;
   catch;                                                        
@@ -39,12 +39,12 @@ so.Rate=SampleRate;
 
 %%                                                    Add an output channel
 ws=warning;warning off;
-so.addAnalogOutputChannel('PXI1Slot6', 0, 'Voltage');
+%so.addAnalogOutputChannel('PXI1Slot11', 0, 'Voltage');
 
 %%                                                       Add input channels
 NOutCh=length(so.Channels);
 NInCh=0;
-for I=0:7; % Channels of PXI1Slot2
+for I=0:1; % Channels of PXI1Slot2
   NInCh=NInCh+1;Type='Voltage';
   if strcmp(lower(Ch.On(NInCh)),'yes')
     if strcmp(lower(Ch.Type(NInCh)),'iepe');Type='Accelerometer';end
@@ -60,11 +60,11 @@ for I=0:7; % Channels of PXI1Slot2
     end
   end
 end
-for I=0:7; % Channels of PXI1Slot3
+for I=0:15; % Channels of PXI1Slot8
   NInCh=NInCh+1;Type='Voltage';
   if strcmp(lower(Ch.On(NInCh)),'yes')
     if strcmp(lower(Ch.Type(NInCh)),'iepe');Type='Accelerometer';end
-    so.addAnalogInputChannel('PXI1Slot3',I,Type);
+    so.addAnalogInputChannel('PXI1Slot8',I,Type);
     so.Channels(length(so.Channels)).Coupling=char(upper(Ch.Coupl(NInCh)));
     if strcmp(lower(Ch.Type(NInCh)),'iepe')
       so.Channels(length(so.Channels)).Sensitivity=1;% Dummy value
@@ -76,11 +76,11 @@ for I=0:7; % Channels of PXI1Slot3
     end
   end
 end
-for I=0:7; % Channels of PXI1Slot4
+for I=0:15; % Channels of PXI1Slot9
   NInCh=NInCh+1;Type='Voltage';
   if strcmp(lower(Ch.On(NInCh)),'yes')
     if strcmp(lower(Ch.Type(NInCh)),'iepe');Type='Accelerometer';end
-    so.addAnalogInputChannel('PXI1Slot4',I,Type);
+    so.addAnalogInputChannel('PXI1Slot9',I,Type);
     so.Channels(length(so.Channels)).Coupling=char(upper(Ch.Coupl(NInCh)));
     if strcmp(lower(Ch.Type(NInCh)),'iepe')
       so.Channels(length(so.Channels)).Sensitivity=1;% Dummy value
@@ -92,11 +92,11 @@ for I=0:7; % Channels of PXI1Slot4
     end
   end
 end
-for I=0:7; % Channels of PXI1Slot5
+for I=0:1; % Channels of PXI1Slot10
   NInCh=NInCh+1;Type='Voltage';
   if strcmp(lower(Ch.On(NInCh)),'yes')
     if strcmp(lower(Ch.Type(NInCh)),'iepe');Type='Accelerometer';end
-    so.addAnalogInputChannel('PXI1Slot5',I,Type);
+    so.addAnalogInputChannel('PXI1Slot10',I,Type);
     so.Channels(length(so.Channels)).Coupling=char(upper(Ch.Coupl(NInCh)));
     if strcmp(lower(Ch.Type(NInCh)),'iepe')
       so.Channels(length(so.Channels)).Sensitivity=1;% Dummy value
@@ -108,11 +108,11 @@ for I=0:7; % Channels of PXI1Slot5
     end
   end
 end
-for I=0:1; % Channels of PXI1Slot6
+for I=0:1; % Channels of PXI1Slot11
   NInCh=NInCh+1;Type='Voltage';
   if strcmp(lower(Ch.On(NInCh)),'yes')
     if strcmp(lower(Ch.Type(NInCh)),'iepe');Type='Accelerometer';end
-    so.addAnalogInputChannel('PXI1Slot6',I,Type);
+    so.addAnalogInputChannel('PXI1Slot11',I,Type);
     so.Channels(length(so.Channels)).Coupling=char(upper(Ch.Coupl(NInCh)));
     if strcmp(lower(Ch.Type(NInCh)),'iepe')
       so.Channels(length(so.Channels)).Sensitivity=1;% Dummy value
@@ -127,13 +127,13 @@ end
 
 %%                                                    Make the modules sync
 if ~verLessThan('matlab','7.14.0')
-  try,so.addTriggerConnection('PXI1Slot6/PXI_Trig0','PXI1Slot2/PXI_Trig0',...
+  try,so.addTriggerConnection('PXI1Slot11/PXI_Trig0','PXI1Slot2/PXI_Trig0',...
               'StartTrigger');catch, end
-  try,so.addTriggerConnection('PXI1Slot6/PXI_Trig0','PXI1Slot3/PXI_Trig0',...
+  try,so.addTriggerConnection('PXI1Slot11/PXI_Trig0','PXI1Slot8/PXI_Trig0',...
       'StartTrigger');catch, end
-  try,so.addTriggerConnection('PXI1Slot6/PXI_Trig0','PXI1Slot4/PXI_Trig0',...
+  try,so.addTriggerConnection('PXI1Slot11/PXI_Trig0','PXI1Slot9/PXI_Trig0',...
       'StartTrigger');catch, end
-  try,so.addTriggerConnection('PXI1Slot6/PXI_Trig0','PXI1Slot5/PXI_Trig0',...
+  try,so.addTriggerConnection('PXI1Slot11/PXI_Trig0','PXI1Slot10/PXI_Trig0',...
       'StartTrigger');catch, end
 end
 
