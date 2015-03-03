@@ -24,3 +24,5 @@ addpath(genpath(homePath));
 
 %scanForHardware();
 main();
+
+% Mladen test
