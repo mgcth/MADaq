@@ -59,7 +59,7 @@ for I=1:Nf
   stop(so);% This terminates activities that may interfere
 
   figure(h);
-  plot(times,Data(:,3));
+  plot(times,Data(:,3-1));
   
   tuse=times(Nskip+1:Nskipandtake);
   Datause=Data(Nskip+1:Nskipandtake,:);
