@@ -1,4 +1,4 @@
-National Instruments (MA)Data AcQuisition library for MATLAB.
+National Instruments (MAtlab) Data AcQuisition library.
 
 Added GUI options:
 - Monitor

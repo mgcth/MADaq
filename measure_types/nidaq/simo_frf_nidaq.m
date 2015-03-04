@@ -34,8 +34,10 @@ DAQ.y=[];
 
 %%                                                             Initiate GUI
 frf_gui;
-ical=1./DAQ.cal(CH.active);Refch=find(CH.active==CH.refch);
-names=DAQ.name(CH.active);
+%ical=1./DAQ.cal(CH.active);Refch=find(CH.active==CH.refch);
+%names=DAQ.name(CH.active);
+ical=1./DAQ.cal(CH.active(1));Refch=find(CH.active(1)==CH.refch);
+names=DAQ.name(CH.active(1));
 
 
 ItoBuffer=1;Imax=Nf;Iprocessed=0;

@@ -39,7 +39,7 @@ so.Rate=SampleRate;
 
 %%                                                    Add an output channel
 ws=warning;warning off;
-%so.addAnalogOutputChannel('PXI1Slot11', 0, 'Voltage');
+so.addAnalogOutputChannel('PXI1Slot2', 0, 'Voltage');
 
 %%                                                       Add input channels
 NOutCh=length(so.Channels);

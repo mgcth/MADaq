@@ -1398,6 +1398,8 @@ function previewAdHocLog (hObject, eventData, handles)
 %     setappdata(0, 'previewStruct', preview);
 
 function closePreview (currentHandle, events, handles)
+    
+    set(handles.startButton, 'String', 'Start measurement');
 
     preview = getappdata(0, 'previewStruct');
 
