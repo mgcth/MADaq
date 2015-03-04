@@ -13,6 +13,9 @@ global DAQ
 %     DAQ.ScansOutByHardware{bc}=so.ScansOutputByHardware;
 %     DAQ.ScansAcquired{bc}=so.ScansAcquired;
 % 
+
+% disp('In nidaqGetData')
+
 if so.ScansAcquired>so.ScansOutputByHardware+DAQ.AcceptedOutputDelay
   DAQ.ErrorState=2;
 elseif isempty(DAQ.NextBlockEndAddress)

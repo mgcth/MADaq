@@ -28,15 +28,16 @@ if nargin==0
   HFRFGUI.hFigfd=figure;clf; % FRF window
 %   set(HFRFGUI.hFigfd,'Position',[-1908 369 982 680],'Number','off',...
 %                       'Name','FRF window','Visible','on','MenuBar','None');
-   set(HFRFGUI.hFigfd,'Position',[700 350 550 350],'NumberTitle','off',...
+%   set(HFRFGUI.hFigfd,'Position',[700 350 550 350],'Number','off',...
+  set(HFRFGUI.hFigfd,'Position',[700 350 550 350],...
                                        'Name','FRF window','Visible','on');
                   
   HFRFGUI.hFigtd=figure;clf; % Time data window
-  set(HFRFGUI.hFigtd,'Position',[100 350 550 350],'NumberTitle','off',...
+  set(HFRFGUI.hFigtd,'Position',[100 350 550 350],...
                      'Name','Time window','Visible','on','MenuBar','None');
   HFRFGUI.TWpos=get(HFRFGUI.hFigtd,'Position');
   HFRFGUI.hFigdd=figure;clf; % Distorsion window
-  set(HFRFGUI.hFigdd,'Position',[ 700 100 550 200],'NumberTitle','off',...
+  set(HFRFGUI.hFigdd,'Position',[ 700 100 550 200],...
                'Name','Distorsion window','Visible','on','MenuBar','None');
   HFRFGUI.DWpos=get(HFRFGUI.hFigdd,'Position');
 
@@ -124,6 +125,7 @@ FRFminus=(abs(FRF)-alpha*stdFRF).*FRF./abs(FRF);
   end
   
 %%                                                                Residuals
+ if 0
   if get(HFRFGUI.RB(6),'Value')
      figure(HFRFGUI.hFigdd)
 %      set(gcf,'Position',HFRFGUI.DWpos,'MenuBar','None');
@@ -141,6 +143,7 @@ FRFminus=(abs(FRF)-alpha*stdFRF).*FRF./abs(FRF);
        close(HFRFGUI.hFigdd)
      catch,end
   end
+end  
 end
 
 %%                                                   Helper function sssGUI

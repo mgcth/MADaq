@@ -62,7 +62,10 @@ if strcmp(lower(TestType),'stepped sine')
   try,CH.eval=eval(raw{7,5});catch, CH.eval=raw{7,5};end
 %  SSarray.chplot=cheval(1);
 %  SSarray.refno=refch(1);
-  [sysfrd,stdY]=simo_frf_nidaq(so,Freqs,Loads);
+
+%   [sysfrd,stdY]=simo_frf_nidaq(so,Freqs,Loads);
+  [sysfrd,stdY]=steppedsine_nidaq(so,Freqs,Loads);
+  
   varargout{1}=sysfrd;
 elseif strcmp(lower(TestType),'periodic')
   [num,txt,raw]=xlsread(XLSetFile,'Periodic');
@@ -72,7 +75,8 @@ elseif strcmp(lower(TestType),'periodic')
   catch
     errormsg(2);
   end
-  MaxAmpl=raw{3,8};MaxLoad=max(abs(Load));Fspan=raw{5,8};
+  MaxAmpl=eval(raw{3,8});
+  MaxLoad=max(abs(Load));Fspan=eval(raw{5,8});
   Cycles=raw{4,5};Skipps=raw{5,5};
   Tend=raw{4,8};
   dt=t(2)-t(1);

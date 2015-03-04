@@ -40,7 +40,6 @@ c(Ny,order+1)=0;
 for I=1:Ny
 %%                                                          Make regression
   x(:,I)=Ainv*y(:,I);
-  %x(:,I)=A\y(:,I);
 
 %%                                        Calc complex Fourier coefficients
   for II=1:order+1
@@ -66,19 +65,15 @@ for I=1:Ny
 end
 
 %%                                             Calc stationarity properties
-%C=zeros(Ny,Ncyc);%tcyc=t(1:N);
 Nshifts=20;C=zeros(Ny,Nshifts);
 Ishift=1:round((Nt-N)/Nshifts):Nt-N;tshift=t(Ishift);
 
 if nargout>3
-%  for I=1:Ncyc
   for I=1:Nshifts
     for II=1:Ny
-%       ycyc=y((I-1)*N+(1:N),II);
       ycyc=y(Ishift(I)+(0:N-1),II);
       xx=Acycinv*ycyc;
       C(II,I)=(xx(1)-1i*xx(2))*exp(-1i*w0*tshift(I));
-%       ycycr(:,II)=Acyc*xx;
     end
   end
   rs=zeros(Ny,1);

@@ -15,12 +15,12 @@ global CH DAQ
 
 %%                                                        Initiate and test
 NCyclesInBlock=8;%                    Minimum number of periods in AI block
-NBlocks=8;%                           Number of blocks in AO buffer
+NBlocks=4;%                           Number of blocks in AO buffer
 HarmOrder=2;
 Ny=length(CH.active);Nf=length(Freqs);
 
 %   Warning message issued if blocks are generated at a faster rate than 20 
-%   per second. Use some margin for AIBSmin. Here F.S.=2
+%   per second. Use some margin for AIBSmin. Here margin=2
 Fs=so.Rate;Ts=1/Fs;AIBSmin=ceil(Fs/10);
 
 DAQ.ErrorState=0;DAQ.BufferReady=true;
@@ -34,10 +34,8 @@ DAQ.y=[];
 
 %%                                                             Initiate GUI
 frf_gui;
-%ical=1./DAQ.cal(CH.active);Refch=find(CH.active==CH.refch);
-%names=DAQ.name(CH.active);
-ical=1./DAQ.cal(CH.active(1));Refch=find(CH.active(1)==CH.refch);
-names=DAQ.name(CH.active(1));
+ical=1./DAQ.cal(CH.active);Refch=find(CH.active==CH.refch);
+names=DAQ.name(CH.active);
 
 
 ItoBuffer=1;Imax=Nf;Iprocessed=0;
@@ -161,11 +159,9 @@ while ItoBuffer<=Imax
 %       stdY(:,I)=sqrt(diag(covY(:,:,I)));
 %      stdY(:,I)=std(Yc,0,2);
       Iprocessed=Iprocessed+1;
-      t=DAQ.t{I}-min(DAQ.t{I});ycal=DAQ.y{I}*diag(ical);
-      DAQ.y{I}=[];% When read, clear to gain memory
     end
-%     t=DAQ.t{I}-min(DAQ.t{I});ycal=DAQ.y{I}*diag(ical);
-%     DAQ.y{I}=[];% When read, clear to gain memory
+    t=DAQ.t{I}-min(DAQ.t{I});ycal=DAQ.y{I}*diag(ical);
+    DAQ.y{I}=[];% When read, clear to gain memory
 %     frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
    catch
       disp('No data available, or problem processing data')
@@ -173,8 +169,7 @@ while ItoBuffer<=Imax
   
   try
     if Iprocessed>1
-%        frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
-       frf_gui(t,ycal,Irecorded,Freqs,meanY,stdY,RN,RH,RS,PW,names);
+       frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
     end   
   catch,end
   
@@ -271,7 +266,11 @@ elseif freq<70.001,   Freq =  60;
 elseif freq<80.001,   Freq =  70;
 elseif freq<90.001,   Freq =  80;
 elseif freq<100.001,  Freq =  90;
-elseif freq<5000, Freq = 100;
+elseif freq<150.001,  Freq = 100;
+elseif freq<200.001,  Freq = 150;
+elseif freq<500.001,  Freq = 200;
+elseif freq<1000.001,  Freq = 500;
+elseif freq<5000.001, Freq = 500;
 else 
     error('Cannot handle excitation frequencies above 5kHz')
 end    
@@ -281,3 +280,4 @@ blocksizemin=ceil(Fs/20)+1;%           Warning message issued if blocks are
 %                                      per second
 
 bs=max([ceil(Ncycles*Fs/Freq) blocksizemin]);%       Allow at least Ncycles
+

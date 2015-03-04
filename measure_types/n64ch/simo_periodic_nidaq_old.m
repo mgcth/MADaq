@@ -80,7 +80,7 @@ for II=1:size(y,2)
   [FRF(II,1,:),f] = ...
               tfestimate(u,y(:,II),ones(NCycleLength,1),0,NCycleLength,Fs);
 end
-ind=find(f<=Fspan);FRF=FRF(:,:,ind);f=f(ind);
+ind=find(f>=min(Fspan) & f<=max(Fspan));FRF=FRF(:,:,ind);f=f(ind);
     
  
 %%                              Stop Analog Output/Input and delete handles

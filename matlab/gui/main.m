@@ -1399,8 +1399,6 @@ function previewAdHocLog (hObject, eventData, handles)
 
 function closePreview (currentHandle, events, handles)
     
-    set(handles.startButton, 'String', 'Start measurement');
-
     preview = getappdata(0, 'previewStruct');
 
     if (~isempty(preview))
@@ -1413,6 +1411,7 @@ function closePreview (currentHandle, events, handles)
             try preview.session.stop();         catch, end
             try preview.session.release();      catch, end
             try delete(preview.session);        catch, end
+            for i = 1:length(preview.subplots.handles), cla(preview.subplots.handles(i)); end
             try delete(preview.figure);         catch, end
             try rmappdata(0, 'previewStruct');  catch, end
         
@@ -1422,8 +1421,8 @@ function closePreview (currentHandle, events, handles)
             msgbox('Make sure to stop the free logging before closing the monitor','Free logging in progress...');
         end
     end
-        
-    %set(handles.previewButton, 'String', 'Start monitor');
+    
+    set(handles.startButton, 'String', 'Start measurement');
     drawnow();
 
 % --- Executes when user attempts to close figure1.
