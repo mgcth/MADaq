@@ -1693,7 +1693,7 @@ elseif handles.periodic.Value == 1 % if impactTest
     
     
     
-    %                                                        Initiate and test
+    %%                                                        Initiate and test
     Fs=so.Rate;Ts=1/Fs;
     
     Refch=find(CH.active==CH.refch);
@@ -1715,7 +1715,7 @@ elseif handles.periodic.Value == 1 % if impactTest
     disp('Done.')
     disp('Estimating transfer functions. Please wait ...')
     
-    %                                                           Do calibration
+    %%                                                           Do calibration
     yind=setdiff(CH.active,CH.refch);uind=CH.refch;
     y=y*diag(1./DAQ.cal(yind));u=u*diag(1./DAQ.cal(uind));
     
@@ -1725,7 +1725,7 @@ elseif handles.periodic.Value == 1 % if impactTest
     end
     ind=find(f>=min(Fspan) & f<=max(Fspan));FRF=FRF(:,:,ind);f=f(ind);
     
-    % Make IDFRD data object
+    %% Make IDFRD data object
     frdsys=frd(FRF,2*pi*f,'FrequencyUnit','rad/s');
     frdsys=idfrd(frdsys);
     
