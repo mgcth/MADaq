@@ -91,6 +91,22 @@ handles.preview.reset = false;
 % Update handles structure
 guidata(hObject, handles);
 
+% Start with monitor and make other things invisible
+set(handles.fun1Text,'visible','off')
+set(handles.fun1Edit,'visible','off')
+set(handles.fun2Text,'visible','off')
+set(handles.fun2Edit,'visible','off')
+set(handles.fun3Text,'visible','off')
+set(handles.fun3Edit,'visible','off')
+set(handles.fun4Text,'visible','off')
+set(handles.fun4Edit,'visible','off')
+set(handles.fun5Text,'visible','off')
+set(handles.fun5Edit,'visible','off')
+set(handles.fun6Text,'visible','off')
+set(handles.fun6Edit,'visible','off')
+set(handles.fun7Text,'visible','off')
+set(handles.fun7Edit,'visible','off')
+
 % UIWAIT makes main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -1951,6 +1967,23 @@ if (val)
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.durationTimeText,'string','Duration [s]:')
+    
+    set(handles.fun1Text,'visible','off')
+    set(handles.fun1Edit,'visible','off')
+    set(handles.fun2Text,'visible','off')
+    set(handles.fun2Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.monitor, 'Value', 1);
 end
@@ -1970,6 +2003,23 @@ if (val)
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.durationTimeText,'string','Duration [s]:')
+    
+    set(handles.fun1Text,'visible','off')
+    set(handles.fun1Edit,'visible','off')
+    set(handles.fun2Text,'visible','off')
+    set(handles.fun2Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.standardTest, 'Value', 1);
 end
@@ -1988,6 +2038,23 @@ if (val)
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.durationTimeText,'string','Duration [s]:')
+    
+    set(handles.fun1Text,'visible','off')
+    set(handles.fun1Edit,'visible','off')
+    set(handles.fun2Text,'visible','off')
+    set(handles.fun2Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.impactTest, 'Value', 1);
 end
@@ -2006,6 +2073,33 @@ if (val)
     set(handles.impactTest, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.durationTimeText,'string','Cycle duration [s]:')
+    
+    set(handles.fun1Text,'visible','on')
+    set(handles.fun1Text,'string','Periodic function:')
+    set(handles.fun1Edit,'visible','on')
+    set(handles.fun1Edit,'string','Function')
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Repeats:')
+    set(handles.fun2Edit,'visible','on')
+    set(handles.fun2Edit,'string','3')
+    set(handles.fun3Text,'visible','on')
+    set(handles.fun3Text,'string','Initiation repeats:')
+    set(handles.fun3Edit,'visible','on')
+    set(handles.fun3Edit,'string','1')
+    set(handles.fun4Text,'visible','on')
+    set(handles.fun4Text,'string','Max amplitude:')
+    set(handles.fun4Edit,'visible','on')
+    set(handles.fun4Edit,'string','1')
+    set(handles.fun5Text,'visible','on')
+    set(handles.fun5Text,'string','Freq. range [Hz]:')
+    set(handles.fun5Edit,'visible','on')
+    set(handles.fun5Edit,'string','[1 1000]')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.periodic, 'Value', 1);
 end
@@ -2024,6 +2118,33 @@ if (val)
     set(handles.impactTest, 'Value', 0);
     set(handles.periodic, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.durationTimeText,'string','Duration [s]:')
+    
+    set(handles.fun1Text,'visible','on')
+    set(handles.fun1Text,'string','Frequency list:')
+    set(handles.fun1Edit,'visible','on')
+    set(handles.fun1Edit,'string','Matlab expr.')
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Amplitude list:')
+    set(handles.fun2Edit,'visible','on')
+    set(handles.fun2Edit,'string','3')
+    set(handles.fun3Text,'visible','on')
+    set(handles.fun3Text,'string','Min. # cycles:')
+    set(handles.fun3Edit,'visible','on')
+    set(handles.fun3Edit,'string','50')
+    set(handles.fun4Text,'visible','on')
+    set(handles.fun4Text,'string','Distorsion level:')
+    set(handles.fun4Edit,'visible','on')
+    set(handles.fun4Edit,'string','0.0001')
+    set(handles.fun5Text,'visible','on')
+    set(handles.fun5Text,'string','Distorsion orders:')
+    set(handles.fun5Edit,'visible','on')
+    set(handles.fun5Edit,'string','2')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.steppedSine, 'Value', 1);
 end

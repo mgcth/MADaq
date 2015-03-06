@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 03-Mar-2015 11:29:36
+% Last Modified by GUIDE v2.5 06-Mar-2015 10:09:25
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -90,6 +90,22 @@ handles.preview.reset = false;
 
 % Update handles structure
 guidata(hObject, handles);
+
+% Start with monitor and make other things invisible
+set(handles.fun1Text,'visible','off')
+set(handles.fun1Edit,'visible','off')
+set(handles.fun2Text,'visible','off')
+set(handles.fun2Edit,'visible','off')
+set(handles.fun3Text,'visible','off')
+set(handles.fun3Edit,'visible','off')
+set(handles.fun4Text,'visible','off')
+set(handles.fun4Edit,'visible','off')
+set(handles.fun5Text,'visible','off')
+set(handles.fun5Edit,'visible','off')
+set(handles.fun6Text,'visible','off')
+set(handles.fun6Edit,'visible','off')
+set(handles.fun7Text,'visible','off')
+set(handles.fun7Edit,'visible','off')
 
 % UIWAIT makes main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -1864,10 +1880,10 @@ elseif handles.periodic.Value == 1 % if impactTest
     disp('Estimating transfer functions. Please wait ...')
     
     %                                                           Do calibration
-    active = [periodic.MHEADER.SeqNo]
+    active = [periodic.MHEADER.SeqNo];
     refch = 1;
     cal = 1./[periodic.MHEADER.SensorSensitivity];
-    yind=setdiff(CH.active,CH.refch);uind=CH.refch;
+    yind=setdiff(active,refch);uind=refch;
     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
     
     for II=1:size(y,2)
@@ -1951,6 +1967,21 @@ if (val)
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.fun1Text,'visible','off')
+    set(handles.fun1Edit,'visible','off')
+    set(handles.fun2Text,'visible','off')
+    set(handles.fun2Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.monitor, 'Value', 1);
 end
@@ -1970,6 +2001,21 @@ if (val)
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.fun1Text,'visible','off')
+    set(handles.fun1Edit,'visible','off')
+    set(handles.fun2Text,'visible','off')
+    set(handles.fun2Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.standardTest, 'Value', 1);
 end
@@ -2006,6 +2052,53 @@ if (val)
     set(handles.impactTest, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.fun1Text,'visible','on')
+    set(handles.fun1Text,'string','Periodic function:')
+    set(handles.fun1Edit,'visible','on')
+    set(handles.fun1Edit,'string','Function')
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Repeats:')
+    set(handles.fun2Edit,'visible','on')
+    set(handles.fun2Edit,'string','3')
+    set(handles.fun3Text,'visible','on')
+    set(handles.fun3Text,'string','Initiation repeats:')
+    set(handles.fun3Edit,'visible','on')
+    set(handles.fun3Edit,'string','1')
+    set(handles.fun4Text,'visible','on')
+    set(handles.fun4Text,'string','Max amplitude:')
+    set(handles.fun4Edit,'visible','on')
+    set(handles.fun4Edit,'string','1')
+    set(handles.fun5Text,'visible','on')
+    set(handles.fun5Text,'string','Cycle duration [s]:')
+    set(handles.fun5Edit,'visible','on')
+    set(handles.fun5Edit,'string','1')
+    set(handles.fun6Text,'visible','on')
+    set(handles.fun6Text,'string','Freq. range [Hz]:')
+    set(handles.fun6Edit,'visible','on')
+    set(handles.fun6Edit,'string','')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3Edit,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4Edit,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5Edit,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6Edit,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7Edit,'visible','off')
 else
     set(handles.periodic, 'Value', 1);
 end
@@ -2094,4 +2187,165 @@ function menuItemHelp_Callback(hObject, eventdata, handles)
 % hObject    handle to menuItemHelp (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-h = msgbox('Visit https://github.com/mgcth/idaq_sd/wiki for more information.');
+h = msgbox('Visit https://github.com/mgcth/MADaq/wiki for more information.');
+
+
+
+function fun1Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun1Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun1Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun1Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun1Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun1Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun2Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun2Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun2Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun2Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun2Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun2Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun3Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun3Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun3Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun3Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun3Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun3Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun4Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun4Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun4Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun4Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun4Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun4Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun5Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun5Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun5Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun5Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun5Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun5Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun6Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun6Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun6Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun6Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun6Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun6Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function fun7Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to fun7Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fun7Edit as text
+%        str2double(get(hObject,'String')) returns contents of fun7Edit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function fun7Edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun7Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
