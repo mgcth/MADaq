@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 06-Mar-2015 10:09:25
+% Last Modified by GUIDE v2.5 06-Mar-2015 14:28:50
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -92,20 +92,22 @@ handles.preview.reset = false;
 guidata(hObject, handles);
 
 % Start with monitor and make other things invisible
-set(handles.fun1Text,'visible','off')
-set(handles.fun1Edit,'visible','off')
 set(handles.fun2Text,'visible','off')
-set(handles.fun2Edit,'visible','off')
+set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')
-set(handles.fun3Edit,'visible','off')
+set(handles.fun3,'visible','off')
 set(handles.fun4Text,'visible','off')
-set(handles.fun4Edit,'visible','off')
+set(handles.fun4,'visible','off')
 set(handles.fun5Text,'visible','off')
-set(handles.fun5Edit,'visible','off')
+set(handles.fun5,'visible','off')
 set(handles.fun6Text,'visible','off')
-set(handles.fun6Edit,'visible','off')
+set(handles.fun6,'visible','off')
 set(handles.fun7Text,'visible','off')
-set(handles.fun7Edit,'visible','off')
+set(handles.fun7,'visible','off')
+set(handles.fun8Text,'visible','off')
+set(handles.fun8,'visible','off')
+set(handles.fun9Text,'visible','off')
+set(handles.fun9,'visible','off')
 
 % UIWAIT makes main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -122,19 +124,19 @@ function varargout = main_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on selection change in sampleFrequency.
-function sampleFrequency_Callback(hObject, eventdata, handles)
-% hObject    handle to sampleFrequency (see GCBO)
+% --- Executes on selection change in fun1.
+function fun1_Callback(hObject, eventdata, handles)
+% hObject    handle to fun1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns sampleFrequency contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from sampleFrequency
+% Hints: contents = cellstr(get(hObject,'String')) returns fun1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from fun1
 
 
 % --- Executes during object creation, after setting all properties.
-function sampleFrequency_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to sampleFrequency (see GCBO)
+function fun1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -145,18 +147,18 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function durationTime_Callback(hObject, eventdata, handles)
-% hObject    handle to durationTime (see GCBO)
+function fun2_Callback(hObject, eventdata, handles)
+% hObject    handle to fun2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of durationTime as text
-%        str2double(get(hObject,'String')) returns contents of durationTime as a double
+% Hints: get(hObject,'String') returns contents of fun2 as text
+%        str2double(get(hObject,'String')) returns contents of fun2 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function durationTime_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to durationTime (see GCBO)
+function fun2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -247,20 +249,20 @@ if (~error)
     %   Get measurement settings
     if (strcmp(raw{7,1}, '##'))
         if (isfloat(raw{8,2}))
-            set(handles.sampleFrequency, 'Value', raw{8,2});
+            set(handles.fun1, 'Value', raw{8,2});
             %set(handles.freqStr, 'String', num2str(raw{8,2}));
         else
             set(handles.freqStr, 'String', '');
         end
         if (isfloat(raw{9,2}))
-            set(handles.durationTime, 'String', num2str(raw{9,2}));
+            set(handles.fun2, 'String', num2str(raw{9,2}));
         else
-            set(handles.durationTime, 'String', '');
+            set(handles.fun2, 'String', '');
         end
         % % MG 2015-03-03 (mod start)
         % Set all radion buttons to zero first
         set(handles.monitor, 'Value', 0);
-        set(handles.standardTest, 'Value', 0);
+        set(handles.dataLogg, 'Value', 0);
         set(handles.impactTest, 'Value', 0);
         set(handles.periodic, 'Value', 0);
         set(handles.steppedSine, 'Value', 0);
@@ -270,7 +272,7 @@ if (~error)
         if (raw{10,1})
             set(handles.monitor, 'Value', 1);
         elseif (raw{10,2})
-            set(handles.standardTest, 'Value', 1);
+            set(handles.dataLogg, 'Value', 1);
         elseif (raw{10,3})
             set(handles.impactTest, 'Value', 1);
         elseif (raw{10,4})
@@ -386,24 +388,44 @@ if (~isempty(answer))
     output{5, 1} = 'Title3';
     output{5, 2} = get(handles.title3, 'String');
     output{6, 1} = 'Title4';
-    output{6, 2}  = get(handles.title4, 'String');
+    output{6, 2} = get(handles.title4, 'String');
     output{7, 1} = '##';
     output{8, 1} = 'SampleFreq';
-    output{8, 2} = get(handles.sampleFrequency, 'Value');
-    %disp(get(handles.sampleFrequency, 'String'));
-    output{9, 1} = 'Duration';
-    output{9, 2} = get(handles.durationTime, 'String');
+    output{8, 2} = get(handles.fun1, 'Value');
+    %disp(get(handles.fun1, 'String'));
     % % MG 2015-03-03 (mod start)
-    output{10, 1} = get(handles.monitor, 'Value');
-    output{10, 2} = get(handles.standardTest, 'Value');
-    output{10, 3} = get(handles.impactTest, 'Value');
-    output{10, 4} = get(handles.periodic, 'Value');
-    output{10, 5} = get(handles.steppedSine, 'Value');
-    output{10, 6} = get(handles.multisine, 'Value');
+    if handles.monitor.Values == 1 
+        
+    elseif handles.dataLogg.Values == 1 ...
+            || handles.impactTest.Values == 1 || handles.steppedSine.Values == 1
+        output{9, 1} = 'Duration';
+        output{9, 2} = get(handles.fun2, 'String');
+    elseif handles.monitor.Values == 1
+    end
+    output{10, 1} = 'Duration';
+    output{10, 2} = get(handles.fun2, 'String');
+    output{11, 1} = 'Duration';
+    output{11, 2} = get(handles.fun2, 'String');
+    output{12, 1} = 'Duration';
+    output{12, 2} = get(handles.fun2, 'String');
+    output{13, 1} = 'Duration';
+    output{13, 2} = get(handles.fun2, 'String');
+    output{14, 1} = 'Duration';
+    output{14, 2} = get(handles.fun2, 'String');
+    output{15, 1} = 'Duration';
+    output{15, 2} = get(handles.fun2, 'String');
+    output{16, 1} = 'Duration';
+    output{16, 2} = get(handles.fun2, 'String');
+    output{17, 1} = get(handles.monitor, 'Value');
+    output{17, 2} = get(handles.dataLogg, 'Value');
+    output{17, 3} = get(handles.impactTest, 'Value');
+    output{17, 4} = get(handles.periodic, 'Value');
+    output{17, 5} = get(handles.steppedSine, 'Value');
+    output{17, 6} = get(handles.multisine, 'Value');
+    output{18, 1} = '###';
     % % MG (mod end)
-    output{11, 1} = '###';
     
-    offset = 11; %Last entry of header
+    offset = 18; %Last entry of header
     
     for i = 1:m
         output{offset + i, 1} = data{i, 1};     %   Active
@@ -1115,7 +1137,7 @@ setappdata(0, 'previewStruct', preview);
 %               Make files for data collection
 %             dateString = datestr(logNow,'mm-dd-yyyy_HH-MM-SS');
 %             homeDir = char(java.lang.System.getProperty('user.home'));
-%             dataDir = [homeDir, '/DataLogger/', dateString];
+%             dataDir = [homeDir, '/datalogg/', dateString];
 %             mkdir(dataDir);
 %
 %             logFile = [dataDir, '/time.bin'];
@@ -1248,8 +1270,8 @@ if handles.monitor.Value == 1 % if monitor
         preview.session = daq.createSession('ni');
         preview.session.IsContinuous = true;
         
-        items = get(handles.sampleFrequency, 'String');
-        f = freqConverter(items{get(handles.sampleFrequency, 'Value')});
+        items = get(handles.fun1, 'String');
+        f = freqConverter(items{get(handles.fun1, 'Value')});
         preview.session.Rate = f;
         
         %   Get overall info
@@ -1459,7 +1481,7 @@ if handles.monitor.Value == 1 % if monitor
         set(handles.startButton, 'String', 'Start measurement');
     end
     
-elseif handles.standardTest.Value == 1 % if standard test
+elseif handles.dataLogg.Value == 1 % if standard test
     % TA (start mod)
     global DATAcontainer
     CHdata = get(handles.channelsTable, 'data');
@@ -1496,11 +1518,11 @@ elseif handles.standardTest.Value == 1 % if standard test
     %   Setup session
     logging.session = daq.createSession('ni');
     
-    items = get(handles.sampleFrequency, 'String');
-    f = freqConverter(items{get(handles.sampleFrequency, 'Value')});
+    items = get(handles.fun1, 'String');
+    f = freqConverter(items{get(handles.fun1, 'Value')});
     logging.session.Rate = f;
     
-    logging.session.DurationInSeconds = str2double(get(handles.durationTime, 'String'));
+    logging.session.DurationInSeconds = str2double(get(handles.fun2, 'String'));
     
     %   Add channels
     data = get(handles.channelsTable, 'data');
@@ -1605,7 +1627,7 @@ elseif handles.standardTest.Value == 1 % if standard test
         % TA (start mod)
         %         %   Make files for data collection
         %         homeDir = char(java.lang.System.getProperty('user.home'));
-        %         dataDir = [homeDir, '/DataLogger/', dateString];
+        %         dataDir = [homeDir, '/datalogg/', dateString];
         %         mkdir(dataDir);
         %
         %         logFile = [dataDir, '/time.bin'];
@@ -1707,7 +1729,6 @@ elseif handles.impactTest.Value == 1 % if impactTest
 elseif handles.periodic.Value == 1 % if impactTest
     
     
-    
     % TA (start mod)
     % global DATAcontainer
     CHdata = get(handles.channelsTable, 'data');
@@ -1731,11 +1752,11 @@ elseif handles.periodic.Value == 1 % if impactTest
     %   Setup session
     periodic.session = daq.createSession('ni');
     
-    items = get(handles.sampleFrequency, 'String');
-    f = freqConverter(items{get(handles.sampleFrequency, 'Value')});
+    items = get(handles.fun1, 'String');
+    f = freqConverter(items{get(handles.fun1, 'Value')});
     periodic.session.Rate = f;
     
-    periodic.session.DurationInSeconds = str2double(get(handles.durationTime, 'String'));
+    periodic.session.DurationInSeconds = str2double(get(handles.fun2, 'String'));
     
     %   Add channels
     data = get(handles.channelsTable, 'data');
@@ -1857,8 +1878,31 @@ elseif handles.periodic.Value == 1 % if impactTest
         
         
         
-        %                                                        Initiate and test
+        %                                                        Initiate and test  
     Fs=periodic.session.Rate;Ts=1/Fs;
+    
+    
+    
+    
+    
+  try
+    [t,Load]=eval(char(handles.fun3.String));
+  catch
+    errormsg(2);
+  end
+  MaxAmpl=eval(handles.fun6.String);
+  MaxLoad=max(abs(Load));Fspan=eval(handles.fun7.String);
+  Cycles=str2double(handles.fun4.String);Skipps=str2double(handles.fun5.String);
+  Tend=str2double(handles.fun2.String);
+  dt=t(2)-t(1);
+  t(end+1)=t(end)+dt;t(end+1)=Tend;
+  %Load(end+1)=0;Load(end+1)=0;
+  Ts=1/Fs;
+  Load=interp1(t,(MaxAmpl/MaxLoad)*Load,t(1):Ts:t(end));
+    
+    
+    
+    
     
     Refch=1; %%DUMMY for now!  find(CH.active==CH.refch);
     Nch=Chact;%length(CH.active);
@@ -1962,38 +2006,40 @@ function monitor_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of monitor
 val = get(hObject,'Value');
 if (val)
-    set(handles.standardTest, 'Value', 0);
+    set(handles.dataLogg, 'Value', 0);
     set(handles.impactTest, 'Value', 0);
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
     
-    set(handles.fun1Text,'visible','off')
-    set(handles.fun1Edit,'visible','off')
     set(handles.fun2Text,'visible','off')
-    set(handles.fun2Edit,'visible','off')
+    set(handles.fun2,'visible','off')
     set(handles.fun3Text,'visible','off')
-    set(handles.fun3Edit,'visible','off')
+    set(handles.fun3,'visible','off')
     set(handles.fun4Text,'visible','off')
-    set(handles.fun4Edit,'visible','off')
+    set(handles.fun4,'visible','off')
     set(handles.fun5Text,'visible','off')
-    set(handles.fun5Edit,'visible','off')
+    set(handles.fun5,'visible','off')
     set(handles.fun6Text,'visible','off')
-    set(handles.fun6Edit,'visible','off')
+    set(handles.fun6,'visible','off')
     set(handles.fun7Text,'visible','off')
-    set(handles.fun7Edit,'visible','off')
+    set(handles.fun7,'visible','off')
+    set(handles.fun8Text,'visible','off')
+    set(handles.fun8,'visible','off')
+    set(handles.fun9Text,'visible','off')
+    set(handles.fun9,'visible','off')
 else
     set(handles.monitor, 'Value', 1);
 end
 
 
-% --- Executes on button press in standardTest.
-function standardTest_Callback(hObject, eventdata, handles)
-% hObject    handle to standardTest (see GCBO)
+% --- Executes on button press in dataLogg.
+function dataLogg_Callback(hObject, eventdata, handles)
+% hObject    handle to dataLogg (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of standardTest
+% Hint: get(hObject,'Value') returns toggle state of dataLogg
 val = get(hObject,'Value');
 if (val)
     set(handles.monitor, 'Value', 0);
@@ -2002,22 +2048,27 @@ if (val)
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
     
-    set(handles.fun1Text,'visible','off')
-    set(handles.fun1Edit,'visible','off')
-    set(handles.fun2Text,'visible','off')
-    set(handles.fun2Edit,'visible','off')
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Duration [s]:')
+    set(handles.fun2,'visible','on')
+    set(handles.fun2,'string','10')
+    
     set(handles.fun3Text,'visible','off')
-    set(handles.fun3Edit,'visible','off')
+    set(handles.fun3,'visible','off')
     set(handles.fun4Text,'visible','off')
-    set(handles.fun4Edit,'visible','off')
+    set(handles.fun4,'visible','off')
     set(handles.fun5Text,'visible','off')
-    set(handles.fun5Edit,'visible','off')
+    set(handles.fun5,'visible','off')
     set(handles.fun6Text,'visible','off')
-    set(handles.fun6Edit,'visible','off')
+    set(handles.fun6,'visible','off')
     set(handles.fun7Text,'visible','off')
-    set(handles.fun7Edit,'visible','off')
+    set(handles.fun7,'visible','off')
+    set(handles.fun8Text,'visible','off')
+    set(handles.fun8,'visible','off')
+    set(handles.fun9Text,'visible','off')
+    set(handles.fun9,'visible','off')
 else
-    set(handles.standardTest, 'Value', 1);
+    set(handles.dataLogg, 'Value', 1);
 end
 
 % --- Executes on button press in impactTest.
@@ -2030,10 +2081,30 @@ function impactTest_Callback(hObject, eventdata, handles)
 val = get(hObject,'Value');
 if (val)
     set(handles.monitor, 'Value', 0);
-    set(handles.standardTest, 'Value', 0);
+    set(handles.dataLogg, 'Value', 0);
     set(handles.periodic, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Duration [s]:')
+    set(handles.fun2,'visible','on')
+    set(handles.fun2,'string','10')
+    
+    set(handles.fun3Text,'visible','off')
+    set(handles.fun3,'visible','off')
+    set(handles.fun4Text,'visible','off')
+    set(handles.fun4,'visible','off')
+    set(handles.fun5Text,'visible','off')
+    set(handles.fun5,'visible','off')
+    set(handles.fun6Text,'visible','off')
+    set(handles.fun6,'visible','off')
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7,'visible','off')
+    set(handles.fun8Text,'visible','off')
+    set(handles.fun8,'visible','off')
+    set(handles.fun9Text,'visible','off')
+    set(handles.fun9,'visible','off')
 else
     set(handles.impactTest, 'Value', 1);
 end
@@ -2048,57 +2119,39 @@ function periodic_Callback(hObject, eventdata, handles)
 val = get(hObject,'Value');
 if (val)
     set(handles.monitor, 'Value', 0);
-    set(handles.standardTest, 'Value', 0);
+    set(handles.dataLogg, 'Value', 0);
     set(handles.impactTest, 'Value', 0);
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
     
-    set(handles.fun1Text,'visible','on')
-    set(handles.fun1Text,'string','Periodic function:')
-    set(handles.fun1Edit,'visible','on')
-    set(handles.fun1Edit,'string','Function')
     set(handles.fun2Text,'visible','on')
-    set(handles.fun2Text,'string','Repeats:')
-    set(handles.fun2Edit,'visible','on')
-    set(handles.fun2Edit,'string','3')
+    set(handles.fun2Text,'string','Cycle duration [s]:')
+    set(handles.fun2,'visible','on')
+    set(handles.fun2,'string','5')
     set(handles.fun3Text,'visible','on')
-    set(handles.fun3Text,'string','Initiation repeats:')
-    set(handles.fun3Edit,'visible','on')
-    set(handles.fun3Edit,'string','1')
+    set(handles.fun3Text,'string','Periodic function:')
+    set(handles.fun3,'visible','on')
+    set(handles.fun3,'string','Function')
     set(handles.fun4Text,'visible','on')
-    set(handles.fun4Text,'string','Max amplitude:')
-    set(handles.fun4Edit,'visible','on')
-    set(handles.fun4Edit,'string','1')
+    set(handles.fun4Text,'string','Repeats:')
+    set(handles.fun4,'visible','on')
+    set(handles.fun4,'string','3')
     set(handles.fun5Text,'visible','on')
-    set(handles.fun5Text,'string','Cycle duration [s]:')
-    set(handles.fun5Edit,'visible','on')
-    set(handles.fun5Edit,'string','1')
+    set(handles.fun5Text,'string','Initiation repeats:')
+    set(handles.fun5,'visible','on')
+    set(handles.fun5,'string','1')
     set(handles.fun6Text,'visible','on')
-    set(handles.fun6Text,'string','Freq. range [Hz]:')
-    set(handles.fun6Edit,'visible','on')
-    set(handles.fun6Edit,'string','')
-    set(handles.fun7Text,'visible','off')
-    set(handles.fun7Edit,'visible','off')
-    set(handles.fun3Text,'visible','off')
-    set(handles.fun3Edit,'visible','off')
-    set(handles.fun4Text,'visible','off')
-    set(handles.fun4Edit,'visible','off')
-    set(handles.fun5Text,'visible','off')
-    set(handles.fun5Edit,'visible','off')
-    set(handles.fun6Text,'visible','off')
-    set(handles.fun6Edit,'visible','off')
-    set(handles.fun7Text,'visible','off')
-    set(handles.fun7Edit,'visible','off')
-    set(handles.fun3Text,'visible','off')
-    set(handles.fun3Edit,'visible','off')
-    set(handles.fun4Text,'visible','off')
-    set(handles.fun4Edit,'visible','off')
-    set(handles.fun5Text,'visible','off')
-    set(handles.fun5Edit,'visible','off')
-    set(handles.fun6Text,'visible','off')
-    set(handles.fun6Edit,'visible','off')
-    set(handles.fun7Text,'visible','off')
-    set(handles.fun7Edit,'visible','off')
+    set(handles.fun6Text,'string','Max amplitude:')
+    set(handles.fun6,'visible','on')
+    set(handles.fun6,'string','1')
+    set(handles.fun7Text,'visible','on')
+    set(handles.fun7Text,'string','Freq. range [Hz]:')
+    set(handles.fun7,'visible','on')
+    set(handles.fun7,'string','[1 1000]')
+    set(handles.fun8Text,'visible','off')
+    set(handles.fun8,'visible','off')
+    set(handles.fun9Text,'visible','off')
+    set(handles.fun9,'visible','off')
 else
     set(handles.periodic, 'Value', 1);
 end
@@ -2113,10 +2166,40 @@ function steppedSine_Callback(hObject, eventdata, handles)
 val = get(hObject,'Value');
 if (val)
     set(handles.monitor, 'Value', 0);
-    set(handles.standardTest, 'Value', 0);
+    set(handles.dataLogg, 'Value', 0);
     set(handles.impactTest, 'Value', 0);
     set(handles.periodic, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    
+    set(handles.fun2Text,'visible','on')
+    set(handles.fun2Text,'string','Frequency list:')
+    set(handles.fun2,'visible','on')
+    set(handles.fun2,'string','Matlab expr.')
+    set(handles.fun3Text,'visible','on')
+    set(handles.fun3Text,'string','Amplitude list:')
+    set(handles.fun3,'visible','on')
+    set(handles.fun3,'string','3')
+    set(handles.fun4Text,'visible','on')
+    set(handles.fun4Text,'string','Min. # cycles:')
+    set(handles.fun4,'visible','on')
+    set(handles.fun4,'string','50')
+    set(handles.fun5Text,'visible','on')
+    set(handles.fun5Text,'string','Distorsion level:')
+    set(handles.fun5,'visible','on')
+    set(handles.fun5,'string','0.0001')
+    set(handles.fun6Text,'visible','on')
+    set(handles.fun6Text,'string','Distorsion orders:')
+    set(handles.fun6,'visible','on')
+    set(handles.fun6,'string','2')
+    
+    %if 
+    
+    set(handles.fun7Text,'visible','off')
+    set(handles.fun7,'visible','off')
+    set(handles.fun8Text,'visible','off')
+    set(handles.fun8,'visible','off')
+    set(handles.fun9Text,'visible','off')
+    set(handles.fun9,'visible','off')
 else
     set(handles.steppedSine, 'Value', 1);
 end
@@ -2133,7 +2216,7 @@ set(handles.multisine, 'Value', 0);
 %     val = get(hObject,'Value');
 %     if (val)
 %         set(handles.monitor, 'Value', 0);
-%         set(handles.standardTest, 'Value', 0);
+%         set(handles.dataLogg, 'Value', 0);
 %         set(handles.impactTest, 'Value', 0);
 %         set(handles.periodic, 'Value', 0);
 %         set(handles.steppedSine, 'Value', 0);
@@ -2191,18 +2274,18 @@ h = msgbox('Visit https://github.com/mgcth/MADaq/wiki for more information.');
 
 
 
-function fun1Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun1Edit (see GCBO)
+function fun3_Callback(hObject, eventdata, handles)
+% hObject    handle to fun3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun1Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun1Edit as a double
+% Hints: get(hObject,'String') returns contents of fun3 as text
+%        str2double(get(hObject,'String')) returns contents of fun3 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun1Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun1Edit (see GCBO)
+function fun3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2214,18 +2297,18 @@ end
 
 
 
-function fun2Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun2Edit (see GCBO)
+function fun4_Callback(hObject, eventdata, handles)
+% hObject    handle to fun4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun2Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun2Edit as a double
+% Hints: get(hObject,'String') returns contents of fun4 as text
+%        str2double(get(hObject,'String')) returns contents of fun4 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun2Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun2Edit (see GCBO)
+function fun4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2237,18 +2320,18 @@ end
 
 
 
-function fun3Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun3Edit (see GCBO)
+function fun5_Callback(hObject, eventdata, handles)
+% hObject    handle to fun5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun3Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun3Edit as a double
+% Hints: get(hObject,'String') returns contents of fun5 as text
+%        str2double(get(hObject,'String')) returns contents of fun5 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun3Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun3Edit (see GCBO)
+function fun5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2260,18 +2343,18 @@ end
 
 
 
-function fun4Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun4Edit (see GCBO)
+function fun6_Callback(hObject, eventdata, handles)
+% hObject    handle to fun6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun4Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun4Edit as a double
+% Hints: get(hObject,'String') returns contents of fun6 as text
+%        str2double(get(hObject,'String')) returns contents of fun6 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun4Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun4Edit (see GCBO)
+function fun6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2283,18 +2366,18 @@ end
 
 
 
-function fun5Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun5Edit (see GCBO)
+function fun7_Callback(hObject, eventdata, handles)
+% hObject    handle to fun7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun5Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun5Edit as a double
+% Hints: get(hObject,'String') returns contents of fun7 as text
+%        str2double(get(hObject,'String')) returns contents of fun7 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun5Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun5Edit (see GCBO)
+function fun7_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2306,18 +2389,18 @@ end
 
 
 
-function fun6Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun6Edit (see GCBO)
+function fun8_Callback(hObject, eventdata, handles)
+% hObject    handle to fun8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun6Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun6Edit as a double
+% Hints: get(hObject,'String') returns contents of fun8 as text
+%        str2double(get(hObject,'String')) returns contents of fun8 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun6Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun6Edit (see GCBO)
+function fun8_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -2329,18 +2412,18 @@ end
 
 
 
-function fun7Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to fun7Edit (see GCBO)
+function fun9_Callback(hObject, eventdata, handles)
+% hObject    handle to fun9 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fun7Edit as text
-%        str2double(get(hObject,'String')) returns contents of fun7Edit as a double
+% Hints: get(hObject,'String') returns contents of fun9 as text
+%        str2double(get(hObject,'String')) returns contents of fun9 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function fun7Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fun7Edit (see GCBO)
+function fun9_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fun9 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
