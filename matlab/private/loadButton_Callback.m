@@ -77,41 +77,35 @@ if (~error)
     
     %   Get measurement settings
     if (strcmp(raw{7,1}, '##'))
-        if (isfloat(raw{8,2}))
-            set(handles.fun1, 'Value', raw{8,2});
-            %set(handles.freqStr, 'String', num2str(raw{8,2}));
-        else
-            set(handles.freqStr, 'String', '');
+        if (raw{9,1})
+            %set(handles.monitor, 'Value', 1);
+            monitor_Callback(hObject, eventdata, handles)
+        elseif (raw{9,2})
+            %set(handles.dataLogg, 'Value', 1);
+            dataLogg_Callback(hObject, eventdata, handles)
+        elseif (raw{9,3})
+            %set(handles.impactTest, 'Value', 1);
+            impactTest_Callback(hObject, eventdata, handles)
+        elseif (raw{9,4})
+            %set(handles.periodic, 'Value', 1);
+            periodic_Callback(hObject, eventdata, handles)
+        elseif (raw{9,5})
+            %set(handles.steppedSine, 'Value', 1);
+            steppedSine_Callback(hObject, eventdata, handles)
+        elseif (raw{9,6})
+            %set(handles.multisine, 'Value', 1);
+            multisine_Callback(hObject, eventdata, handles)
         end
-        if (isfloat(raw{9,2}))
-            set(handles.fun2, 'String', num2str(raw{9,2}));
-        else
-            set(handles.fun2, 'String', '');
-        end
-        % % MG 2015-03-03 (mod start)
-        % Set all radion buttons to zero first
-        set(handles.monitor, 'Value', 0);
-        set(handles.dataLogg, 'Value', 0);
-        set(handles.impactTest, 'Value', 0);
-        set(handles.periodic, 'Value', 0);
-        set(handles.steppedSine, 'Value', 0);
-        set(handles.multisine, 'Value', 0);
         
-        % Set the one to use to one
-        if (raw{10,1})
-            set(handles.monitor, 'Value', 1);
-        elseif (raw{10,2})
-            set(handles.dataLogg, 'Value', 1);
-        elseif (raw{10,3})
-            set(handles.impactTest, 'Value', 1);
-        elseif (raw{10,4})
-            set(handles.periodic, 'Value', 1);
-        elseif (raw{10,5})
-            set(handles.steppedSine, 'Value', 1);
-        elseif (raw{10,6})
-            set(handles.multisine, 'Value', 1);
-        end
-        % % MG (mod end)
+        set(handles.fun1, 'String', raw{8,1});
+        set(handles.fun2, 'String', raw{8,2});
+        set(handles.fun3, 'String', raw{8,3});
+        set(handles.fun4, 'String', raw{8,4});
+        set(handles.fun5, 'String', raw{8,5});
+        set(handles.fun6, 'String', raw{8,6});
+        set(handles.fun7, 'String', raw{8,7});
+        set(handles.fun8, 'String', raw{8,8});
+        set(handles.fun9, 'String', raw{8,9});
     end
     
     %   Get channels
@@ -119,7 +113,7 @@ if (~error)
     nn = n - 11;
     data = cell(nn, m);
     
-    if (strcmp(raw{11,1}, '###'))
+    if (strcmp(raw{10,1}, '###'))
         for i = 12:n
             
             %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)

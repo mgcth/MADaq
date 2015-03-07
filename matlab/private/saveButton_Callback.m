@@ -23,42 +23,25 @@ if (~isempty(answer))
     output{6, 1} = 'Title4';
     output{6, 2} = get(handles.title4, 'String');
     output{7, 1} = '##';
-    output{8, 1} = 'SampleFreq';
-    output{8, 2} = get(handles.fun1, 'Value');
-    %disp(get(handles.fun1, 'String'));
-    % % MG 2015-03-03 (mod start)
-    if handles.monitor.Values == 1
-        
-    elseif handles.dataLogg.Values == 1 ...
-            || handles.impactTest.Values == 1 || handles.steppedSine.Values == 1
-        output{9, 1} = 'Duration';
-        output{9, 2} = get(handles.fun2, 'String');
-    elseif handles.monitor.Values == 1
-    end
-    output{10, 1} = 'Duration';
-    output{10, 2} = get(handles.fun2, 'String');
-    output{11, 1} = 'Duration';
-    output{11, 2} = get(handles.fun2, 'String');
-    output{12, 1} = 'Duration';
-    output{12, 2} = get(handles.fun2, 'String');
-    output{13, 1} = 'Duration';
-    output{13, 2} = get(handles.fun2, 'String');
-    output{14, 1} = 'Duration';
-    output{14, 2} = get(handles.fun2, 'String');
-    output{15, 1} = 'Duration';
-    output{15, 2} = get(handles.fun2, 'String');
-    output{16, 1} = 'Duration';
-    output{16, 2} = get(handles.fun2, 'String');
-    output{17, 1} = get(handles.monitor, 'Value');
-    output{17, 2} = get(handles.dataLogg, 'Value');
-    output{17, 3} = get(handles.impactTest, 'Value');
-    output{17, 4} = get(handles.periodic, 'Value');
-    output{17, 5} = get(handles.steppedSine, 'Value');
-    output{17, 6} = get(handles.multisine, 'Value');
-    output{18, 1} = '###';
+    output{8, 1} = get(handles.fun1, 'String');
+    output{8, 2} = get(handles.fun2, 'String');
+    output{8, 3} = get(handles.fun3, 'String');
+    output{8, 4} = get(handles.fun4, 'String');
+    output{8, 5} = get(handles.fun5, 'String');
+    output{8, 6} = get(handles.fun6, 'String');
+    output{8, 8} = get(handles.fun7, 'String');
+    output{8, 9} = get(handles.fun8, 'String');
+    output{8, 9} = get(handles.fun9, 'String');
+    output{9, 1} = get(handles.monitor, 'Value');
+    output{9, 2} = get(handles.dataLogg, 'Value');
+    output{9, 3} = get(handles.impactTest, 'Value');
+    output{9, 4} = get(handles.periodic, 'Value');
+    output{9, 5} = get(handles.steppedSine, 'Value');
+    output{9, 6} = get(handles.multisine, 'Value');
+    output{10, 1} = '###';
     % % MG (mod end)
     
-    offset = 18; %Last entry of header
+    offset = 10; %Last entry of header
     
     for i = 1:m
         output{offset + i, 1} = data{i, 1};     %   Active
