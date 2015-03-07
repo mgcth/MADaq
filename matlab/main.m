@@ -75,8 +75,8 @@ handles.output = hObject;
 handles.homePath = evalin('base', 'homePath');
 
 %   Version
-handles.version = 'beta 2.0';
-set(handles.figure1, 'Name', ['Data Logger ', handles.version]);
+handles.version = '0.1';
+set(handles.figure1, 'Name', ['MADaq ', handles.version]);
 
 %   Empty channels table
 data = {};
@@ -399,6 +399,32 @@ end
 %
 %     setappdata(0, 'previewStruct', preview);
 
+% --- Executes on button press in startButton.
+function startButton_Callback(hObject, eventdata, handles)
+% hObject    handle to startButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Check which test
+if handles.monitor.Value == 1 % if monitor
+    startMonitor(hObject, eventdata, handles);
+    
+elseif handles.dataLogg.Value == 1 % if standard test
+    startLogg(hObject, eventdata, handles);
+    
+elseif handles.impactTest.Value == 1 % if impactTest
+    startImpact(hObject, eventdata, handles);
+    
+elseif handles.periodic.Value == 1 % if impactTest
+    startPeriodic(hObject, eventdata, handles);
+    
+elseif handles.steppedSine.Value == 1 % if impactTest
+    startSteppedSine(hObject, eventdata, handles);
+    
+elseif handles.multisine.Value == 1 % if impactTest
+    startMultisine(hObject, eventdata, handles);
+    
+end
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventData, handles)

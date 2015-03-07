@@ -4,6 +4,8 @@ function monitor_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global currentState
+
 % Hint: get(hObject,'Value') returns toggle state of monitor
 val = get(hObject,'Value');
 if (val)

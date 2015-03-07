@@ -4,6 +4,8 @@ function impactTest_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global currentState
+
 % Hint: get(hObject,'Value') returns toggle state of impactTest
 val = get(hObject,'Value');
 if (val)
@@ -17,7 +19,7 @@ if (val)
     set(handles.fun2Text,'visible','on')
     set(handles.fun2Text,'string','Duration [s]:')
     set(handles.fun2,'visible','on')
-    set(handles.fun2,'string','10')
+    set(handles.fun2,'string',currentState{3,2})
     
     set(handles.fun3Text,'visible','off')
     set(handles.fun3,'visible','off')
