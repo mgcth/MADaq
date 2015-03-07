@@ -110,11 +110,11 @@ if (~error)
     
     %   Get channels
     [n, m] = size(raw);
-    nn = n - 11;
+    nn = n - 10;
     data = cell(nn, m);
     
     if (strcmp(raw{10,1}, '###'))
-        for i = 12:n
+        for i = 11:n
             
             %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
             temp = cell(1, 12);
@@ -122,7 +122,23 @@ if (~error)
             temp{1, 1} = raw{i, 1};     %   Active
             temp{1, 5} = raw{i, 5};     %   Voltage
             temp{1, 7} = raw{i, 7};     %   Manufacturer ID
-            temp{1, 8} = raw{i, 8};   %   Serial number
+            
+            %%% VERY DUMB, but dotn want to code some other save/load
+            %%% system if this system is prefered
+            %if strcmp(handles.channelsTable.ColumnFormat{8},'char')
+            %    temp{1, 8} = raw{i, 8};   %   Serial number
+            %else
+                SensorsInLabFile=which('SensorsInLab.xlsx');
+                if ~isempty(SensorsInLabFile)
+                    [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
+                    CLL{1}(1,1)={' '};% Replace column header with blank
+                    handles.channelsTable.ColumnFormat{8}=CLL{:};
+                end
+                handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
+                temp{1, 8} = raw{i, 8};   %   Serial number
+            %end
+            %%% END STUPIDITY
+            
             temp{1, 9} = raw{i, 9};   %   Sensitivity
             temp{1, 11} = raw{i, 11};   %   Dof
             
@@ -174,7 +190,7 @@ if (~error)
                 temp{1, 12} = '';
             end
             
-            data(i - 11, :) = temp(1, :);
+            data(i - 10, :) = temp(1, :);
             %data(i - 10, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
             %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
             %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};

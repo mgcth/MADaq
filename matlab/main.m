@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 06-Mar-2015 14:28:50
+% Last Modified by GUIDE v2.5 07-Mar-2015 16:19:20
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -58,6 +58,7 @@ end
 % End initialization code - DO NOT EDIT
 
 warning off;
+
 
 % --- Executes just before main is made visible.
 function main_OpeningFcn(hObject, eventdata, handles, varargin)
@@ -91,8 +92,12 @@ handles.preview.reset = false;
 % Update handles structure
 guidata(hObject, handles);
 
+global currentState
+currentState= cell(6,9);
+
 % Start with monitor and make other things invisible
 set(handles.fun1,'String','50')
+currentState{1,1} = get(handles.fun1,'String');
 set(handles.fun2Text,'visible','off')
 set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')
@@ -146,7 +151,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function title2_Callback(hObject, eventdata, handles)
 % hObject    handle to title2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -169,7 +173,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function title3_Callback(hObject, eventdata, handles)
 % hObject    handle to title3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -190,7 +193,6 @@ function title3_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function title4_Callback(hObject, eventdata, handles)
@@ -222,6 +224,7 @@ function scanButton_ButtonDownFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+
 % --- Executes on button press in activateButton.
 function activateButton_Callback(hObject, eventdata, handles)
 % hObject    handle to activateButton (see GCBO)
@@ -236,6 +239,7 @@ for i=1:m
 end
 
 set(handles.channelsTable, 'data', data);
+
 
 % --- Executes on button press in deactivateButton.
 function deactivateButton_Callback(hObject, eventdata, handles)
@@ -252,13 +256,13 @@ end
 
 set(handles.channelsTable, 'data', data);
 
+
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
 % --- Otherwise, executes on mouse press in 5 pixel border or over activateButton.
 function activateButton_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to activateButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 
 
 function freqStr_Callback(hObject, eventdata, handles)
@@ -281,6 +285,7 @@ function freqStr_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
 
 % function previewSliderUpdate(hObject, eventData, handles)
 %     preview = getappdata(0, 'previewStruct');
@@ -394,6 +399,7 @@ end
 %
 %     setappdata(0, 'previewStruct', preview);
 
+
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventData, handles)
 % hObject    handle to figure1 (see GCBO)
@@ -405,7 +411,8 @@ closePreview (hObject, eventData, handles);
 % Hint: delete(hObject) closes the figure
 delete(hObject);
 
-%   Handles the streaming of data to disk
+
+% Handles the streaming of data to disk
 function logData(src, event, fileDescriptor)
 %disp('Logging...');
 
@@ -423,6 +430,7 @@ for i = 1:n
     fwrite(fileDescriptor(i + 1), event.Data(:,i), 'double');
 end
 
+
 % --- Executes on button press in clearButton.
 function clearButton_Callback(hObject, eventdata, handles)
 % hObject    handle to clearButton (see GCBO)
@@ -432,11 +440,13 @@ function clearButton_Callback(hObject, eventdata, handles)
 data = cell(0, 0);
 set(handles.channelsTable, 'data', data);
 
+
 % --------------------------------------------------------------------
 function menuAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to menuAbout (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 
 % --------------------------------------------------------------------
 function menuItemAbout_Callback(hObject, eventdata, handles)
@@ -445,12 +455,14 @@ function menuItemAbout_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 h = msgbox('MAtlab Data AcQuisition system (MADaq) version 0.1. Developed at University of Southern Denmark and Chalmers University of Technology.');
 
+
 % --------------------------------------------------------------------
 function menuItemHelp_Callback(hObject, eventdata, handles)
 % hObject    handle to menuItemHelp (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 h = msgbox('Visit https://github.com/mgcth/MADaq/wiki for more information.');
+
 
 % --- Executes on selection change in fun1.
 function fun1_Callback(hObject, eventdata, handles)
@@ -503,6 +515,8 @@ elseif freq < max(minRateLimit)
     set(handles.fun1,'String',num2str(freq * Hz2kHz));
 end
 
+currentState(handles,1);
+
 % --- Executes during object creation, after setting all properties.
 function fun1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to fun1 (see GCBO)
@@ -524,6 +538,7 @@ function fun2_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun2 as text
 %        str2double(get(hObject,'String')) returns contents of fun2 as a double
 
+currentState(handles,2);
 
 % --- Executes during object creation, after setting all properties.
 function fun2_CreateFcn(hObject, eventdata, handles)
@@ -546,6 +561,7 @@ function fun3_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun3 as text
 %        str2double(get(hObject,'String')) returns contents of fun3 as a double
 
+currentState(handles,3);
 
 % --- Executes during object creation, after setting all properties.
 function fun3_CreateFcn(hObject, eventdata, handles)
@@ -560,7 +576,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun4_Callback(hObject, eventdata, handles)
 % hObject    handle to fun4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -569,6 +584,7 @@ function fun4_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun4 as text
 %        str2double(get(hObject,'String')) returns contents of fun4 as a double
 
+currentState(handles,4);
 
 % --- Executes during object creation, after setting all properties.
 function fun4_CreateFcn(hObject, eventdata, handles)
@@ -583,7 +599,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun5_Callback(hObject, eventdata, handles)
 % hObject    handle to fun5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -592,6 +607,7 @@ function fun5_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun5 as text
 %        str2double(get(hObject,'String')) returns contents of fun5 as a double
 
+currentState(handles,5);
 
 % --- Executes during object creation, after setting all properties.
 function fun5_CreateFcn(hObject, eventdata, handles)
@@ -606,7 +622,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun6_Callback(hObject, eventdata, handles)
 % hObject    handle to fun6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -615,6 +630,7 @@ function fun6_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun6 as text
 %        str2double(get(hObject,'String')) returns contents of fun6 as a double
 
+currentState(handles,6);
 
 % --- Executes during object creation, after setting all properties.
 function fun6_CreateFcn(hObject, eventdata, handles)
@@ -629,7 +645,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun7_Callback(hObject, eventdata, handles)
 % hObject    handle to fun7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -638,6 +653,7 @@ function fun7_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun7 as text
 %        str2double(get(hObject,'String')) returns contents of fun7 as a double
 
+currentState(handles,7);
 
 % --- Executes during object creation, after setting all properties.
 function fun7_CreateFcn(hObject, eventdata, handles)
@@ -652,7 +668,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun8_Callback(hObject, eventdata, handles)
 % hObject    handle to fun8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -661,6 +676,7 @@ function fun8_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun8 as text
 %        str2double(get(hObject,'String')) returns contents of fun8 as a double
 
+currentState(handles,8);
 
 % --- Executes during object creation, after setting all properties.
 function fun8_CreateFcn(hObject, eventdata, handles)
@@ -675,7 +691,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fun9_Callback(hObject, eventdata, handles)
 % hObject    handle to fun9 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -684,6 +699,7 @@ function fun9_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of fun9 as text
 %        str2double(get(hObject,'String')) returns contents of fun9 as a double
 
+currentState(handles,9);
 
 % --- Executes during object creation, after setting all properties.
 function fun9_CreateFcn(hObject, eventdata, handles)
@@ -696,3 +712,10 @@ function fun9_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes when figure1 is resized.
+function figure1_SizeChangedFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
