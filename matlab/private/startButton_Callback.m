@@ -1,5 +1,8 @@
-function startButton(hObject, eventdata, handles)
-% Startbutton function
+% --- Executes on button press in startButton.
+function startButton_Callback(hObject, eventdata, handles)
+% hObject    handle to startButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 % Check which test
 if handles.monitor.Value == 1 % if monitor
@@ -268,7 +271,7 @@ elseif handles.dataLogg.Value == 1 % if standard test
     logging.session = daq.createSession('ni');
     
     items = get(handles.fun1, 'String');
-    f = freqConverter(items{get(handles.fun1, 'Value')});
+    f = str2double(get(handles.fun1, 'String')); %freqConverter(items{get(handles.fun1, 'Value')});
     logging.session.Rate = f;
     
     logging.session.DurationInSeconds = str2double(get(handles.fun2, 'String'));
@@ -502,7 +505,7 @@ elseif handles.periodic.Value == 1 % if impactTest
     periodic.session = daq.createSession('ni');
     
     items = get(handles.fun1, 'String');
-    f = freqConverter(items{get(handles.fun1, 'Value')});
+    f = str2double(get(handles.fun1, 'String')); %freqConverter(items{get(handles.fun1, 'Value')});
     periodic.session.Rate = f;
     
     periodic.session.DurationInSeconds = str2double(get(handles.fun2, 'String'));

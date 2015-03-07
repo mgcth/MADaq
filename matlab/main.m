@@ -123,519 +123,6 @@ function varargout = main_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-% --- Executes on button press in loadButton.
-function loadButton_Callback(hObject, eventdata, handles)
-% hObject    handle to loadButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-error = false;
-loadFile = false;
-directory = [handles.homePath, '\conf'];
-selection = '';
-raw = {};
-
-%   Input dialog for menuAbout selection
-while (~loadFile)
-    d = dir(directory);
-    str = {d.name};
-    [select, status] = listdlg( 'PromptString','Select a file:',...
-        'SelectionMode','single',...
-        'ListString',str);
-    drawnow; pause(0.1);                       %   Prevent MatLab from hanging
-    
-    selection = [directory, '\', d(select).name];
-    type = exist(selection, 'file');
-    
-    if (status ~= 0)
-        
-        if (type == 2)      %   File
-            loadFile = true;
-            
-            % load
-            %disp(['Selection: ', selection]);
-            try
-                [num, txt, raw] = xlsread(selection);
-            catch e
-                errorMsg = {'An error occured, try again.'; ...
-                    ['Exception: ', e.identifier]};
-                msgbox(errorMsg, 'Exception', 'error');
-                drawnow; pause(0.1);                       %   Prevent MatLab from hanging
-                set(handles.statusStr, 'String', ['Exception: ', e.identifier]);
-                error = true;
-            end
-        elseif (type == 7)  %   Directory
-            directory = selection;
-            %disp(['Dir: ', directory]);
-        end
-        
-    else    % cancel operation
-        loadFile = true;
-        error = true;
-    end
-end
-
-if (~error)
-    %   Get titles
-    if (strcmp(raw{2,1}, '#'))
-        if (ischar(raw{3,2}))
-            set(handles.title1, 'String', raw{3,2});
-        else
-            set(handles.title1, 'String', '');
-        end
-        if (ischar(raw{4,2}))
-            set(handles.title2, 'String', raw{4,2});
-        else
-            set(handles.title2, 'String', '');
-        end
-        if (ischar(raw{5,2}))
-            set(handles.title3, 'String', raw{5,2});
-        else
-            set(handles.title3, 'String', '');
-        end
-        if (ischar(raw{6,2}))
-            set(handles.title4, 'String', raw{6,2});
-        else
-            set(handles.title4, 'String', '');
-        end
-    end
-    
-    %   Get measurement settings
-    if (strcmp(raw{7,1}, '##'))
-        if (isfloat(raw{8,2}))
-            set(handles.fun1, 'Value', raw{8,2});
-            %set(handles.freqStr, 'String', num2str(raw{8,2}));
-        else
-            set(handles.freqStr, 'String', '');
-        end
-        if (isfloat(raw{9,2}))
-            set(handles.fun2, 'String', num2str(raw{9,2}));
-        else
-            set(handles.fun2, 'String', '');
-        end
-        % % MG 2015-03-03 (mod start)
-        % Set all radion buttons to zero first
-        set(handles.monitor, 'Value', 0);
-        set(handles.dataLogg, 'Value', 0);
-        set(handles.impactTest, 'Value', 0);
-        set(handles.periodic, 'Value', 0);
-        set(handles.steppedSine, 'Value', 0);
-        set(handles.multisine, 'Value', 0);
-        
-        % Set the one to use to one
-        if (raw{10,1})
-            set(handles.monitor, 'Value', 1);
-        elseif (raw{10,2})
-            set(handles.dataLogg, 'Value', 1);
-        elseif (raw{10,3})
-            set(handles.impactTest, 'Value', 1);
-        elseif (raw{10,4})
-            set(handles.periodic, 'Value', 1);
-        elseif (raw{10,5})
-            set(handles.steppedSine, 'Value', 1);
-        elseif (raw{10,6})
-            set(handles.multisine, 'Value', 1);
-        end
-        % % MG (mod end)
-    end
-    
-    %   Get channels
-    [n, m] = size(raw);
-    nn = n - 11;
-    data = cell(nn, m);
-    
-    if (strcmp(raw{11,1}, '###'))
-        for i = 12:n
-            
-            %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
-            temp = cell(1, 12);
-            
-            temp{1, 1} = raw{i, 1};     %   Active
-            temp{1, 5} = raw{i, 5};     %   Voltage
-            temp{1, 7} = raw{i, 7};     %   Manufacturer ID
-            temp{1, 8} = raw{i, 8};   %   Serial number
-            temp{1, 9} = raw{i, 9};   %   Sensitivity
-            temp{1, 11} = raw{i, 11};   %   Dof
-            
-            if (ischar(raw{i, 2}))      %   Channel
-                temp{1, 2} = raw{i, 2};
-            else
-                temp{1, 2} = '';
-            end
-            
-            %                 if (ischar(raw{i, 3}))      %   Signal type
-            %                     temp{1, 3} = raw{i, 3};
-            %                 else
-            %                     temp{1, 3} = '';
-            %                 end
-            
-            if (ischar(raw{i, 3}))      %   Label
-                temp{1, 3} = raw{i, 3};
-            else
-                temp{1, 3} = '';
-            end
-            
-            if (ischar(raw{i, 4}))      %   Coupling
-                temp{1, 4} = raw{i, 4};
-            else
-                temp{1, 4} = '';
-            end
-            
-            %                 if (ischar(raw{i, 7}))      %   Transducer type
-            %                     temp{1, 7} = raw{i, 7};
-            %                 else
-            %                     temp{1, 7} = '';
-            %                 end
-            
-            if (ischar(raw{i, 6}))      %   Manufacturer
-                temp{1, 6} = raw{i, 6};
-            else
-                temp{1, 6} = '';
-            end
-            
-            if (ischar(raw{i, 10}))      %   Units
-                temp{1, 10} = raw{i, 10};
-            else
-                temp{1, 10} = '';
-            end
-            
-            if (ischar(raw{i, 12}))      %   Direction
-                temp{1, 12} = raw{i, 12};
-            else
-                temp{1, 12} = '';
-            end
-            
-            data(i - 11, :) = temp(1, :);
-            %data(i - 10, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
-            %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
-            %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
-        end
-    end
-    set(handles.channelsTable, 'data', data);
-    
-    %   Update status bar
-    set(handles.statusStr, 'String', [selection, ' is now loaded ...']);
-    
-    guidata(hObject, handles);
-end
-
-% --- Executes on button press in saveButton.
-function saveButton_Callback(hObject, eventdata, handles)
-% hObject    handle to saveButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-answer = inputdlg('Enter name of the file to save', 'Save configuration');
-drawnow; pause(0.1);                       %   Prevent MatLab from hanging
-
-if (~isempty(answer))
-    data = get(handles.channelsTable, 'data');
-    [m, n] = size(data);
-    output = cell(10 + m, n);
-    
-    output{1, 1} = 'NB: Changing this file may corrupt it!';
-    output{2, 1} = '#';
-    output{3, 1} = 'Title1';
-    output{3, 2} = get(handles.title1, 'String');
-    output{4, 1} = 'Title2';
-    output{4, 2} = get(handles.title2, 'String');
-    output{5, 1} = 'Title3';
-    output{5, 2} = get(handles.title3, 'String');
-    output{6, 1} = 'Title4';
-    output{6, 2} = get(handles.title4, 'String');
-    output{7, 1} = '##';
-    output{8, 1} = 'SampleFreq';
-    output{8, 2} = get(handles.fun1, 'Value');
-    %disp(get(handles.fun1, 'String'));
-    % % MG 2015-03-03 (mod start)
-    if handles.monitor.Values == 1 
-        
-    elseif handles.dataLogg.Values == 1 ...
-            || handles.impactTest.Values == 1 || handles.steppedSine.Values == 1
-        output{9, 1} = 'Duration';
-        output{9, 2} = get(handles.fun2, 'String');
-    elseif handles.monitor.Values == 1
-    end
-    output{10, 1} = 'Duration';
-    output{10, 2} = get(handles.fun2, 'String');
-    output{11, 1} = 'Duration';
-    output{11, 2} = get(handles.fun2, 'String');
-    output{12, 1} = 'Duration';
-    output{12, 2} = get(handles.fun2, 'String');
-    output{13, 1} = 'Duration';
-    output{13, 2} = get(handles.fun2, 'String');
-    output{14, 1} = 'Duration';
-    output{14, 2} = get(handles.fun2, 'String');
-    output{15, 1} = 'Duration';
-    output{15, 2} = get(handles.fun2, 'String');
-    output{16, 1} = 'Duration';
-    output{16, 2} = get(handles.fun2, 'String');
-    output{17, 1} = get(handles.monitor, 'Value');
-    output{17, 2} = get(handles.dataLogg, 'Value');
-    output{17, 3} = get(handles.impactTest, 'Value');
-    output{17, 4} = get(handles.periodic, 'Value');
-    output{17, 5} = get(handles.steppedSine, 'Value');
-    output{17, 6} = get(handles.multisine, 'Value');
-    output{18, 1} = '###';
-    % % MG (mod end)
-    
-    offset = 18; %Last entry of header
-    
-    for i = 1:m
-        output{offset + i, 1} = data{i, 1};     %   Active
-        output{offset + i, 2} = data{i, 2};     %   Channel
-        %output{10 + i, 3} = data{i, 3};        %   Signal
-        output{offset + i, 3} = data{i, 3};     %   Label
-        output{offset + i, 4} = data{i, 4};     %   Coupling
-        output{offset + i, 5} = data{i, 5};     %   Voltage
-        %output{10 + i, 7} = data{i, 7};        %   Transducer type
-        output{offset + i, 6} = data{i, 6};     %   Manufacturer
-        output{offset + i, 7} = data{i, 7};     %   Manufacturer ID
-        output{offset + i, 8} = data{i, 8};     %   Serial number
-        output{offset + i, 9} = data{i, 9};     %   Sensitivity
-        output{offset + i, 10} = data{i, 10};   %   Units
-        output{offset + i, 11} = data{i, 11};   %   Dof
-        output{offset + i, 12} = data{i, 12};   %   Direction
-    end
-    
-    file = [handles.homePath, '/conf/', answer{1,1}, '.conf'];
-    try
-        if exist(file, 'file')
-            delete(file);
-        end
-        xlswrite(file, output);
-        set(handles.statusStr, 'String', [file, ' was saved to the disk ...']);
-    catch e
-        errorMsg = {'An error occured, try again.'; ...
-            ['Exception: ', e.identifier]};
-        msgbox(errorMsg, 'Exception', 'error');
-        drawnow; pause(0.1);                       %   Prevent MatLab from hanging
-        set(handles.statusStr, 'String', ['Exception: ', e.identifier]);
-    end
-    
-end
-
-% --- Executes on button press in scanButton.
-function scanButton_Callback(hObject, eventdata, handles)
-% hObject    handle to scanButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% ----- TA 2015-02-27 (mod start)
-WB=waitbar(0);
-set(WB,'Name','Scanning channels');
-WB.Children.Title.String='Preparing ...';
-% ----- TA (mod end)
-
-%   Get old data
-oldData = get(handles.channelsTable, 'data');
-
-[oldN, oldM] = size(oldData);
-
-set(handles.statusStr, 'String', 'Scanning hardware for avaible channels and sensors...');
-guidata(hObject, handles);
-drawnow();
-
-%   Get state of monitor if existing and close it
-preview = getappdata(0, 'previewStruct');
-
-try     running = ~isempty(preview) && preview.session.IsRunning;
-catch,  running = false;
-end
-
-if (running)
-    closePreview (hObject, eventdata, handles);
-end
-
-%   Load TEDS Parser DLL
-%     loadlibrary('tedsLib', 'tedsLib.h');
-
-%   Get available devices
-daq.reset;
-devices = daq.getDevices;
-
-%   Calculate size of cell
-m = 12; n = 0;
-for i = 1:length(devices)
-    %         calllib('tedsLib', 'resetDevice', devices(i).ID); % Reset device
-    for j = 1:length(devices(i).Subsystems)
-        if (strcmp(devices(i).Subsystems(j).SubsystemType, 'AnalogInput'))
-            n = n + devices(i).Subsystems(j).NumberOfChannelsAvailable;
-        end
-    end
-end
-
-%   If number of channels corresponds to the current number of channels
-%   then dont delete colums LABEL, DOF og DIR
-if (oldN == n)
-    keepColumns = true;
-    data = oldData;
-else
-    keepColumns = false;
-    data = cell(n, m);
-end
-
-%disp([num2str(n), '    ', num2str(m)])
-%disp(['Keep columns: ', num2str(keepColumns)]);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%   Scan all channels on all devices
-%   Check devices
-
-% ----- TA 2015-02-27 (mod start)
-Nch=0;
-for currentDevice = 1:length(devices)
-    if (devices(currentDevice).isvalid)
-        for subsys = 1:length(devices(currentDevice).Subsystems)
-            for channel = 1:devices(currentDevice).Subsystems(subsys).NumberOfChannelsAvailable
-                Nch=Nch+1;
-            end
-        end
-    end
-end
-% ----- TA (mod end)
-
-
-i = 1;Ich=0;
-for currentDevice = 1:length(devices)
-    %         disp(['Scanning device: ', devices(currentDevice).ID, ' ...']);
-    resetDevice(devices(currentDevice).ID);
-    
-    if (devices(currentDevice).isvalid)
-        for subsys = 1:length(devices(currentDevice).Subsystems)
-            
-            %   Get input
-            if (strcmp(devices(currentDevice).Subsystems(subsys).SubsystemType, 'AnalogInput'))
-                %   Get input channels
-                for channel = 0:devices(currentDevice).Subsystems(subsys).NumberOfChannelsAvailable - 1
-                    %                         fprintf(['Scanning channel: ai', num2str(channel), ' on device: ', devices(currentDevice).ID ,' ... ']);
-                    Ich=Ich+1;waitbar(Ich/Nch,WB);WB.Children.Title.String=['Scanning: ' devices(currentDevice).ID];
-                    
-                    chanStr = [devices(currentDevice).ID, '/ai', num2str(channel)];
-                    s = getTEDS(chanStr);
-                    
-                    if (s.ErrorCode == 0)
-                        %                             fprintf('Sensor found.\n');
-                        %   Loop through manufactures
-                        manufacturer = '';
-                        for manId = 1:length(handles.pubListId)
-                            if (handles.pubListId(manId) == s.ManufacturerId)
-                                manufacturer = handles.pubListCompany(manId);
-                            end
-                        end
-                        
-                        %                             sens = calllib('tedsLib', 'getSens', chanStr);
-                        
-                        %   Extract unit
-                        unit = s.Unit;  %   Extract unit
-                        
-                        if strcmp(unit(1:2), 'V/')
-                            if strcmp(unit(3), '(')
-                                unit = unit(4:length(unit)-1);
-                            else
-                                unit = unit(3:length(unit));
-                            end
-                        end
-                        
-                        if (keepColumns)
-                            data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %%data(i, 3) = {'Input'};
-                            data(i, 3) = oldData(i, 3);
-                            data(i, 4) = {'IEPE'};
-                            %data(i, 5) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            data(i, 5) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
-                            %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%data(i, 7) = {'IEPE'};
-                            data(i, 6) = {char(manufacturer)};
-                            data(i, 7) = {num2str(s.ModelNumber)};
-                            data(i, 8) = {num2str(s.SerialNumber)};
-                            data(i, 9) = {(s.Sensitivity) * 1000};
-                            data(i, 10) = {unit};
-                            data(i, 11) = oldData(i, 11);
-                            data(i, 12) = oldData(i, 12);
-                        else
-                            %                                 data(i, :) = {false, chanStr, ' ', 'AC', devices(currentDevice).Subsystems.RangesAvailable.Max, char(manufacturer), s.ModelNumber, s.SerialNumber, s.Sensitivity, {''}, NaN, ' '};
-                            data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %%data(i, 3) = {'Input'};
-                            data(i, 3) = {' '};
-                            data(i, 4) = {'IEPE'};
-                            %data(i, 5) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            data(i, 5) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
-                            %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%data(i, 7) = {'IEPE'};
-                            data(i, 6) = {char(manufacturer)};
-                            data(i, 7) = {num2str(s.ModelNumber)};
-                            data(i, 8) = {num2str(s.SerialNumber)};
-                            data(i, 9) = {(s.Sensitivity) * 1000};
-                            data(i, 10) = {unit};
-                            data(i, 11) = {NaN};
-                            data(i, 12) = {' '};
-                        end
-                    else
-                        %                             fprintf('Sensor not found!\n');
-                        
-                        if (keepColumns)
-                            data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %data(i, 3) = {'Input'};
-                            data(i, 3) = oldData(i, 3);
-                            data(i, 4) = {' '};
-                            data(i, 5) = {NaN};
-                            %data(i, 7) = {'Voltage'};
-                            data(i, 6) = {' '};
-                            data(i, 7) = {num2str(NaN)};
-                            data(i, 8) = {num2str(NaN)};
-                            data(i, 9) = {NaN};
-                            data(i, 10) = {' '};
-                            data(i, 11) = oldData(i, 11);
-                            data(i, 12) = oldData(i, 12);
-                        else
-                            data(i, :) = {false, chanStr, ' ', ' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
-                        end
-                    end
-                    
-                    i = i + 1;
-                    set(handles.channelsTable, 'data', data);   %   Experimental
-                    guidata(hObject, handles);                  %   Experimental
-                    drawnow();                                  %   Experimental
-                end
-            end
-            
-            %   Get output channels
-        end
-    else
-        fprintf('No devices found\n ');
-    end
-    % ----- TA 2015-02-27 (mod start)
-    %         handles.channelsTable.CellSelectionCallback='disp(''CellSelect'')';
-    %         handles.channelsTable.KeyPressFcn='disp(''Press'')';
-    %         handles.channelsTable.ButtonDownFcn='disp(''ButtonDown'')';
-    %         handles.channelsTable.KeyReleaseFcn='disp(''Release'')';
-    SensorsInLabFile=which('SensorsInLab.xlsx');
-    if ~isempty(SensorsInLabFile)
-        [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
-        CLL{1}(1,1)={' '};% Replace column header with blank
-        handles.channelsTable.ColumnFormat{8}=CLL{:};
-    end
-    handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
-    % ----- TA 2015-02-27 (end)
-    
-end
-try,delete(WB),catch,end;% TA 2015-02-28
-
-%   Unload TEDS Parser DLL
-%     unloadlibrary('tedsLib');
-
-%   Clear DAQ
-daq.reset;
-
-set(handles.channelsTable, 'data', data);
-set(handles.statusStr, 'String', 'Scanning hardware complete - READY');
-guidata(hObject, handles);
-
 function title1_Callback(hObject, eventdata, handles)
 % hObject    handle to title1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -917,14 +404,6 @@ closePreview (hObject, eventData, handles);
 % Hint: delete(hObject) closes the figure
 delete(hObject);
 
-% --- Executes on button press in startButton.
-function startButton_Callback(hObject, eventdata, handles)
-% hObject    handle to startButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-startButton(hObject, eventdata, handles)
-
 %   Handles the streaming of data to disk
 function logData(src, event, fileDescriptor)
 %disp('Logging...');
@@ -942,7 +421,6 @@ fwrite(fileDescriptor(1), event.TimeStamps, 'double');
 for i = 1:n
     fwrite(fileDescriptor(i + 1), event.Data(:,i), 'double');
 end
-
 
 % --- Executes on button press in clearButton.
 function clearButton_Callback(hObject, eventdata, handles)
@@ -1149,7 +627,7 @@ if (val)
     set(handles.fun6,'visible','on')
     set(handles.fun6,'string','2')
     
-    %if 
+    %if
     
     set(handles.fun7Text,'visible','off')
     set(handles.fun7,'visible','off')
@@ -1182,33 +660,6 @@ set(handles.multisine, 'Value', 0);
 %     end
 % % MG (mod end)
 
-function out_freq = freqConverter (freq)
-
-if strcmp(freq, '20')
-    out_freq = 20;
-elseif strcmp(freq, '100')
-    out_freq = 100;
-elseif strcmp(freq, '1k')
-    out_freq = 1000;
-elseif strcmp(freq, '2k')
-    out_freq = 2000;
-elseif strcmp(freq, '5k')
-    out_freq = 5000;
-elseif strcmp(freq, '10k')
-    out_freq = 10000;
-elseif strcmp(freq, '20k')
-    out_freq = 20000;
-elseif strcmp(freq, '50k')
-    out_freq = 50000;
-elseif strcmp(freq, '100k')
-    out_freq = 100000;
-elseif strcmp(freq, '200k')
-    out_freq = 200000;
-else
-    out_freq = 0;
-end
-
-
 % --------------------------------------------------------------------
 function menuAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to menuAbout (see GCBO)
@@ -1238,6 +689,47 @@ function fun1_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns fun1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from fun1
 
+% Define conversion between Hz and kHz;
+kHz2Hz = 1000;
+Hz2kHz = 0.001;
+
+% Get the set frequency
+freq = str2double(get(handles.fun1,'String')) * kHz2Hz;
+
+% Check if the hardware info is stored
+if ~exist('devices')
+    daq.reset;
+    devices = daq.getDevices;
+end
+
+% Find the rate limit of all the devices
+numberDevices = length(devices);
+counter = 1;
+for i = 1:numberDevices
+    numberSubsystems = length(devices(i));
+    
+    for j = 1: numberSubsystems
+        rateLimit = devices(i).Subsystems(j).RateLimit;
+        minRateLimit(counter) = min(rateLimit);
+        maxRateLimit(counter) = max(rateLimit);
+    end
+    
+    counter = counter + 1;
+end
+
+% Check so that the set rate limit is in the valid range, if not chnage it
+% and notify the user.
+if freq > min(maxRateLimit)
+    tmpString = sprintf('Sample rate to high. Maximum allowed %3.2f [kHz].', min(maxRateLimit) * Hz2kHz);
+    msgbox(tmpString)
+    freq = min(maxRateLimit);
+    set(handles.fun1,'String',num2str(freq * Hz2kHz));
+elseif freq < max(minRateLimit)
+    tmpString = sprintf('Sample rate to low. Minimum allowed %3.2f [kHz].', max(minRateLimit) * Hz2kHz);
+    msgbox(tmpString)
+    freq = max(minRateLimit);
+    set(handles.fun1,'String',num2str(freq * Hz2kHz));
+end
 
 % --- Executes during object creation, after setting all properties.
 function fun1_CreateFcn(hObject, eventdata, handles)
