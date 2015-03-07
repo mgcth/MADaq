@@ -92,6 +92,7 @@ handles.preview.reset = false;
 guidata(hObject, handles);
 
 % Start with monitor and make other things invisible
+set(handles.fun1,'String','50')
 set(handles.fun2Text,'visible','off')
 set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')
