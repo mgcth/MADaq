@@ -12,114 +12,12 @@ catch,  running = false;
 end
 
 if (~running)
-    preview.freeLogging = false;
-    preview.normLogging = false;
-    
-    %   Setup session
-    preview.session = daq.createSession('ni');
-    preview.session.IsContinuous = true;
-    
-    preview.session.Rate = str2double(get(handles.fun1, 'String')) * kHz2Hz;
-    
-    %   Get overall info
-    preview.logging.impact = get(handles.impactTest, 'Value');
-    
-    %   Add channels
-    data = get(handles.channelsTable, 'data');
-    [m, n] = size(data);
-    j = 1;
-    preMin = 0;
-    preMax = 0;
-    preview.chanNames = {};
-    
-    for i = 1:m
-        
-        channelData.index = i;
-        channelData.active = data{i, 1};
-        channelData.channel = data{i, 2};
-        %             channelData.signal = data{i, 3};
-        channelData.label = data{i, 3};
-        channelData.coupling = data{i, 4};
-        channelData.voltage = data{i, 5};
-        %             channelData.sensorType = data{i, 7};
-        channelData.manufacturer = data{i, 6};
-        channelData.model = data{i, 7};
-        channelData.serialNumber = data{i, 8};
-        channelData.sensitivity = data{i, 9};
-        channelData.units = data{i, 10};
-        channelData.dof = data{i, 11};
-        channelData.direction = data{i, 12};
-        channelData.Min = -0.001;%- (channelData.voltage * channelData.sensitivity) - 1;
-        channelData.Max = 0.001;%(channelData.voltage * channelData.sensitivity) + 1;
-        
-        channelData.title1 = get(handles.title1, 'String');
-        channelData.title2 = get(handles.title2, 'String');
-        channelData.title3 = get(handles.title3, 'String');
-        channelData.title4 = get(handles.title4, 'String');
-        
-        
-        %   Check if channel is ok, if so, then add channel to
-        %   monitor
-        configOk =  channelData.active && ...
-            ~isnan(channelData.voltage) && ...
-            ~isnan(channelData.sensitivity);
-        
-        if (configOk)
-            chan = textscan(channelData.channel, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
-            
-            if strcmp(channelData.coupling, 'IEPE')
-                preview.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
-            else
-                analogChan = preview.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
-                
-                if strcmp(channelData.coupling, 'AC')
-                    analogChan.Coupling = 'AC';
-                elseif strcmp(channelData.coupling, 'DC')
-                    analogChan.Coupling = 'DC';
-                end
-            end
-            
-            %preview.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
-            %preview.session.Channels(j).Sensitivity = channelData.sensitivity;
-            
-            absAmp = 5.1;%channelData.voltage / (channelData.sensitivity / 1000);     %   [m/s^2, g, whatever...]
-            
-            channelData.Min = - absAmp;
-            channelData.Max = absAmp;
-            
-            preMin = min(preMin, channelData.Min);
-            preMax = max(preMax, channelData.Max);
-            
-            preview.channelData(j) = channelData;
-            preview.chanNames(j) = {channelData.channel};
-            j = j + 1;
-        end
-    end
-    
-    preview.Min = -1.1;
-    preview.Max = 1.1;
+
+    % Initialaise the test setup
+	preview = startInitialisation(hObject, eventdata, handles);
     
     %   Check if any channels was added to the session
-    if (isempty(preview.session.Channels))
-        msgbox('No channels in session, might be because no channels have been activated yet.','No channels in session');
-        preview.session.release();
-        delete(preview.session);
-        
-        %   Else create preview and start plotting
-    else
-        %   Sync and reject alias if low freqency
-        try preview.session.AutoSyncDSA = true; catch, end
-        
-        try
-            lowFreq = f < 1000;
-            for i = 1:length(preview.session.Channels)
-                preview.session.Channels(i).EnhancedAliasRejectionEnable = lowFreq;
-            end
-        catch
-            lowFreq = 0;
-        end
-        
-        disp(['SyncDSA: ', num2str(preview.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
+    if (~isempty(preview.session.Channels))
         
         %   Figure/plots/slider
         preview.figure = figure('DoubleBuffer', 'on', ...

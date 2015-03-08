@@ -6,7 +6,7 @@ function DAQdata2WS(opt,varargin)
 if opt==1,
   t=varargin{1};
   data=varargin{2};
-  CHdata=varargin{3};
+  %CHdata=varargin{3};
   ts=timeseries(data,t);
   ts.UserData.MeasurementDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
   assignin('base','DAQts',ts);

@@ -16,7 +16,7 @@ Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
 if Chact==0,error('Seems that no channels are active');end
 [uv,sv]=memory;
 memmax=sv.PhysicalMemory.Available;
-ntmax=round(memmax/4/Chact/2);% Don't use more that half of available memory
+ntmax=round(memmax/4/Chact/2/2);% Don't use more that half of available memory, only half of that
 DATAcontainer.nt=0;
 DATAcontainer.t=zeros(ntmax,1);
 DATAcontainer.data=zeros(ntmax,Chact);
@@ -27,8 +27,14 @@ drawnow();
 
 % Setup session
 sessionObject.session = daq.createSession('ni');
-sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
-if handles.monitor == 1 || handles.dataLogg == 1
+if get(handles.monitor, 'Value') == 1
+    sessionObject.freeLogging = false;
+    sessionObject.normLogging = false;
+    sessionObject.session.IsContinuous = true;
+else
+    sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
+end
+if get(handles.dataLogg, 'Value') == 1
     sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
 end
 
@@ -97,6 +103,11 @@ for i = 1:m
         sessionObject.MHEADER(j).Dir = data{i, 12};
         %   sessionObject.MHEADER(j).Sensitivity = data{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
         sessionObject.MHEADER(j).FunctionType = 1;
+        
+        if get(handles.monitor, 'Value') == 1
+            sessionObject.channelData(j) = channelData;
+            sessionObject.chanNames(j) = {channelData.channel};
+        end
         
         %   Increment channels counter
         j = j + 1;
