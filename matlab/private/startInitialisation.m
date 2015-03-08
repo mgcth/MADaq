@@ -16,7 +16,7 @@ Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
 if Chact==0,error('Seems that no channels are active');end
 [uv,sv]=memory;
 memmax=sv.PhysicalMemory.Available;
-ntmax=round(memmax/4/Chact/2/2);% Don't use more that half of available memory, only half of that
+ntmax=round(memmax/4/Chact/2/5);% Don't use more that half of available memory, only half of that
 DATAcontainer.nt=0;
 DATAcontainer.t=zeros(ntmax,1);
 DATAcontainer.data=zeros(ntmax,Chact);
