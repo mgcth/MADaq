@@ -3,7 +3,7 @@ function closePreview (currentHandle, events, handles)
 preview = getappdata(0, 'previewStruct');
 
 if (~isempty(preview))
-    
+    clear plotPreview; % clear the persisten variables in there
     try logging = preview.adHocLogging;
     catch, logging = false;
     end
@@ -12,7 +12,7 @@ if (~isempty(preview))
         try preview.session.stop();         catch, end
         try preview.session.release();      catch, end
         try delete(preview.session);        catch, end
-        for i = 1:length(preview.subplots.handles), cla(preview.subplots.handles(i)); end
+        %for i = 1:length(preview.subplots.handles), cla(preview.subplots.handles(i)); cla(preview.figure); end
         try delete(preview.figure);         catch, end
         try rmappdata(0, 'previewStruct');  catch, end
         

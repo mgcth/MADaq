@@ -19,16 +19,14 @@ if (~running)
     preview.session = daq.createSession('ni');
     preview.session.IsContinuous = true;
     
-    items = get(handles.fun1, 'String');
-    f = str2double(get(handles.fun1, 'String')) * kHz2Hz; %freqConverter(items{get(handles.fun1, 'Value')});
-    preview.session.Rate = f;
+    preview.session.Rate = str2double(get(handles.fun1, 'String')) * kHz2Hz;
     
     %   Get overall info
     preview.logging.impact = get(handles.impactTest, 'Value');
     
     %   Add channels
     data = get(handles.channelsTable, 'data');
-    [m n] = size(data);
+    [m, n] = size(data);
     j = 1;
     preMin = 0;
     preMax = 0;
