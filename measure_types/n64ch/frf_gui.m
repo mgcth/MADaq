@@ -44,7 +44,8 @@ if nargin==0
  
 %%                                                                Start GUI
 %sssGUI(setdiff(CH.active,CH.refch));
-sssGUI(CH.active);
+sssGUI(1);
+%sssGUI(CH.active);
      
 else
 %%                                                    Create current legend
@@ -53,7 +54,7 @@ else
   for I=1:3
     if ind{I}>1
         str=get(HFRFGUI.LB(I),'String');        
-        chplot=[chplot;find(CH.active==str2num(str{ind{I}}))];
+        chplot=[chplot;1];%chplot=[chplot;find(CH.active==str2num(str{ind{I}}))];
     end
   end    
   Legend=[];
@@ -89,7 +90,7 @@ FRFminus=(abs(FRF)-alpha*stdFRF).*FRF./abs(FRF);
       semilogy(freq(1:Nf),abs(FRFminus(chplot,:)),'color',grey)     
      semilogy(freq(1:Nf),abs(FRF(chplot,:)))
      hold off
-     title(cell2mat([cell2mat(names(chplot)) '/ ' names(find(CH.active==CH.refch))]))
+     %title(cell2mat([cell2mat(names(chplot)) '/ ' names(find(CH.active==CH.refch))]))
           
      %legend(Legend,'Location','SouthWest')
   elseif plotopt{2}; % Bode plot  
@@ -107,13 +108,13 @@ FRFminus=(abs(FRF)-alpha*stdFRF).*FRF./abs(FRF);
 %%                                                                Time data
   if get(HFRFGUI.RB(5),'Value')
      figure(HFRFGUI.hFigtd);clf
-     titletext=[cell2mat(names(chplot)) ' @ ' num2str(freq(Ind)) 'Hz'];
+     %titletext=[cell2mat(names(chplot)) ' @ ' num2str(freq(Ind)) 'Hz'];
 %     miny=min(min(y(:,chplot)));maxy=max(max(y(:,chplot)));
 %     plot(t,y(:,chplot),miny,t,maxy);title(titletext)
      for I=1:length(chplot)
          yac(:,chplot(I))=y(:,chplot(I))-mean(y(:,chplot(I)));
      end
-     plot(t,yac(:,chplot));grid,title(titletext)
+     plot(t,yac(:,chplot));grid,%title(titletext)
      drawnow
 %      plot(t.t,y(:,chplot));hold on
 %      vax=axis;

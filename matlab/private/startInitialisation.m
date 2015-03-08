@@ -28,7 +28,9 @@ drawnow();
 % Setup session
 sessionObject.session = daq.createSession('ni');
 sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
-sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
+if handles.monitor == 1 || handles.dataLogg == 1
+    sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
+end
 
 % Add channels
 data = get(handles.channelsTable, 'data');

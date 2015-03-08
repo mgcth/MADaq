@@ -18,7 +18,7 @@ if (~isempty(steppedSine.session.Channels))
     steppedSine.session.startForeground();
     
     % Actual steppedSine test                             Initiate and test
-    Fs=periodic.session.Rate;Ts=1/Fs;
+    Fs=steppedSine.session.Rate;Ts=1/Fs;
     
     Freqs = eval(char(handles.fun2.String));
     Loads = eval(char(handles.fun3.String));
@@ -26,7 +26,7 @@ if (~isempty(steppedSine.session.Channels))
     % NCyclesInBlock=8;%                    Minimum number of periods in AI block
     % NBlocks=4;%                           Number of blocks in AO buffer
     HarmOrder=2;
-    Ny=length([periodic.MHEADER.Index]);Nf=length(Freqs);
+    Ny=length([steppedSine.MHEADER.Index]);Nf=length(Freqs);
     
     if length(Loads==1),Loads=Loads*ones(size(Freqs));end
     
@@ -36,23 +36,24 @@ if (~isempty(steppedSine.session.Channels))
     % Naverages=20;
     tmargin=0.2;%Margin to compensate for the modules trigger att different times
     
-    % Fs=so.Rate;Ts=1/Fs;
+    % Fs=steppedSine.session .Rate;Ts=1/Fs;
     % AIBSmin=ceil(Fs/10);
     
     %                                                          Initiate GUI
     frf_gui;
     Refch=1; %%% DUMMY UGLY! FIX! find(CH.active==CH.refch);
-    ical=1./DAQ.cal([periodic.MHEADER.Index]);
-    names=DAQ.name([periodic.MHEADER.Index]);
+    cal = 1./[steppedSine.MHEADER.SensorSensitivity];
+    ical=1./cal;
+    names=[steppedSine.MHEADER.Index];
     
     h=figure;
-    
+    steppedSine.session.addAnalogOutputChannel('PXI1Slot2', 0, 'Voltage');
     for I=1:Nf
         f=Freqs(I);
         
         Rate=50*f;if Rate<1000,Rate=1000;end
         if Rate>51200;Rate=51200;end
-        so.Rate=Rate;
+        steppedSine.session .Rate=Rate;
         Fs=Rate;Ts=1/Fs;
         Nramp=rampcycles/f/Ts;
         w=(1-cos(pi*[0:Nramp-1]/Nramp))/2;
@@ -63,9 +64,10 @@ if (~isempty(steppedSine.session.Channels))
         
         W=ones(length(t),1);W(1:length(w))=w;
         Sine=Loads(I)*W.*sin(2*pi*f*t(:));
-        queueOutputData(so,Sine);
-        [Data,times,Trigt]=startForeground(so);
-        stop(so);% This terminates activities that may interfere
+        
+        queueOutputData(steppedSine.session ,Sine);
+        [Data,times,Trigt]=startForeground(steppedSine.session);
+        stop(steppedSine.session );% This terminates activities that may interfere
         
         figure(h);
         plot(times,Data(:,3-1));

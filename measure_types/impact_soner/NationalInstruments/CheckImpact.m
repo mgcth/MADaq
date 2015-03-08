@@ -1,1 +1,0 @@
-function CheckImpact(src,event)
