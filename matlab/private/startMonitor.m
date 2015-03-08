@@ -1,4 +1,9 @@
 function startMonitor(hObject, eventdata, handles)
+
+% Define conversion between Hz and kHz;
+kHz2Hz = 1000;
+Hz2kHz = 0.001;
+
 %   Get state of session if existing
 preview = getappdata(0, 'previewStruct');
 
@@ -15,7 +20,7 @@ if (~running)
     preview.session.IsContinuous = true;
     
     items = get(handles.fun1, 'String');
-    f = str2double(get(handles.fun1, 'String')); %freqConverter(items{get(handles.fun1, 'Value')});
+    f = str2double(get(handles.fun1, 'String')) * kHz2Hz; %freqConverter(items{get(handles.fun1, 'Value')});
     preview.session.Rate = f;
     
     %   Get overall info

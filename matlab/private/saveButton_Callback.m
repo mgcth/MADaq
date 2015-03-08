@@ -4,6 +4,8 @@ function saveButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global currentState
+
 answer = inputdlg('Enter name of the file to save', 'Save configuration');
 drawnow; pause(0.1);                       %   Prevent MatLab from hanging
 
@@ -23,15 +25,18 @@ if (~isempty(answer))
     output{6, 1} = 'Title4';
     output{6, 2} = get(handles.title4, 'String');
     output{7, 1} = '##';
-    output{8, 1} = get(handles.fun1, 'String');
-    output{8, 2} = get(handles.fun2, 'String');
-    output{8, 3} = get(handles.fun3, 'String');
-    output{8, 4} = get(handles.fun4, 'String');
-    output{8, 5} = get(handles.fun5, 'String');
-    output{8, 6} = get(handles.fun6, 'String');
-    output{8, 8} = get(handles.fun7, 'String');
-    output{8, 9} = get(handles.fun8, 'String');
-    output{8, 9} = get(handles.fun9, 'String');
+    % Save currentState as a vector (rows after each other)
+    counter = 1;
+    for q = 1:size(currentState,1)
+        for qq = 1:size(currentState,2)
+            if isempty(currentState{q,qq})
+                currentState{q,qq} = 'undefined'; % to save all the columns in xls
+            end
+            output{8, counter} = currentState{q,qq};
+            counter = counter + 1;
+        end
+    end
+    % End currentState save
     output{9, 1} = get(handles.monitor, 'Value');
     output{9, 2} = get(handles.dataLogg, 'Value');
     output{9, 3} = get(handles.impactTest, 'Value');

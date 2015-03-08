@@ -16,6 +16,7 @@ if (val)
     set(handles.steppedSine, 'Value', 1);
     set(handles.multisine, 'Value', 0);
     
+    set(handles.fun1,'string',currentState{5,1})
     set(handles.fun2Text,'visible','on')
     set(handles.fun2Text,'string','Frequency list:')
     set(handles.fun2,'visible','on')

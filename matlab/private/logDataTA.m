@@ -3,9 +3,6 @@ function logDataTA(src, evt)
 
 global DATAcontainer
 
-% data = [evt.TimeStamps, evt.Data]' ;
-% fwrite(fid,data,'double');
-
 nt=length(evt.TimeStamps);
 Nt=DATAcontainer.nt;
 

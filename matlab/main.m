@@ -98,6 +98,11 @@ currentState= cell(6,9);
 % Start with monitor and make other things invisible
 set(handles.fun1,'String','50')
 currentState{1,1} = get(handles.fun1,'String');
+currentState{2,1} = get(handles.fun1,'String');
+currentState{3,1} = get(handles.fun1,'String');
+currentState{4,1} = get(handles.fun1,'String');
+currentState{5,1} = get(handles.fun1,'String');
+currentState{6,1} = get(handles.fun1,'String');
 set(handles.fun2Text,'visible','off')
 set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')

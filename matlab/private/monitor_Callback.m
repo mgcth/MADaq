@@ -16,6 +16,7 @@ if (val)
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
     
+    set(handles.fun1,'string',currentState{1,1})
     set(handles.fun2Text,'visible','off')
     set(handles.fun2,'visible','off')
     set(handles.fun3Text,'visible','off')

@@ -16,11 +16,11 @@ if (val)
     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
     
+    set(handles.fun1,'string',currentState{2,1})
     set(handles.fun2Text,'visible','on')
     set(handles.fun2Text,'string','Duration [s]:')
     set(handles.fun2,'visible','on')
     set(handles.fun2,'string',currentState{2,2})
-    
     set(handles.fun3Text,'visible','off')
     set(handles.fun3,'visible','off')
     set(handles.fun4Text,'visible','off')
