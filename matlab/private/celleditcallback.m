@@ -4,7 +4,7 @@ CellEditData=varargin{2};
 rawCells=varargin{3};
 
 ind=CellEditData.Indices;row=ind(1);col=ind(2);
-if col~=8,return;end
+if col~=9,return;end
 
 was=CellEditData.PreviousData;
 isnow=CellEditData.NewData;
@@ -27,12 +27,12 @@ if ind == 0
     Coupling=char([]);
     Calib='NaN';
     
-    DTA{row,4}=Coupling;
-    DTA{row,5}='NaN';% 10 V
-    DTA{row,6}=Make;
-    DTA{row,7}=Model;
-    DTA{row,9}=Calib;
-    DTA{row,10}=Unit;
+    DTA{row,5}=Coupling;
+    DTA{row,6}='NaN';% 10 V
+    DTA{row,7}=Make;
+    DTA{row,8}=Model;
+    DTA{row,10}=Calib;
+    DTA{row,11}=Unit;
 else
     Model=rawCells{ind,4};
     Make=rawCells{ind,6};
@@ -40,12 +40,12 @@ else
     Coupling=rawCells{ind,8};
     Calib=rawCells{ind,10};
     
-    DTA{row,4}=Coupling;
-    DTA{row,5}=10;% 10 V
-    DTA{row,6}=Make;
-    DTA{row,7}=Model;
-    DTA{row,9}=Calib;
-    DTA{row,10}=Unit;
+    DTA{row,5}=Coupling;
+    DTA{row,6}=10;% 10 V
+    DTA{row,7}=Make;
+    DTA{row,8}=Model;
+    DTA{row,10}=Calib;
+    DTA{row,11}=Unit;
 end
 
 set(gco,'Data',DTA);

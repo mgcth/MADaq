@@ -71,22 +71,23 @@ function main_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for main
 handles.output = hObject;
 
-%   Get working directory
+% Get working directory
 handles.homePath = evalin('base', 'homePath');
 
-%   Version
+% Version
 handles.version = '0.1';
 set(handles.figure1, 'Name', ['MADaq ', handles.version]);
 
-%   Empty channels table
+% Empty channels table
 data = {};
 set(handles.channelsTable, 'data', data);
+set(handles.outputTable, 'data', data);
 
-%   Load IEEE 1451.4 publist.xdl
-%   Source: http://standards.ieee.org/develop/regauth/manid/publist.xdl
+% Load IEEE 1451.4 publist.xdl
+% Source: http://standards.ieee.org/develop/regauth/manid/publist.xdl
 [handles.pubListId, handles.pubListCompany] = openPubList([handles.homePath, '/data/publist.xdl']);
 
-%   Preview
+% Preview
 handles.preview.reset = false;
 
 % Update handles structure

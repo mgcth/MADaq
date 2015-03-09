@@ -6,7 +6,7 @@ function loadButton_Callback(hObject, eventdata, handles)
 
 global currentState
 
-COLUMNSinINPUTTABLE = 12;
+COLUMNSinINPUTTABLE = 13;
 
 error = false;
 loadFile = false;
@@ -125,7 +125,7 @@ if (~error)
     if ~isempty(SensorsInLabFile)
         [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
         CLL{1}(1,1)={' '};% Replace column header with blank
-        handles.channelsTable.ColumnFormat{8}=CLL{:};
+        handles.channelsTable.ColumnFormat{9}=CLL{:};
     end
     handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
     %%% END
@@ -137,18 +137,52 @@ if (~error)
             temp = cell(1, 12);
             
             temp{1, 1} = raw{i, 1};     %   Active
-            temp{1, 5} = raw{i, 5};     %   Voltage
-            temp{1, 7} = raw{i, 7};     %   Manufacturer ID
+            temp{1, 2} = raw{i, 2};     %   Referense
             
-            temp{1, 8} = raw{i, 8};   %   Serial number
-            
-            temp{1, 9} = raw{i, 9};   %   Sensitivity
-            temp{1, 11} = raw{i, 11};   %   Dof
-            
-            if (ischar(raw{i, 2}))      %   Channel
-                temp{1, 2} = raw{i, 2};
+            if (ischar(raw{i, 3}))      %   Channel
+                temp{1, 3} = raw{i, 3};
             else
-                temp{1, 2} = '';
+                temp{1, 3} = '';
+            end
+            
+            if (ischar(raw{i, 4}))      %   Label
+                temp{1, 4} = raw{i, 4};
+            else
+                temp{1, 4} = '';
+            end
+            
+            if (ischar(raw{i, 5}))      %   Coupling
+                temp{1, 5} = raw{i, 5};
+            else
+                temp{1, 5} = '';
+            end
+            
+            temp{1, 6} = raw{i, 6};     %   Voltage
+            
+            if (ischar(raw{i, 7}))      %   Manufacturer
+                temp{1, 7} = raw{i, 7};
+            else
+                temp{1, 7} = '';
+            end
+            
+            temp{1, 8} = raw{i, 8};     %   Manufacturer ID
+            
+            temp{1, 9} = raw{i, 9};   %   Serial number
+            
+            temp{1, 10} = raw{i, 10};   %   Sensitivity
+            
+                        if (ischar(raw{i, 11}))      %   Units
+                temp{1, 11} = raw{i, 11};
+            else
+                temp{1, 11} = '';
+            end
+            
+            temp{1, 12} = raw{i, 12};   %   Dof
+            
+            if (ischar(raw{i, 13}))      %   Direction
+                temp{1, 13} = raw{i, 13};
+            else
+                temp{1, 13} = '';
             end
             
             %                 if (ischar(raw{i, 3}))      %   Signal type
@@ -157,41 +191,11 @@ if (~error)
             %                     temp{1, 3} = '';
             %                 end
             
-            if (ischar(raw{i, 3}))      %   Label
-                temp{1, 3} = raw{i, 3};
-            else
-                temp{1, 3} = '';
-            end
-            
-            if (ischar(raw{i, 4}))      %   Coupling
-                temp{1, 4} = raw{i, 4};
-            else
-                temp{1, 4} = '';
-            end
-            
             %                 if (ischar(raw{i, 7}))      %   Transducer type
             %                     temp{1, 7} = raw{i, 7};
             %                 else
             %                     temp{1, 7} = '';
             %                 end
-            
-            if (ischar(raw{i, 6}))      %   Manufacturer
-                temp{1, 6} = raw{i, 6};
-            else
-                temp{1, 6} = '';
-            end
-            
-            if (ischar(raw{i, 10}))      %   Units
-                temp{1, 10} = raw{i, 10};
-            else
-                temp{1, 10} = '';
-            end
-            
-            if (ischar(raw{i, 12}))      %   Direction
-                temp{1, 12} = raw{i, 12};
-            else
-                temp{1, 12} = '';
-            end
             
             data(i - 10, :) = temp(1, :);
             %data(i - 10, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...

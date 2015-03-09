@@ -50,19 +50,20 @@ if (~isempty(answer))
     
     for i = 1:m
         output{offset + i, 1} = data{i, 1};     %   Active
-        output{offset + i, 2} = data{i, 2};     %   Channel
-        %output{10 + i, 3} = data{i, 3};        %   Signal
-        output{offset + i, 3} = data{i, 3};     %   Label
-        output{offset + i, 4} = data{i, 4};     %   Coupling
-        output{offset + i, 5} = data{i, 5};     %   Voltage
+        output{offset + i, 2} = data{i, 2};     %   Referense
+        output{offset + i, 3} = data{i, 3};     %   Channel
+        %output{10 + i, 4} = data{i, 4};        %   Signal
+        output{offset + i, 4} = data{i, 4};     %   Label
+        output{offset + i, 5} = data{i, 5};     %   Coupling
+        output{offset + i, 6} = data{i, 6};     %   Voltage
         %output{10 + i, 7} = data{i, 7};        %   Transducer type
-        output{offset + i, 6} = data{i, 6};     %   Manufacturer
-        output{offset + i, 7} = data{i, 7};     %   Manufacturer ID
-        output{offset + i, 8} = data{i, 8};     %   Serial number
-        output{offset + i, 9} = data{i, 9};     %   Sensitivity
-        output{offset + i, 10} = data{i, 10};   %   Units
-        output{offset + i, 11} = data{i, 11};   %   Dof
-        output{offset + i, 12} = data{i, 12};   %   Direction
+        output{offset + i, 7} = data{i, 7};     %   Manufacturer
+        output{offset + i, 8} = data{i, 8};     %   Manufacturer ID
+        output{offset + i, 9} = data{i, 9};     %   Serial number
+        output{offset + i, 10} = data{i, 10};     %   Sensitivity
+        output{offset + i, 11} = data{i, 11};   %   Units
+        output{offset + i, 12} = data{i, 12};   %   Dof
+        output{offset + i, 13} = data{i, 13};   %   Direction
     end
     
     file = [handles.homePath, '/conf/', answer{1,1}, '.conf'];

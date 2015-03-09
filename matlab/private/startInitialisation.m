@@ -12,11 +12,12 @@ drawnow();
 
 CHdata = get(handles.channelsTable, 'data');
 channelData.active = CHdata{1, 1};
+channelData.reference = CHdata{1, 2};
 Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
 if Chact==0,error('Seems that no channels are active');end
 [uv,sv]=memory;
 memmax=sv.PhysicalMemory.Available;
-ntmax=round(memmax/4/Chact/2/5);% Don't use more that half of available memory, only half of that
+ntmax=round(memmax/4/Chact/2/5);% Don't use more that half of available memory, only 1/5 of that for now
 DATAcontainer.nt=0;
 DATAcontainer.t=zeros(ntmax,1);
 DATAcontainer.data=zeros(ntmax,Chact);
@@ -27,11 +28,12 @@ drawnow();
 
 % Setup session
 sessionObject.session = daq.createSession('ni');
-if get(handles.monitor, 'Value') == 1
+if get(handles.monitor, 'Value') == 1 % if monitor, make it continuous
     sessionObject.freeLogging = false;
     sessionObject.normLogging = false;
     sessionObject.session.IsContinuous = true;
-else
+    sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
+else % else set only rate
     sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
 end
 if get(handles.dataLogg, 'Value') == 1
@@ -46,12 +48,13 @@ j = 1;
 for i = 1:m
     channelData.index = i;
     channelData.active = data{i, 1};
-    channelData.channel = data{i, 2};
-    %channelData.signal = data{i, 3};
-    channelData.coupling = data{i, 4};
-    channelData.voltage = data{i, 5};
-    %channelData.sensorType = data{i, 7};
-    channelData.sensitivity = data{i, 9};
+    channelData.reference = data{i, 2};
+    channelData.channel = data{i, 3};
+    %channelData.signal = data{i, 4};
+    channelData.coupling = data{i, 5};
+    channelData.voltage = data{i, 6};
+    %channelData.sensorType = data{i, 8};
+    channelData.sensitivity = data{i, 10};
     
     %   Check if channel is ok, if so, then add channel to
     %   monitor
