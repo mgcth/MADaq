@@ -2,7 +2,7 @@
 function saveButton_Callback(hObject, eventdata, handles)
 % hObject    handle to saveButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    structure with handles and user dataIn (see GUIDATA)
 
 global currentState
 
@@ -10,9 +10,11 @@ answer = inputdlg('Enter name of the file to save', 'Save configuration');
 drawnow; pause(0.1);                       %   Prevent MatLab from hanging
 
 if (~isempty(answer))
-    data = get(handles.channelsTable, 'data');
-    [m, n] = size(data);
-    output = cell(10 + m, n);
+    dataIn = get(handles.channelsTable, 'data');
+    [m, n] = size(dataIn);
+    dataOut = get(handles.outputTable, 'data');
+    [mm, nn] = size(dataOut);
+    output = cell(10 + m + 1 + mm, n);
     
     output{1, 1} = 'NB: Changing this file may corrupt it!';
     output{2, 1} = '#';
@@ -49,21 +51,43 @@ if (~isempty(answer))
     offset = 10; %Last entry of header
     
     for i = 1:m
-        output{offset + i, 1} = data{i, 1};     %   Active
-        output{offset + i, 2} = data{i, 2};     %   Referense
-        output{offset + i, 3} = data{i, 3};     %   Channel
-        %output{10 + i, 4} = data{i, 4};        %   Signal
-        output{offset + i, 4} = data{i, 4};     %   Label
-        output{offset + i, 5} = data{i, 5};     %   Coupling
-        output{offset + i, 6} = data{i, 6};     %   Voltage
-        %output{10 + i, 7} = data{i, 7};        %   Transducer type
-        output{offset + i, 7} = data{i, 7};     %   Manufacturer
-        output{offset + i, 8} = data{i, 8};     %   Manufacturer ID
-        output{offset + i, 9} = data{i, 9};     %   Serial number
-        output{offset + i, 10} = data{i, 10};     %   Sensitivity
-        output{offset + i, 11} = data{i, 11};   %   Units
-        output{offset + i, 12} = data{i, 12};   %   Dof
-        output{offset + i, 13} = data{i, 13};   %   Direction
+        output{offset + i, 1} = dataIn{i, 1};     %   Active
+        output{offset + i, 2} = dataIn{i, 2};     %   Referense
+        output{offset + i, 3} = dataIn{i, 3};     %   Channel
+        %output{10 + i, 4} = dataIn{i, 4};        %   Signal
+        output{offset + i, 4} = dataIn{i, 4};     %   Label
+        output{offset + i, 5} = dataIn{i, 5};     %   Coupling
+        output{offset + i, 6} = dataIn{i, 6};     %   Voltage
+        %output{10 + i, 7} = dataIn{i, 7};        %   Transducer type
+        output{offset + i, 7} = dataIn{i, 7};     %   Manufacturer
+        output{offset + i, 8} = dataIn{i, 8};     %   Manufacturer ID
+        output{offset + i, 9} = dataIn{i, 9};     %   Serial number
+        output{offset + i, 10} = dataIn{i, 10};   %   Sensitivity
+        output{offset + i, 11} = dataIn{i, 11};   %   Units
+        output{offset + i, 12} = dataIn{i, 12};   %   Dof
+        output{offset + i, 13} = dataIn{i, 13};   %   Direction
+    end
+    
+    output{offset + m + 1, 1} = '### ###';
+    
+    j = 1;
+    for i = m + 1 + 1:m + 1 + mm
+        output{offset + i, 1} = dataOut{j, 1};     %   Active
+        output{offset + i, 2} = dataOut{j, 2};     %   Referense
+        output{offset + i, 3} = dataOut{j, 3};     %   Channel
+        %output{10 + i, 4} = dataOut{j, 4};        %   Signal
+        output{offset + i, 4} = dataOut{j, 4};     %   Label
+        output{offset + i, 5} = dataOut{j, 5};     %   Coupling
+        output{offset + i, 6} = dataOut{j, 6};     %   Voltage
+        %output{10 + i, 7} = dataOut{j, 7};        %   Transducer type
+        output{offset + i, 7} = dataOut{j, 7};     %   Manufacturer
+        output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer ID
+        output{offset + i, 9} = dataOut{j, 9};     %   Serial number
+        output{offset + i, 10} = dataOut{j, 10};   %   Sensitivity
+        output{offset + i, 11} = dataOut{j, 11};   %   Units
+        output{offset + i, 12} = dataOut{j, 12};   %   Dof
+        output{offset + i, 13} = dataOut{j, 13};   %   Direction
+        j = j + 1;
     end
     
     file = [handles.homePath, '/conf/', answer{1,1}, '.conf'];

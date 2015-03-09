@@ -6,7 +6,9 @@ function loadButton_Callback(hObject, eventdata, handles)
 
 global currentState
 
+% Columns in the two tables
 COLUMNSinINPUTTABLE = 13;
+COLUMNSinOUTPUTTABLE = 13;
 
 error = false;
 loadFile = false;
@@ -115,10 +117,23 @@ if (~error)
         % End currentState load
     end
     
-    %   Get channels
+    % Get channels
     [n, m] = size(raw);
-    nn = n - 10;
-    data = cell(nn, COLUMNSinINPUTTABLE);
+    
+    a=cell(n,1);
+    for i = 1:n
+        a{i} = raw{i,1};
+    end
+    
+    inputIndex = find(strcmp(a,'###'));
+    outputIndex = find(strcmp(a,'### ###'));
+    if isempty(inputIndex) || isempty(outputIndex)
+        errordlg('Corrupt save file.');
+        return;
+    end
+    
+    dataIn = cell(length(inputIndex + 1:outputIndex - 1), COLUMNSinINPUTTABLE);
+    dataOut = cell(length(outputIndex + 1:n), COLUMNSinOUTPUTTABLE);
     
     %%% START
     SensorsInLabFile=which('SensorsInLab.xlsx');
@@ -130,80 +145,160 @@ if (~error)
     handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
     %%% END
     
-    if (strcmp(raw{10,1}, '###'))
-        for i = 11:n
-            
-            %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
-            temp = cell(1, 12);
-            
-            temp{1, 1} = raw{i, 1};     %   Active
-            temp{1, 2} = raw{i, 2};     %   Referense
-            
-            if (ischar(raw{i, 3}))      %   Channel
-                temp{1, 3} = raw{i, 3};
-            else
-                temp{1, 3} = '';
-            end
-            
-            if (ischar(raw{i, 4}))      %   Label
-                temp{1, 4} = raw{i, 4};
-            else
-                temp{1, 4} = '';
-            end
-            
-            if (ischar(raw{i, 5}))      %   Coupling
-                temp{1, 5} = raw{i, 5};
-            else
-                temp{1, 5} = '';
-            end
-            
-            temp{1, 6} = raw{i, 6};     %   Voltage
-            
-            if (ischar(raw{i, 7}))      %   Manufacturer
-                temp{1, 7} = raw{i, 7};
-            else
-                temp{1, 7} = '';
-            end
-            
-            temp{1, 8} = raw{i, 8};     %   Manufacturer ID
-            
-            temp{1, 9} = raw{i, 9};   %   Serial number
-            
-            temp{1, 10} = raw{i, 10};   %   Sensitivity
-            
-                        if (ischar(raw{i, 11}))      %   Units
-                temp{1, 11} = raw{i, 11};
-            else
-                temp{1, 11} = '';
-            end
-            
-            temp{1, 12} = raw{i, 12};   %   Dof
-            
-            if (ischar(raw{i, 13}))      %   Direction
-                temp{1, 13} = raw{i, 13};
-            else
-                temp{1, 13} = '';
-            end
-            
-            %                 if (ischar(raw{i, 3}))      %   Signal type
-            %                     temp{1, 3} = raw{i, 3};
-            %                 else
-            %                     temp{1, 3} = '';
-            %                 end
-            
-            %                 if (ischar(raw{i, 7}))      %   Transducer type
-            %                     temp{1, 7} = raw{i, 7};
-            %                 else
-            %                     temp{1, 7} = '';
-            %                 end
-            
-            data(i - 10, :) = temp(1, :);
-            %data(i - 10, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
-            %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
-            %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
+    for i = inputIndex + 1:outputIndex - 1
+        
+        %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
+        temp = cell(1, 13);
+        
+        temp{1, 1} = raw{i, 1};     %   Active
+        temp{1, 2} = raw{i, 2};     %   Referense
+        
+        if (ischar(raw{i, 3}))      %   Channel
+            temp{1, 3} = raw{i, 3};
+        else
+            temp{1, 3} = '';
         end
+        
+        if (ischar(raw{i, 4}))      %   Label
+            temp{1, 4} = raw{i, 4};
+        else
+            temp{1, 4} = '';
+        end
+        
+        if (ischar(raw{i, 5}))      %   Coupling
+            temp{1, 5} = raw{i, 5};
+        else
+            temp{1, 5} = '';
+        end
+        
+        temp{1, 6} = raw{i, 6};     %   Voltage
+        
+        if (ischar(raw{i, 7}))      %   Manufacturer
+            temp{1, 7} = raw{i, 7};
+        else
+            temp{1, 7} = '';
+        end
+        
+        temp{1, 8} = raw{i, 8};     %   Manufacturer ID
+        
+        temp{1, 9} = raw{i, 9};     %   Serial number
+        
+        temp{1, 10} = raw{i, 10};   %   Sensitivity
+        
+        if (ischar(raw{i, 11}))     %   Units
+            temp{1, 11} = raw{i, 11};
+        else
+            temp{1, 11} = '';
+        end
+        
+        if (ischar(raw{i, 12}))     %   Dof
+            temp{1, 12} = raw{i, 12};
+        else
+            temp{1, 12} = '';
+        end
+        
+        if (ischar(raw{i, 13}))     %   Direction
+            temp{1, 13} = raw{i, 13};
+        else
+            temp{1, 13} = '';
+        end
+        
+        %                 if (ischar(raw{i, 3}))      %   Signal type
+        %                     temp{1, 3} = raw{i, 3};
+        %                 else
+        %                     temp{1, 3} = '';
+        %                 end
+        
+        %                 if (ischar(raw{i, 7}))      %   Transducer type
+        %                     temp{1, 7} = raw{i, 7};
+        %                 else
+        %                     temp{1, 7} = '';
+        %                 end
+        
+        dataIn(i - inputIndex, :) = temp(1, :);
+        %dataIn(i - inputIndex, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
+        %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
+        %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
     end
-    set(handles.channelsTable, 'data', data);
+    
+    for i = outputIndex + 1:n
+        
+        %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
+        temp = cell(1, 13);
+        
+        temp{1, 1} = raw{i, 1};     %   Active
+        temp{1, 2} = raw{i, 2};     %   Referense
+        
+        if (ischar(raw{i, 3}))      %   Channel
+            temp{1, 3} = raw{i, 3};
+        else
+            temp{1, 3} = '';
+        end
+        
+        if (ischar(raw{i, 4}))      %   Label
+            temp{1, 4} = raw{i, 4};
+        else
+            temp{1, 4} = '';
+        end
+        
+        if (ischar(raw{i, 5}))      %   Coupling
+            temp{1, 5} = raw{i, 5};
+        else
+            temp{1, 5} = '';
+        end
+        
+        temp{1, 6} = raw{i, 6};     %   Voltage
+        
+        if (ischar(raw{i, 7}))      %   Manufacturer
+            temp{1, 7} = raw{i, 7};
+        else
+            temp{1, 7} = '';
+        end
+        
+        temp{1, 8} = raw{i, 8};     %  Model
+        
+        temp{1, 9} = raw{i, 9};     %   Serial number
+        
+        temp{1, 10} = raw{i, 10};   %   Sensitivity
+        
+        if (ischar(raw{i, 11}))     %   Units
+            temp{1, 11} = raw{i, 11};
+        else
+            temp{1, 11} = '';
+        end
+        
+        if (ischar(raw{i, 12}))     %   Dof
+            temp{1, 12} = raw{i, 12};
+        else
+            temp{1, 12} = '';
+        end
+        
+        if (ischar(raw{i, 13}))      %   Direction
+            temp{1, 13} = raw{i, 13};
+        else
+            temp{1, 13} = '';
+        end
+        
+        %                 if (ischar(raw{i, 3}))      %   Signal type
+        %                     temp{1, 3} = raw{i, 3};
+        %                 else
+        %                     temp{1, 3} = '';
+        %                 end
+        
+        %                 if (ischar(raw{i, 7}))      %   Transducer type
+        %                     temp{1, 7} = raw{i, 7};
+        %                 else
+        %                     temp{1, 7} = '';
+        %                 end
+        
+        dataOut(i - outputIndex, :) = temp(1, :);
+        %dataOut(i - outputIndex, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
+        %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
+        %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
+    end
+    
+    set(handles.channelsTable, 'data', dataIn);
+    set(handles.outputTable, 'data', dataOut);
     
     %   Update status bar
     set(handles.statusStr, 'String', [selection, ' is now loaded ...']);

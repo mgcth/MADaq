@@ -5,17 +5,18 @@ global DATAcontainer
 % Initialaise the test setup
 periodic = startInitialisation(hObject, eventdata, handles);
 
+periodic.session.Rate = eval(get(handles.fun1, 'String')) * 1000;
+
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
-Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
 
 % Check if any channels was added to the session
-if (~isempty(periodic.session.Channels))
-    % Add listener
-    periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-    
-    % Start periodic
-    periodic.session.startForeground();
+if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.reference)
+%     % Add listener
+%     periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+%     
+%     % Start periodic
+%     periodic.session.startForeground();
     
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
@@ -35,8 +36,8 @@ if (~isempty(periodic.session.Channels))
     Ts=1/Fs;
     Load=interp1(t,(MaxAmpl/MaxLoad)*Load,t(1):Ts:t(end));
     
-    Refch=1; %%DUMMY for now!  find(CH.active==CH.refch);
-    Nch=length([periodic.MHEADER.Index]);
+    Refch=find(periodic.channelInfo.active == periodic.channelInfo.reference);
+    Nch=length(periodic.channelInfo.active);
     Ych=setdiff(1:Nch,Refch);
     
     Ndata=length(Load);
@@ -46,9 +47,9 @@ if (~isempty(periodic.session.Channels))
     
     qd=[];
     for I=1:Cycles;qd=[qd;Load(:)];end
-    periodic.session.addAnalogOutputChannel('PXI1Slot2', 0, 'Voltage');
     queueOutputData(periodic.session,qd);
-    y=startForeground(periodic.session);
+    [y,times_,Trigt_] = startForeground(periodic.session);
+    %y=startForeground(periodic.session);
     y(1:Skipps*Ndata,:)=[];
     u=y(:,Refch);
     y=y(:,Ych);
@@ -56,9 +57,9 @@ if (~isempty(periodic.session.Channels))
     set(handles.statusStr, 'String', 'Estimating transfer functions. Please wait ...');
     
     %                                                        Do calibration
-    active = [periodic.MHEADER.SeqNo];
-    refch = 1;
-    cal = 1./[periodic.MHEADER.SensorSensitivity];
+    active = periodic.channelInfo.active;
+    refch = periodic.channelInfo.reference;
+    cal = 1./[handles.channelsTable.Data{:,10}];
     yind=setdiff(active,refch);uind=refch;
     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
     
@@ -87,5 +88,9 @@ if (~isempty(periodic.session.Channels))
     clear('DATAcontainer');
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
+    drawnow();
+else
+    errordlg('No channels or no reference.')
+    set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
 end

@@ -11,9 +11,13 @@ set(handles.statusStr, 'String', 'Allocating memory ...');
 drawnow();
 
 CHdata = get(handles.channelsTable, 'data');
-channelData.active = CHdata{1, 1};
-channelData.reference = CHdata{1, 2};
-Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
+channelData.active = find([CHdata{:, 1}] == 1);
+channelData.reference = find([CHdata{:, 2}] == 1);
+sessionObject.channelInfo.active = channelData.active;
+sessionObject.channelInfo.reference = channelData.reference;
+
+Chact = sum([CHdata{:, 1}]);
+Chref = sum([CHdata{:, 2}]);
 if Chact==0,error('Seems that no channels are active');end
 [uv,sv]=memory;
 memmax=sv.PhysicalMemory.Available;
@@ -27,34 +31,33 @@ set(handles.statusStr, 'String', 'Setting up system ...');
 drawnow();
 
 % Setup session
+daq.reset;
 sessionObject.session = daq.createSession('ni');
 if get(handles.monitor, 'Value') == 1 % if monitor, make it continuous
     sessionObject.freeLogging = false;
     sessionObject.normLogging = false;
     sessionObject.session.IsContinuous = true;
-    sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
-else % else set only rate
-    sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
 end
 if get(handles.dataLogg, 'Value') == 1
     sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
 end
+sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
 
-% Add channels
-data = get(handles.channelsTable, 'data');
-[m, n] = size(data);
+% Add input channels
+dataIn = get(handles.channelsTable, 'data');
+[m, n] = size(dataIn);
 j = 1;
 
 for i = 1:m
     channelData.index = i;
-    channelData.active = data{i, 1};
-    channelData.reference = data{i, 2};
-    channelData.channel = data{i, 3};
-    %channelData.signal = data{i, 4};
-    channelData.coupling = data{i, 5};
-    channelData.voltage = data{i, 6};
-    %channelData.sensorType = data{i, 8};
-    channelData.sensitivity = data{i, 10};
+    channelData.active = dataIn{i, 1};
+    channelData.reference = dataIn{i, 2};
+    channelData.channel = dataIn{i, 3};
+    %channelData.signal = dataIn{i, 4};
+    channelData.coupling = dataIn{i, 5};
+    channelData.voltage = dataIn{i, 6};
+    %channelData.sensorType = dataIn{i, 8};
+    channelData.sensitivity = dataIn{i, 10};
     
     %   Check if channel is ok, if so, then add channel to
     %   monitor
@@ -85,7 +88,7 @@ for i = 1:m
         %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
         %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
         
-        %   Setup header
+        % Setup header
         sessionObject.MHEADER(j).Index = i;
         sessionObject.MHEADER(j).SeqNo = j;
         sessionObject.MHEADER(j).RespId = channelData.channel;
@@ -94,17 +97,17 @@ for i = 1:m
         sessionObject.MHEADER(j).Title2 = get(handles.title2, 'String');
         sessionObject.MHEADER(j).Title3 = get(handles.title3, 'String');
         sessionObject.MHEADER(j).Title4 = get(handles.title4, 'String');
-        sessionObject.MHEADER(j).Label = data{i, 3};
-        %   Added by Kent 17-02-2014
-        sessionObject.MHEADER(j).SensorManufacturer = data{i, 6};
-        sessionObject.MHEADER(j).SensorModel = data{i, 7};
-        sessionObject.MHEADER(j).SensorSerialNumber = data{i, 8};
-        sessionObject.MHEADER(j).SensorSensitivity = data{i, 9};
+        sessionObject.MHEADER(j).Label = dataIn{i, 3};
+        % Added by Kent 17-02-2014
+        sessionObject.MHEADER(j).SensorManufacturer = dataIn{i, 6};
+        sessionObject.MHEADER(j).SensorModel = dataIn{i, 7};
+        sessionObject.MHEADER(j).SensorSerialNumber = dataIn{i, 8};
+        sessionObject.MHEADER(j).SensorSensitivity = dataIn{i, 9};
         %   %   %   %   %   %   %   %   %
-        sessionObject.MHEADER(j).Unit = data{i, 10};
-        sessionObject.MHEADER(j).Dof = data{i, 11};
-        sessionObject.MHEADER(j).Dir = data{i, 12};
-        %   sessionObject.MHEADER(j).Sensitivity = data{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
+        sessionObject.MHEADER(j).Unit = dataIn{i, 10};
+        sessionObject.MHEADER(j).Dof = dataIn{i, 11};
+        sessionObject.MHEADER(j).Dir = dataIn{i, 12};
+        % sessionObject.MHEADER(j).Sensitivity = dataIn{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
         sessionObject.MHEADER(j).FunctionType = 1;
         
         if get(handles.monitor, 'Value') == 1
@@ -112,7 +115,7 @@ for i = 1:m
             sessionObject.chanNames(j) = {channelData.channel};
         end
         
-        %   Increment channels counter
+        % Increment channels counter
         j = j + 1;
     end
 end
@@ -144,4 +147,30 @@ else
     end
     
     disp(['SyncDSA: ', num2str(sessionObject.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
+    
+    
+    if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
+            get(handles.multisine,'Value') == 1
+        
+        % Add listener
+        sessionObject.eventListener = addlistener(sessionObject.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+        
+        % Start periodic
+        sessionObject.session.startForeground();
+        
+        % Add output channels
+        dataOut = get(handles.outputTable, 'data');
+        [mm, nn] = size(dataOut);
+        j = 1;
+        
+        for i = 1:mm
+            if dataOut{i,1} == 1
+                chan = textscan(dataOut{i,3}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
+                sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
+                
+                % Increment channels counter
+                j = j + 1;
+            end
+        end
+    end
 end

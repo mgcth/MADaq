@@ -6,7 +6,7 @@ function scanButton_Callback(hObject, eventdata, handles)
 
 % Columns in the two tables
 COLUMNSinINPUTTABLE = 13;
-COLUMNSinOUTPUTTABALE = 13;
+COLUMNSinOUTPUTTABLE = 13;
 
 % Waitbar
 WB=waitbar(0);
@@ -43,7 +43,7 @@ daq.reset;
 devices = daq.getDevices;
 
 % Calculate size of cell for input channels
-m = COLUMNSinINPUTTABLE; mm = COLUMNSinOUTPUTTABALE; n = 0; nn = 0;
+m = COLUMNSinINPUTTABLE; mm = COLUMNSinOUTPUTTABLE; n = 0; nn = 0;
 for i = 1:length(devices)
     % calllib('tedsLib', 'resetDevice', devices(i).ID); % Reset device
     for j = 1:length(devices(i).Subsystems)

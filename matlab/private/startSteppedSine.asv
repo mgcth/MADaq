@@ -52,10 +52,11 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     for I=1:Nf
         f=Freqs(I);
         
-        Rate=50*f;if Rate<1000,Rate=1000;end
-        if Rate>51200;Rate=51200;end
-        steppedSine.session.Rate=Rate;
-        Fs=Rate;Ts=1/Fs;
+        %Rate=50*f;if Rate<1000,Rate=1000;end
+        %if Rate>51200;Rate=51200;end
+        %steppedSine.session.Rate=Rate;
+        Fs=Rate;
+        Ts=1/Fs;
         Nramp=rampcycles/f/Ts;
         w=(1-cos(pi*[0:Nramp-1]/Nramp))/2;
         t=0:Ts:(skipcycles+takecycles)/f+tmargin;
