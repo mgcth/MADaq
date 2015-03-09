@@ -4,16 +4,15 @@ function scanButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-COLUMNSinINPUTTABLE = 12;
+COLUMNSinINPUTTABLE = 13;
 COLUMNSinOUTPUTTABALE = 1;
 
-% ----- TA 2015-02-27 (mod start)
+% Waitbar
 WB=waitbar(0);
 set(WB,'Name','Scanning channels');
 WB.Children.Title.String='Preparing ...';
-% ----- TA (mod end)
 
-%   Get old data
+% Get old data
 oldData = get(handles.channelsTable, 'data');
 
 [oldN, oldM] = size(oldData);
@@ -22,7 +21,7 @@ set(handles.statusStr, 'String', 'Scanning hardware for avaible channels and sen
 guidata(hObject, handles);
 drawnow();
 
-%   Get state of monitor if existing and close it
+% Get state of monitor if existing and close it
 preview = getappdata(0, 'previewStruct');
 
 try     running = ~isempty(preview) && preview.session.IsRunning;
@@ -125,60 +124,63 @@ for currentDevice = 1:length(devices)
                         
                         if (keepColumns)
                             data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %%data(i, 3) = {'Input'};
-                            data(i, 3) = oldData(i, 3);
-                            data(i, 4) = {'IEPE'};
-                            %data(i, 5) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            data(i, 5) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            data(i, 2) = {false};
+                            data(i, 3) = {chanStr};
+                            %%data(i, 4) = {'Input'};
+                            data(i, 4) = oldData(i, 3);
+                            data(i, 5) = {'IEPE'};
+                            %data(i, 6) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            data(i, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%data(i, 7) = {'IEPE'};
-                            data(i, 6) = {char(manufacturer)};
-                            data(i, 7) = {num2str(s.ModelNumber)};
-                            data(i, 8) = {num2str(s.SerialNumber)};
-                            data(i, 9) = {(s.Sensitivity) * 1000};
-                            data(i, 10) = {unit};
-                            data(i, 11) = oldData(i, 11);
-                            data(i, 12) = oldData(i, 12);
+                            %%data(i, 8) = {'IEPE'};
+                            data(i, 7) = {char(manufacturer)};
+                            data(i, 8) = {num2str(s.ModelNumber)};
+                            data(i, 9) = {num2str(s.SerialNumber)};
+                            data(i, 10) = {(s.Sensitivity) * 1000};
+                            data(i, 11) = {unit};
+                            data(i, 12) = oldData(i, 11);
+                            data(i, 13) = oldData(i, 12);
                         else
                             %                                 data(i, :) = {false, chanStr, ' ', 'AC', devices(currentDevice).Subsystems.RangesAvailable.Max, char(manufacturer), s.ModelNumber, s.SerialNumber, s.Sensitivity, {''}, NaN, ' '};
                             data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %%data(i, 3) = {'Input'};
-                            data(i, 3) = {' '};
-                            data(i, 4) = {'IEPE'};
-                            %data(i, 5) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            data(i, 5) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            data(i, 2) = {false};
+                            data(i, 3) = {chanStr};
+                            %%data(i, 4) = {'Input'};
+                            data(i, 4) = {' '};
+                            data(i, 5) = {'IEPE'};
+                            %data(i, 6) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            data(i, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%data(i, 7) = {'IEPE'};
-                            data(i, 6) = {char(manufacturer)};
-                            data(i, 7) = {num2str(s.ModelNumber)};
-                            data(i, 8) = {num2str(s.SerialNumber)};
-                            data(i, 9) = {(s.Sensitivity) * 1000};
-                            data(i, 10) = {unit};
-                            data(i, 11) = {NaN};
-                            data(i, 12) = {' '};
+                            %%data(i, 8) = {'IEPE'};
+                            data(i, 7) = {char(manufacturer)};
+                            data(i, 8) = {num2str(s.ModelNumber)};
+                            data(i, 9) = {num2str(s.SerialNumber)};
+                            data(i, 10) = {(s.Sensitivity) * 1000};
+                            data(i, 11) = {unit};
+                            data(i, 12) = {NaN};
+                            data(i, 13) = {' '};
                         end
                     else
                         %                             fprintf('Sensor not found!\n');
                         
                         if (keepColumns)
                             data(i, 1) = {false};
-                            data(i, 2) = {chanStr};
-                            %data(i, 3) = {'Input'};
-                            data(i, 3) = oldData(i, 3);
-                            data(i, 4) = {' '};
-                            data(i, 5) = {NaN};
-                            %data(i, 7) = {'Voltage'};
-                            data(i, 6) = {' '};
-                            data(i, 7) = {num2str(NaN)};
+                            data(i, 2) = {false};
+                            data(i, 3) = {chanStr};
+                            %data(i, 4) = {'Input'};
+                            data(i, 4) = oldData(i, 3);
+                            data(i, 5) = {' '};
+                            data(i, 6) = {NaN};
+                            %data(i, 8) = {'Voltage'};
+                            data(i, 7) = {' '};
                             data(i, 8) = {num2str(NaN)};
-                            data(i, 9) = {NaN};
-                            data(i, 10) = {' '};
-                            data(i, 11) = oldData(i, 11);
-                            data(i, 12) = oldData(i, 12);
+                            data(i, 9) = {num2str(NaN)};
+                            data(i, 10) = {NaN};
+                            data(i, 11) = {' '};
+                            data(i, 12) = oldData(i, 11);
+                            data(i, 13) = oldData(i, 12);
                         else
-                            data(i, :) = {false, chanStr, ' ', ' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
+                            data(i, :) = {false, false, chanStr, ' ', ' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
                         end
                     end
                     
