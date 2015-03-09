@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 07-Mar-2015 16:19:20
+% Last Modified by GUIDE v2.5 09-Mar-2015 14:05:38
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -639,3 +639,12 @@ function figure1_SizeChangedFcn(hObject, eventdata, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in autoReport.
+function autoReport_Callback(hObject, eventdata, handles)
+% hObject    handle to autoReport (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of autoReport
