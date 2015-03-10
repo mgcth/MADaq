@@ -48,7 +48,7 @@ dataIn = get(handles.channelsTable, 'data');
 [m, n] = size(dataIn);
 j = 1;
 
-for i = 1:m
+for i = [3:m 1:2]
     channelData.index = i;
     channelData.active = dataIn{i, 1};
     channelData.reference = dataIn{i, 2};
@@ -120,6 +120,24 @@ for i = 1:m
     end
 end
 
+% Add output channels
+if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
+        get(handles.multisine,'Value') == 1
+    dataOut = get(handles.outputTable, 'data');
+    [mm, nn] = size(dataOut);
+    j = 1;
+    
+    for i = 1:mm
+        if dataOut{i,1} == 1
+            chan = textscan(dataOut{i,3}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
+            sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
+            
+            % Increment channels counter
+            j = j + 1;
+        end
+    end
+end
+
 % Check if any channels was added to the session
 if (isempty(sessionObject.session.Channels))
     msgbox('No channels in session, might be because no channels have been activated yet.','No channels in session');
@@ -147,30 +165,4 @@ else
     end
     
     disp(['SyncDSA: ', num2str(sessionObject.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
-    
-    
-    if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
-            get(handles.multisine,'Value') == 1
-        
-        % Add listener
-        sessionObject.eventListener = addlistener(sessionObject.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-        
-        % Start periodic
-        sessionObject.session.startForeground();
-        
-        % Add output channels
-        dataOut = get(handles.outputTable, 'data');
-        [mm, nn] = size(dataOut);
-        j = 1;
-        
-        for i = 1:mm
-            if dataOut{i,1} == 1
-                chan = textscan(dataOut{i,3}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
-                sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
-                
-                % Increment channels counter
-                j = j + 1;
-            end
-        end
-    end
 end

@@ -12,24 +12,24 @@ CHdata = get(handles.channelsTable, 'data');
 
 % Check if any channels was added to the session
 if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.reference)
-%     % Add listener
-%     periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-%     
-%     % Start periodic
-%     periodic.session.startForeground();
+    % Add listener
+    periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+
+    % Start periodic
+    %periodic.session.startForeground();
     
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
     
     try
-        [t,Load]=eval(char(handles.fun3.String));
+        [t,Load]=eval(char(get(handles.fun3,'String')));
     catch
         errormsg(2);
     end
-    MaxAmpl=eval(handles.fun6.String);
-    MaxLoad=max(abs(Load));Fspan=eval(handles.fun7.String);
-    Cycles=str2double(handles.fun4.String);Skipps=str2double(handles.fun5.String);
-    Tend=str2double(handles.fun2.String);
+    MaxAmpl=eval(get(handles.fun6,'String'));
+    MaxLoad=max(abs(Load));Fspan=eval(get(handles.fun7,'String'));
+    Cycles=str2double(get(handles.fun4,'String'));Skipps=str2double(get(handles.fun5,'String'));
+    Tend=str2double(get(handles.fun2,'String'));
     dt=t(2)-t(1);
     t(end+1)=t(end)+dt;t(end+1)=Tend;
     Load(end+1)=0;Load(end+1)=0;
@@ -48,6 +48,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     qd=[];
     for I=1:Cycles;qd=[qd;Load(:)];end
     queueOutputData(periodic.session,qd);
+    periodic.session.Rate = 10000;
     [y,times_,Trigt_] = startForeground(periodic.session);
     %y=startForeground(periodic.session);
     y(1:Skipps*Ndata,:)=[];

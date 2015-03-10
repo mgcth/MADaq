@@ -291,7 +291,8 @@ else
         %legend(Legend,'Location','SouthWest')
     elseif plotopt{2}; % Bode plot
         figure(HFRFGUI.hFigfd);clf
-        magphase(freq,FRF(chplot(1),:));
+        Nf=size(FRF,2);
+        magphase(freq(1:Nf),FRF(chplot(1),:));
         legend(Legend{1})
     elseif plotopt{3}; % Nyquist plot
         figure(HFRFGUI.hFigfd);clf

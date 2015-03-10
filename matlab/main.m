@@ -300,19 +300,19 @@ function startButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Check which test
-if handles.monitor.Value == 1 % if monitor
+if get(handles.monitor,'Value') == 1 % if monitor
     startMonitor(hObject, eventdata, handles);
     
-elseif handles.dataLogg.Value == 1 % if standard test
+elseif get(handles.dataLogg,'Value') == 1 % if standard test
     startLogg(hObject, eventdata, handles);
     
-elseif handles.impactTest.Value == 1 % if impactTest
+elseif get(handles.impactTest,'Value') == 1 % if impactTest
     startImpact(hObject, eventdata, handles);
     
-elseif handles.periodic.Value == 1 % if impactTest
+elseif get(handles.periodic,'Value') == 1 % if impactTest
     startPeriodic(hObject, eventdata, handles);
     
-elseif handles.steppedSine.Value == 1 % if impactTest
+elseif get(handles.steppedSine,'Value') == 1 % if impactTest
     startSteppedSine(hObject, eventdata, handles);
     
 elseif handles.multisine.Value == 1 % if impactTest

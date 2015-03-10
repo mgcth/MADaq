@@ -12,11 +12,11 @@ CHdata = get(handles.channelsTable, 'data');
 
 % Check if any channels was added to the session
 if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
-    %     % Add listener
-    %     impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-    %
-    %     % Start impact
-    %     impact.session.startForeground();
+    % Add listener
+    impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    
+    % Start impact
+    %impact.session.startForeground();
     
     % Actual impact test                                Initiate and test
     Fs=impact.session.Rate;Ts=1/Fs;

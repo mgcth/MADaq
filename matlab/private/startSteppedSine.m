@@ -12,17 +12,17 @@ CH = steppedSine.channelInfo;
 
 % Check if any channels was added to the session
 if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.reference)
-%     % Add listener
-%     steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-%     
-%     % Start steppedSine
-%     steppedSine.session.startForeground();
+    % Add listener
+    steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    
+    % Start steppedSine
+    %steppedSine.session.startForeground();
     
     % Actual steppedSine test                             Initiate and test
     Fs=steppedSine.session.Rate;Ts=1/Fs;
     
-    Freqs = eval(char(handles.fun2.String));
-    Loads = eval(char(handles.fun3.String));
+    Freqs = eval(char(get(handles.fun2,'String')));
+    Loads = eval(char(get(handles.fun3,'String')));
     
     % NCyclesInBlock=8;%                    Minimum number of periods in AI block
     % NBlocks=4;%                           Number of blocks in AO buffer
@@ -43,7 +43,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     %                                                          Initiate GUI
     frf_gui;
     Refch = find(steppedSine.channelInfo.active == steppedSine.channelInfo.reference);
-    cal = 1./[handles.channelsTable.Data{steppedSine.channelInfo.active,10}];
+    tmpTable = get(handles.channelsTable,'Data');
+    cal = 1./[tmpTable{steppedSine.channelInfo.active,10}];
     ical = 1./cal;
     names = steppedSine.channelInfo.active;
     
@@ -66,7 +67,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         W=ones(length(t),1);W(1:length(w))=w;
         Sine=Loads(I)*W.*sin(2*pi*f*t(:));
         
-        queueOutputData(steppedSine.session ,Sine);
+        queueOutputData(steppedSine.session,Sine);
+        
         [Data,times,Trigt]=startForeground(steppedSine.session);
         stop(steppedSine.session );% This terminates activities that may interfere
         
