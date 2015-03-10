@@ -21,10 +21,10 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     % Actual impact test                                Initiate and test
     Fs=impact.session.Rate;Ts=1/Fs;
     
-    nRefPoints = eval(handles.fun3.String);
-    impactsOnRef = eval(handles.fun4.String);
-    recordTime = eval(handles.fun2.String);
-    triggerLevel = eval(handles.fun5.String);
+    nRefPoints = eval(get(handles.fun3,'String'));
+    impactsOnRef = eval(get(handles.fun4,'String'));
+    recordTime = eval(get(handles.fun2,'String'));
+    triggerLevel = eval(get(handles.fun5,'String'));
     
     %
     if strcmp(lower(impact.session.Channels(1).ID(1:2)),'ao')

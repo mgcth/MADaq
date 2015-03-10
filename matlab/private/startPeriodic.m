@@ -5,7 +5,7 @@ global DATAcontainer
 % Initialaise the test setup
 periodic = startInitialisation(hObject, eventdata, handles);
 
-periodic.session.Rate = eval(get(handles.fun1, 'String')) * 1000;
+%periodic.session.Rate = eval(get(handles.fun1, 'String')) * 1000;
 
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
@@ -45,12 +45,15 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     set(handles.statusStr, 'String', sprintf('Shaking about %5.2f s. Please wait ...', WaitTime));
     drawnow();
     
+    %y = [];
     qd=[];
     for I=1:Cycles;qd=[qd;Load(:)];end
+    %periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) tempPeriodic(src, event));
+    
     queueOutputData(periodic.session,qd);
-    periodic.session.Rate = 10000;
-    [y,times_,Trigt_] = startForeground(periodic.session);
-    %y=startForeground(periodic.session);
+    [y,times,Trigt]=periodic.session.startForeground();
+    %periodic.session.startBackground();
+    %wait(periodic.session)
     y(1:Skipps*Ndata,:)=[];
     u=y(:,Refch);
     y=y(:,Ych);
@@ -60,7 +63,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     %                                                        Do calibration
     active = periodic.channelInfo.active;
     refch = periodic.channelInfo.reference;
-    cal = 1./[handles.channelsTable.Data{:,10}];
+    tmpTable = get(handles.channelsTable,'Data');
+    cal = 1./[tmpTable{:,10}];
     yind=setdiff(active,refch);uind=refch;
     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
     
@@ -94,4 +98,12 @@ else
     errordlg('No channels or no reference.')
     set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
+end
+
+    function tempPeriodic(src, event)
+        
+        q = event.Data;
+        y = [q; y];
+        %times = event.TimeStamps;
+    end
 end

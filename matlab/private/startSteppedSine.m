@@ -48,6 +48,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     ical = 1./cal;
     names = steppedSine.channelInfo.active;
     
+    times = [];
+        Data = [];
     h=figure;
     %steppedSine.session.addAnalogOutputChannel('PXI1Slot2', 0, 'Voltage');
     for I=1:Nf
@@ -67,10 +69,12 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         W=ones(length(t),1);W(1:length(w))=w;
         Sine=Loads(I)*W.*sin(2*pi*f*t(:));
         
+        %steppedSine = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
         queueOutputData(steppedSine.session,Sine);
-        
-        [Data,times,Trigt]=startForeground(steppedSine.session);
-        stop(steppedSine.session );% This terminates activities that may interfere
+        [Data,times,Trigt]=steppedSine.session.startForeground();
+        %startBackground(steppedSine.session);
+        %wait
+        stop(steppedSine.session);% This terminates activities that may interfere
         
         figure(h);
         plot(times,Data(:,3-1));
@@ -129,4 +133,14 @@ else
     errordlg('No channels or no reference.')
     set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
+end
+
+    function tempSine(src, event)
+        d = event.Data;
+        tt = event.TimeStamps;
+        
+        Data = [d; Data];
+        times = [tt; times];
+        
+    end
 end
