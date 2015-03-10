@@ -45,9 +45,9 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     set(handles.statusStr, 'String', sprintf('Shaking about %5.2f s. Please wait ...', WaitTime));
     drawnow();
     
-    %y = [];
     qd=[];
     for I=1:Cycles;qd=[qd;Load(:)];end
+    %y = [];
     %periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) tempPeriodic(src, event));
     
     queueOutputData(periodic.session,qd);

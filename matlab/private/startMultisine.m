@@ -48,12 +48,11 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     ical = 1./cal;
     names = steppedSine.channelInfo.active;
     
-    %times = [];
-    %Data = [];
+    times = [];
+        Data = [];
     h=figure;
-
+    %steppedSine.session.addAnalogOutputChannel('PXI1Slot2', 0, 'Voltage');
     for I=1:Nf
-        %tic
         f=Freqs(I);
         
         Rate=50*f;if Rate<1000,Rate=1000;end
@@ -69,15 +68,13 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         
         W=ones(length(t),1);W(1:length(w))=w;
         Sine=Loads(I)*W.*sin(2*pi*f*t(:));
-
-        %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
+        
+        %steppedSine = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
         queueOutputData(steppedSine.session,Sine);
         [Data,times,Trigt]=steppedSine.session.startForeground();
-        %aaa=toc;
         %startBackground(steppedSine.session);
-        %wait(steppedSine.session);
+        %wait
         stop(steppedSine.session);% This terminates activities that may interfere
-        %bbb=toc;
         
         figure(h);
         plot(times,Data(:,3-1));
@@ -87,6 +84,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         
         [c,RN(:,I),RH(:,I),RS(:,I),C,PW(:,I)] = ...
             harmonics(Datause,Ts,f,HarmOrder,Refch);
+        
         Yc=diag(ical)*C./repmat(ical(Refch)*C(Refch,:),size(C,1),1);
         meanY(:,I)=mean(Yc,2);
         if any(isnan(meanY)),keyboard,end
@@ -97,8 +95,6 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         ycal=Datause*diag(ical);
         frf_gui(tuse-tuse(1),ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
         
-        %disp(aaa)
-        %disp(bbb)
     end
     
     % temporary

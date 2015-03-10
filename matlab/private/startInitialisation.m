@@ -121,7 +121,7 @@ for i = 1:m%[3:m 1:2]
 end
 
 % Add output channels
-%if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
+if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
         get(handles.multisine,'Value') == 1
     dataOut = get(handles.outputTable, 'data');
     [mm, nn] = size(dataOut);
@@ -136,7 +136,7 @@ end
             j = j + 1;
         end
     end
-%end
+end
 
 % Check if any channels was added to the session
 if (isempty(sessionObject.session.Channels))
