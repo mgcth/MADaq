@@ -51,9 +51,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     %times = [];
     %Data = [];
     h=figure;
-
+tic
     for I=1:Nf
-        %tic
         f=Freqs(I);
         
         Rate=50*f;if Rate<1000,Rate=1000;end
@@ -73,11 +72,9 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
         queueOutputData(steppedSine.session,Sine);
         [Data,times,Trigt]=steppedSine.session.startForeground();
-        %aaa=toc;
         %startBackground(steppedSine.session);
         %wait(steppedSine.session);
         stop(steppedSine.session);% This terminates activities that may interfere
-        %bbb=toc;
         
         figure(h);
         plot(times,Data(:,3-1));
@@ -96,11 +93,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         %
         ycal=Datause*diag(ical);
         frf_gui(tuse-tuse(1),ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
-        
-        %disp(aaa)
-        %disp(bbb)
     end
-    
+toc
     % temporary
     close(HFRFGUI.hFigtd, HFRFGUI.hFigdd, HFRFGUI.hFigfd, HFRFGUI.Fig, h);
     

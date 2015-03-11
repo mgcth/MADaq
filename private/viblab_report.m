@@ -17,8 +17,8 @@ try, UD=Data.UserData; catch, UD=[];end
 try, Sensor=UD.Sensor; catch, Sensor=[];end
 try, Author=UD.Tester;catch, Author='Anonymous';end
 try, Folder=UD.Folder;catch, Folder=pwd;end
-try, Title=UD.Title;catch, Title='Vibration Test Report';end
-try, Subtitle=UD.Title2;catch, Subtitle='- A test made in Vibrations and Smart Structures Lab';end
+try, Title=UD.TestTitles{1};catch, Title='Vibration Test Report';end
+try, Subtitle=UD.TestTitles{2};catch, Subtitle='- A test made in Vibrations and Smart Structures Lab';end
 try, Affiliation=UD.Affiliation;catch, Affiliation='- A test made in Vibrations and Smart Structures Lab';end
 
 SensorFields=fieldnames(Sensor);Nsf=length(SensorFields);
@@ -33,7 +33,7 @@ RPT = RptgenML.CReport('Description','A vibration test report',...
 
 %%                                                               Title page
 tmpClock=clock; % Get the time (year) of test and report making
-Titlepage = rptgen.cfr_titlepage('Copyright_Date',tmpClock(1),...
+Titlepage = rptgen.cfr_titlepage('Copyright_Date','2015',...
 'Author',Author,...
 'Title',Title,...
 'Subtitle',Subtitle,...
@@ -173,7 +173,7 @@ Section = rptgen.cfr_section('StyleName','rgChapterTitle',...
 setParent(Section,RPT);
 U=1;Y=1;
 for I=1:size(Photos,1)
-  if strcmpi(deblank(Photos(I,:)),['Sensoru' int2str(U) '.jpg'])
+  if strcmpi(deblank(Photos(I,:)),['Sensor' int2str(U) '.jpg'])
     Paragraph = rptgen.cfr_paragraph('ParaTitle','4.1');
     Text = rptgen.cfr_text;
     set(Paragraph,'ParaTextComp',Text);
@@ -190,7 +190,7 @@ for I=1:size(Photos,1)
     setParent(Image,Section);
     U=U+1;
   end
-  if strcmpi(deblank(Photos(I,:)),['Sensory' int2str(Y) '.jpg'])
+  if strcmpi(deblank(Photos(I,:)),['Sensor' int2str(Y) '.jpg'])
     Paragraph = rptgen.cfr_paragraph('ParaTitle','4.1');
     Text = rptgen.cfr_text;
     set(Paragraph,'ParaTextComp',Text);
