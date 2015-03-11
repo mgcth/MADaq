@@ -1,6 +1,6 @@
 function previewAdHocLog (hObject, eventData, handles)
 
-global DATAcontainer
+global dataObject dataOutTmp
 
 preview = getappdata(0, 'previewStruct');
 
@@ -43,8 +43,8 @@ if (~running)
     drawnow;
     
     % % TA (start mod)
-    %        global DATAcontainer
-    %        ts=timeseries(DATAcontainer.data,DATAcontainer.t);
+    %        global dataObject
+    %        ts=timeseries(dataObject.data,dataObject.t);
     %        assignin('base','logdata',ts);
     % % TA (end)
     
@@ -58,9 +58,9 @@ else
     drawnow;
     % TA (start mod)
     % Save data
-    Nt=DATAcontainer.nt;
-    DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:));
-    clear('DATAcontainer');
+    Nt=dataObject.nt;
+    dataOutTmp = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:),preview);
+    clear('dataObject');
     % TA (end)
 end
 

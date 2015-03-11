@@ -258,7 +258,8 @@ else
     end
     
     %%                                                   Create plot quantities
-    alpha=norminv(.95,0,1);% 90% confidence interval
+    %alpha=norminv(.95,0,1);% 90% confidence interval
+    alpha=norminvTMP(.95,0,1);% 90% confidence interval
     FRFplus=(abs(FRF)+alpha*stdFRF).*FRF./abs(FRF);
     FRFminus=(abs(FRF)-alpha*stdFRF).*FRF./abs(FRF);
     %   nf=size(FRF,2);
@@ -287,18 +288,22 @@ else
             semilogy(freq(1:Nf),abs(FRF(chplot,:)))
             hold off
             title(([num2str(names(chplot)) ' / ' num2str(names(find(CH.active==CH.reference)))])); %title(cell2mat([cell2mat(names(chplot)) '/ ' names(find(CH.active==CH.reference))]))
+            %legend(Legend,'Location','SouthWest')
         end
-        %legend(Legend,'Location','SouthWest')
     elseif plotopt{2}; % Bode plot
         figure(HFRFGUI.hFigfd);clf
         Nf=size(FRF,2);
-        magphase(freq(1:Nf),FRF(chplot(1),:));
-        legend(Legend{1})
+        if ~isempty(abs(FRF(chplot,:)))
+            magphase(freq(1:Nf),FRF(chplot(1),:));
+            legend(Legend{1})
+        end
     elseif plotopt{3}; % Nyquist plot
         figure(HFRFGUI.hFigfd);clf
-        plot(real(FRF(chplot(1),:)),imag(FRF(chplot(1),:)));
-        axis equal
-        legend(Legend{1})
+        if ~isempty(abs(FRF(chplot,:)))
+            plot(real(FRF(chplot(1),:)),imag(FRF(chplot(1),:)));
+            axis equal
+            legend(Legend{1})
+        end
     else plotopt{4};   % Multiorder FRF plot
     end
     

@@ -1,11 +1,9 @@
-function frdsys = startPeriodic(hObject, eventdata, handles)
+function dataOut = startPeriodic(hObject, eventdata, handles)
 
-global DATAcontainer frdsys
+global dataObject
 
 % Initialaise the test setup
 periodic = startInitialisation(hObject, eventdata, handles);
-
-%periodic.session.Rate = eval(get(handles.fun1, 'String')) * 1000;
 
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
@@ -14,18 +12,11 @@ CHdata = get(handles.channelsTable, 'data');
 if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.reference)
     % Add listener
     periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
-
-    % Start periodic
-    %periodic.session.startForeground();
     
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
     
-    try
-        [t,Load]=eval(char(get(handles.fun3,'String')));
-    catch
-        errormsg(2);
-    end
+    [t,Load]=eval(char(get(handles.fun3,'String')));
     MaxAmpl=eval(get(handles.fun6,'String'));
     MaxLoad=max(abs(Load));Fspan=eval(get(handles.fun7,'String'));
     Cycles=str2double(get(handles.fun4,'String'));Skipps=str2double(get(handles.fun5,'String'));
@@ -59,6 +50,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     y=y(:,Ych);
     
     set(handles.statusStr, 'String', 'Estimating transfer functions. Please wait ...');
+    drawnow();
     
     %                                                        Do calibration
     active = periodic.channelInfo.active;
@@ -77,9 +69,6 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     % Make IDFRD data object
     frdsys=frd(FRF,2*pi*f,'FrequencyUnit','rad/s');
     frdsys=idfrd(frdsys);
-    frdsys.UserData.MeasurementDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
-    %frdsys.UserData.Sensor = cell(1);
-    frdsys.UserData.Sensor.Make = cell(1);
     
     % Clean-up
     periodic.session.release();
@@ -89,10 +78,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     daq.reset;
     
     % Save data
-    Nt=DATAcontainer.nt;
-    DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
-    assignin('base','frdsys',frdsys);
-    clear('DATAcontainer');
+    Nt=dataObject.nt;
+    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,periodic);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
@@ -101,6 +88,8 @@ else
     set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
 end
+
+clear('dataObject');
 
     function tempPeriodic(src, event)
         

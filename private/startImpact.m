@@ -1,11 +1,9 @@
-function frdsys = startImpact(hObject, eventdata, handles)
+function dataOut = startImpact(hObject, eventdata, handles)
 
-global DATAcontainer
+global dataObject
 
 % Initialaise the test setup
 impact = startInitialisation(hObject, eventdata, handles);
-
-impact.session.Rate = eval(get(handles.fun1, 'String')) * 1000;
 
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
@@ -92,11 +90,9 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     frdsys{2}.FREQ= f;
     frdsys{3}.IMPULSE= collectedData.data(1,:);
     
-    
     % Make IDFRD data object
     frdsys=frd(FRF,2*pi*f,'FrequencyUnit','rad/s');
     frdsys=idfrd(frdsys);
-    frdsys.UserData.MeasurementDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
     % Clean-up
     impact.session.release();
@@ -106,10 +102,8 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     daq.reset;
     
     % Save data
-    Nt=DATAcontainer.nt;
-    DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
-    assignin('base','frdsys',frdsys);
-    clear('DATAcontainer');
+    Nt=dataObject.nt;
+    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,impact);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
@@ -119,3 +113,5 @@ else
     set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
 end
+
+clear('dataObject');

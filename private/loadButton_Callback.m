@@ -117,6 +117,13 @@ if (~error)
         % End currentState load
     end
     
+    % Load Tester Info
+    set(handles.autoReport, 'Value', raw{10,1});
+    tmpTesterInfo{1} = raw{10,2};
+    tmpTesterInfo{2} = raw{10,3};
+    tmpTesterInfo{3} = raw{10,4};
+    handles.autoReport.UserData.TesterInfo = tmpTesterInfo;
+    
     % Get channels
     [n, m] = size(raw);
     
@@ -138,7 +145,7 @@ if (~error)
     set(handles.outputTable, 'data', dataOut);
     
     %%% START
-    SensorsInLabFile=which('SensorsInLab.xlsx');
+    SensorsInLabFile=[handles.homePath, '\conf\SensorsInLab.xlsx'];%which([handles.homePath, '\conf\SensorsInLab.xlsx']);
     if ~isempty(SensorsInLabFile)
         [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
         CLL{1}(1,1)={' '};% Replace column header with blank

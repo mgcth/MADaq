@@ -14,7 +14,7 @@ if (~isempty(answer))
     [m, n] = size(dataIn);
     dataOut = get(handles.outputTable, 'data');
     [mm, nn] = size(dataOut);
-    output = cell(10 + m + 1 + mm, n);
+    output = cell(11 + m + 1 + mm, n);
     
     output{1, 1} = 'NB: Changing this file may corrupt it!';
     output{2, 1} = '#';
@@ -45,10 +45,14 @@ if (~isempty(answer))
     output{9, 4} = get(handles.periodic, 'Value');
     output{9, 5} = get(handles.steppedSine, 'Value');
     output{9, 6} = get(handles.multisine, 'Value');
-    output{10, 1} = '###';
+    output{10, 1} = get(handles.autoReport, 'Value');
+    output{10, 2} = handles.autoReport.UserData.TesterInfo{1};
+    output{10, 3} = handles.autoReport.UserData.TesterInfo{2};
+    output{10, 4} = handles.autoReport.UserData.TesterInfo{3};
+    output{11, 1} = '###';
     % % MG (mod end)
     
-    offset = 10; %Last entry of header
+    offset = 11; %Last entry of header
     
     for i = 1:m
         output{offset + i, 1} = dataIn{i, 1};     %   Active

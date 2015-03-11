@@ -1,6 +1,6 @@
-function ts = startLogg(hObject, eventdata, handles)
+function dataOut = startLogg(hObject, eventdata, handles)
 
-global DATAcontainer
+global dataObject
 
 % Initialaise the test setup
 logging = startInitialisation(hObject, eventdata, handles);
@@ -25,11 +25,11 @@ if (~isempty(logging.session.Channels))
     daq.reset;
     
     % Save data
-    Nt=DATAcontainer.nt;
-    ts = DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
-    clear('DATAcontainer');
+    Nt=dataObject.nt;
+    dataOut = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:),logging);
     
     set(handles.statusStr, 'String', 'READY!  DAQ data available at workbench.');
     drawnow();
-    
 end
+
+clear('dataObject');

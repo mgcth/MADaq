@@ -31,7 +31,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 09-Mar-2015 14:05:38
+% Last Modified by GUIDE v2.5 11-Mar-2015 17:44:59
 
 % % ----- TA 2015-02-27 (mod start)
 % global DATAcontainer
@@ -620,3 +620,17 @@ function autoReport_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of autoReport
+
+% If tick, get some more info
+if get(handles.autoReport,'Value')
+    prompt = {'Your name:','Your email:','Affiliation:'};
+    dlg_title = 'Input';
+    num_lines = 1;
+    if isempty(handles.autoReport.UserData)
+        def = {'','',''};
+    else
+        def = {handles.autoReport.UserData.TesterInfo{1},handles.autoReport.UserData.TesterInfo{2},handles.autoReport.UserData.TesterInfo{3}};
+    end
+    handles.autoReport.UserData.TesterInfo = inputdlg(prompt,dlg_title,num_lines,def);
+end
+

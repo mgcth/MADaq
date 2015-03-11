@@ -1,8 +1,8 @@
-function startMonitor(hObject, eventdata, handles)
+function dataOut = startMonitor(hObject, eventdata, handles)
 
-% Define conversion between Hz and kHz;
-kHz2Hz = 1000;
-Hz2kHz = 0.001;
+global dataOutTmp
+
+dataOut = dataOutTmp;
 
 %   Get state of session if existing
 preview = getappdata(0, 'previewStruct');

@@ -1,6 +1,6 @@
-function frdsys = startSteppedSine(hObject, eventdata, handles)
+function dataOut = startSteppedSine(hObject, eventdata, handles)
 
-global DATAcontainer HFRFGUI CH frdsys
+global dataObject HFRFGUI CH
 
 % Initialaise the test setup
 steppedSine = startInitialisation(hObject, eventdata, handles);
@@ -110,13 +110,12 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
             idCovY(I,1,J,1:2,1:2)=[covY(I,I,J) covY(I,I+Ny,J);covY(I+Ny,I,J) covY(I+Ny,I+Ny,J)];
         end
     end
-    ind=1; %%% DUMMY UGLY! FIX! find(CH.active==CH.refch);
+    ind=find(steppedSine.channelInfo.active==steppedSine.channelInfo.reference);
     meanY(ind,:)=[];idCovY(ind,:,:,:,:)=[];% Exclude reference
     
     frdsys=frd(reshape(meanY,size(meanY,1),1,size(meanY,2)),2*pi*Freqs,'FrequencyUnit','rad/s');
     frdsys=idfrd(frdsys);
     frdsys.CovarianceData=idCovY;
-    frdsys.UserData.MeasurementDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
     % Clean-up
     steppedSine.session.release();
@@ -126,10 +125,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     daq.reset;
     
     % Save data
-    Nt=DATAcontainer.nt;
-    DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
-    assignin('base','frdsys',frdsys);
-    clear('DATAcontainer');
+    Nt=dataObject.nt;
+    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,steppedSine);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
@@ -138,6 +135,8 @@ else
     set(handles.statusStr, 'String', 'Measurement aborted.');
     drawnow();
 end
+
+clear('dataObject');
 
     function tempSine(src, event)
         d = event.Data;

@@ -26,6 +26,14 @@ elseif handles.multisine.Value == 1 % if impactTest
 end
 
 % Check if report is to be generated
-if get(handles.autoReport,'Value')
-    viblab_report(dataOut)
+if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
+    %try
+        for i = 1%:length(dataOut.Data)
+            dataIn = dataOut.Data{i};
+            dataIn.UserData = dataOut.Metadata;
+            viblab_report(dataIn)
+        end
+    %catch
+        %errordlg('Something wrong with the report generation.')
+    %end
 end
