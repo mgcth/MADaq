@@ -1,4 +1,4 @@
-function startLogg(hObject, eventdata, handles)
+function ts = startLogg(hObject, eventdata, handles)
 
 global DATAcontainer
 
@@ -26,7 +26,7 @@ if (~isempty(logging.session.Channels))
     
     % Save data
     Nt=DATAcontainer.nt;
-    DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
+    ts = DAQdata2WS(1,DATAcontainer.t(1:Nt),DATAcontainer.data(1:Nt,:),CHdata);
     clear('DATAcontainer');
     
     set(handles.statusStr, 'String', 'READY!  DAQ data available at workbench.');

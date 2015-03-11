@@ -1,6 +1,6 @@
-function startPeriodic(hObject, eventdata, handles)
+function frdsys = startPeriodic(hObject, eventdata, handles)
 
-global DATAcontainer
+global DATAcontainer frdsys
 
 % Initialaise the test setup
 periodic = startInitialisation(hObject, eventdata, handles);
@@ -78,6 +78,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     frdsys=frd(FRF,2*pi*f,'FrequencyUnit','rad/s');
     frdsys=idfrd(frdsys);
     frdsys.UserData.MeasurementDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
+    %frdsys.UserData.Sensor = cell(1);
+    frdsys.UserData.Sensor.Make = cell(1);
     
     % Clean-up
     periodic.session.release();

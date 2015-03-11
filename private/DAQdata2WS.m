@@ -1,4 +1,4 @@
-function DAQdata2WS(opt,varargin)
+function ts = DAQdata2WS(opt,varargin)
 % DAQdata2WS Put DAQ data in the Matlab workspace
 
 % Written: 2015-02-28, Thomas Abrahamsson, Chalmers University of Technology

@@ -72,7 +72,7 @@ function main_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % Get working directory
-handles.homePath = evalin('base', 'homePath');
+handles.homePath = fileparts(mfilename('fullpath'));
 
 % Version
 handles.version = '0.1';
@@ -290,34 +290,6 @@ function freqStr_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in startButton.
-function startButton_Callback(hObject, eventdata, handles)
-% hObject    handle to startButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Check which test
-if get(handles.monitor,'Value') == 1 % if monitor
-    startMonitor(hObject, eventdata, handles);
-    
-elseif get(handles.dataLogg,'Value') == 1 % if standard test
-    startLogg(hObject, eventdata, handles);
-    
-elseif get(handles.impactTest,'Value') == 1 % if impactTest
-    startImpact(hObject, eventdata, handles);
-    
-elseif get(handles.periodic,'Value') == 1 % if impactTest
-    startPeriodic(hObject, eventdata, handles);
-    
-elseif get(handles.steppedSine,'Value') == 1 % if impactTest
-    startSteppedSine(hObject, eventdata, handles);
-    
-elseif handles.multisine.Value == 1 % if impactTest
-    startMultisine(hObject, eventdata, handles);
-    
 end
 
 % --- Executes when user attempts to close figure1.

@@ -99,14 +99,14 @@ for i = 1:m%[3:m 1:2]
         sessionObject.MHEADER(j).Title4 = get(handles.title4, 'String');
         sessionObject.MHEADER(j).Label = dataIn{i, 3};
         % Added by Kent 17-02-2014
-        sessionObject.MHEADER(j).SensorManufacturer = dataIn{i, 6};
-        sessionObject.MHEADER(j).SensorModel = dataIn{i, 7};
-        sessionObject.MHEADER(j).SensorSerialNumber = dataIn{i, 8};
-        sessionObject.MHEADER(j).SensorSensitivity = dataIn{i, 9};
+        sessionObject.MHEADER(j).SensorManufacturer = dataIn{i, 7};
+        sessionObject.MHEADER(j).SensorModel = dataIn{i, 8};
+        sessionObject.MHEADER(j).SensorSerialNumber = dataIn{i, 9};
+        sessionObject.MHEADER(j).SensorSensitivity = dataIn{i, 10};
         %   %   %   %   %   %   %   %   %
-        sessionObject.MHEADER(j).Unit = dataIn{i, 10};
-        sessionObject.MHEADER(j).Dof = dataIn{i, 11};
-        sessionObject.MHEADER(j).Dir = dataIn{i, 12};
+        sessionObject.MHEADER(j).Unit = dataIn{i, 11};
+        sessionObject.MHEADER(j).Dof = dataIn{i, 12};
+        sessionObject.MHEADER(j).Dir = dataIn{i, 13};
         % sessionObject.MHEADER(j).Sensitivity = dataIn{i,11}; % Esben 28-11-2013 Does not comply with specifications, another is added above this
         sessionObject.MHEADER(j).FunctionType = 1;
         

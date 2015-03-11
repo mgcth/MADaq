@@ -1,4 +1,4 @@
-function startImpact(hObject, eventdata, handles)
+function frdsys = startImpact(hObject, eventdata, handles)
 
 global DATAcontainer
 

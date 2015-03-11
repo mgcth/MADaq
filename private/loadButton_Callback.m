@@ -134,16 +134,18 @@ if (~error)
     
     dataIn = cell(length(inputIndex + 1:outputIndex - 1), COLUMNSinINPUTTABLE);
     dataOut = cell(length(outputIndex + 1:n), COLUMNSinOUTPUTTABLE);
+    set(handles.channelsTable, 'data', dataIn);
+    set(handles.outputTable, 'data', dataOut);
     
-%     %%% START
-%     SensorsInLabFile=which('SensorsInLab.xlsx');
-%     if ~isempty(SensorsInLabFile)
-%         [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
-%         CLL{1}(1,1)={' '};% Replace column header with blank
-%         handles.channelsTable.ColumnFormat{9}=CLL{:};
-%     end
-%     handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
-%     %%% END
+    %%% START
+    SensorsInLabFile=which('SensorsInLab.xlsx');
+    if ~isempty(SensorsInLabFile)
+        [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
+        CLL{1}(1,1)={' '};% Replace column header with blank
+        handles.channelsTable.ColumnFormat{9}=CLL{:};
+    end
+    handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
+    %%% END
     
     for i = inputIndex + 1:outputIndex - 1
         
