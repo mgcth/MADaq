@@ -22,7 +22,7 @@ National Instruments (MAtlab) Data AcQuisition and Experimental Modal Analysis l
 - Signal Processing Toolbox
 - MATLAB Report Generator (if used)
 
-## Required MATLAb version:
+## Required MATLAB version:
 - 2015a
   - Developed mainly in this version.
 - In 2014b AutoSyncDSA does not work.
