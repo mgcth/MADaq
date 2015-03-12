@@ -32,4 +32,4 @@ if (~isempty(logging.session.Channels))
     drawnow();
 end
 
-clear('dataObject');
+clear -global dataObject

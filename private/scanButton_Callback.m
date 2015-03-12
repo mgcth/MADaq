@@ -4,6 +4,17 @@ function scanButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user dataIn (see GUIDATA)
 
+% If packaged as app, .mex files not allowed so packed as .mat files and
+% renamed here
+file1mat = [handles.homePath, '\private\getTEDS.mat'];
+file1mex = [handles.homePath, '\private\getTEDS.mexw64'];
+file2mat = [handles.homePath, '\private\resetDevice.mat'];
+file2mex = [handles.homePath, '\private\resetDevice.mexw64'];
+if exist(file1mat, 'file') == 2 && exist(file2mat, 'file') == 2
+    movefile(file1mat, file1mex)
+    movefile(file2mat, file2mex)
+end
+
 % Columns in the two tables
 COLUMNSinINPUTTABLE = 13;
 COLUMNSinOUTPUTTABLE = 13;
@@ -310,7 +321,7 @@ for currentDevice = 1:length(devices)
 end
 
 % Load in sensor information from xls database
-SensorsInLabFile=which('SensorsInLab.xlsx');
+SensorsInLabFile=[handles.homePath, '\conf\SensorsInLab.xlsx'];
 if ~isempty(SensorsInLabFile)
     [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
     CLL{1}(1,1)={' '};% Replace column header with blank
@@ -331,3 +342,11 @@ set(handles.channelsTable, 'data', dataIn);
 set(handles.outputTable, 'data', dataOut);
 set(handles.statusStr, 'String', 'Scanning hardware complete - READY');
 guidata(hObject, handles);
+
+% If packaged as app, .mex files not allowed so packed as .mat files and
+% renamed here, revert back here
+clear mex % to make them movable
+if exist(file1mex, 'file') == 3 && exist(file2mex, 'file') == 3
+    movefile(file1mex, file1mat)
+    movefile(file2mex, file2mat)
+end

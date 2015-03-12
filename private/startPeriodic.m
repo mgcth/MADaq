@@ -89,7 +89,7 @@ else
     drawnow();
 end
 
-clear('dataObject');
+clear -global dataObject
 
     function tempPeriodic(src, event)
         

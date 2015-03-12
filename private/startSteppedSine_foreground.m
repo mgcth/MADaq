@@ -1,4 +1,4 @@
-function dataOut = startMultisine(hObject, eventdata, handles)
+function dataOut = startSteppedSine_foreground(hObject, eventdata, handles)
 
 global dataObject HFRFGUI CH
 
@@ -48,10 +48,10 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     ical = 1./cal;
     names = steppedSine.channelInfo.active;
     
-    times = [];
-    Data = [];
+    %times = [];
+    %Data = [];
     h=figure;
-    
+tic
     for I=1:Nf
         f=Freqs(I);
         
@@ -68,12 +68,12 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         
         W=ones(length(t),1);W(1:length(w))=w;
         Sine=Loads(I)*W.*sin(2*pi*f*t(:));
-        
-        %steppedSine = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
+
+        %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(scr, event) tempSine(src, event));
         queueOutputData(steppedSine.session,Sine);
         [Data,times,Trigt]=steppedSine.session.startForeground();
         %startBackground(steppedSine.session);
-        %wait
+        %wait(steppedSine.session);
         stop(steppedSine.session);% This terminates activities that may interfere
         
         figure(h);
@@ -84,7 +84,6 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         
         [c,RN(:,I),RH(:,I),RS(:,I),C,PW(:,I)] = ...
             harmonics(Datause,Ts,f,HarmOrder,Refch);
-        
         Yc=diag(ical)*C./repmat(ical(Refch)*C(Refch,:),size(C,1),1);
         meanY(:,I)=mean(Yc,2);
         if any(isnan(meanY)),keyboard,end
@@ -94,9 +93,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         %
         ycal=Datause*diag(ical);
         frf_gui(tuse-tuse(1),ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
-        
     end
-    
+toc
     % temporary
     close(HFRFGUI.hFigtd, HFRFGUI.hFigdd, HFRFGUI.hFigfd, HFRFGUI.Fig, h);
     
@@ -122,7 +120,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     
     % Save data
     Nt=dataObject.nt;
-    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,multisine);
+    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,steppedSine);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
@@ -132,7 +130,7 @@ else
     drawnow();
 end
 
-clear -global dataObject
+clear('dataObject');
 
     function tempSine(src, event)
         d = event.Data;
