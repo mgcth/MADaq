@@ -109,7 +109,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
             DAQ.ErrorState=0;DAQ.BufferReady=true;DAQ.fi0=0;
             DAQ.NextBlockEndAddress=[];NextBlockEndAddress=0;
             
-            try IthIsDone=length(DAQ.y);catch IthIsDone=0;end
+            try IthIsDone=length(DAQ.y);catch, IthIsDone=0;end
             ItoBuffer=IthIsDone+1;
             DAQ.freq=Freqs(ItoBuffer);
             
@@ -146,7 +146,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         
         %   disp(['I=' int2str(ItoBuffer) ' ,  Irecorded=' int2str(IthIsDone)])
         
-        try DAQ.y;doplot=true;catch doplot=false;end
+        try DAQ.y;doplot=true;catch, doplot=false;end
         doplot=false;
         if doplot
             I=length(DAQ.y);
@@ -265,7 +265,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     
     % Save data
     Nt=dataObject.nt;
-    dataOut = data2WS(3,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,steppedSine);
+    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,steppedSine);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
