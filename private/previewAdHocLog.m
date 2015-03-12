@@ -60,7 +60,7 @@ else
     % Save data
     Nt=dataObject.nt;
     dataOutTmp = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:),preview);
-    clear('dataObject');
+    %clear -global dataObject
     % TA (end)
 end
 

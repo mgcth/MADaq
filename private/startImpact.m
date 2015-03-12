@@ -114,4 +114,4 @@ else
     drawnow();
 end
 
-clear('dataObject');
+clear -global dataObject
