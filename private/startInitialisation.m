@@ -134,9 +134,11 @@ end
 % Add input channels
 dataIn = get(handles.channelsTable, 'data');
 [m, n] = size(dataIn);
+activated = find([dataIn{:, 1}] == 1);
 j = 1;
 
-for i = 1:m%[3:m 1:2]
+
+for i = activated%1:m%[3:m 1:2]
     channelData.index = i;
     channelData.active = dataIn{i, 1};
     channelData.reference = dataIn{i, 2};
@@ -176,20 +178,20 @@ for i = 1:m%[3:m 1:2]
         %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
         
         % Setup header
-%         sessionObject.Metadata.Sensor{j}.Index = i;
-%         sessionObject.Metadata.Sensor{j}.Number = j;
-%         sessionObject.Metadata.Sensor{j}.Reference = dataIn{i, 2};
-%         sessionObject.Metadata.Sensor{j}.Channel = dataIn{i, 3};%channelData.channel;
-%         sessionObject.Metadata.Sensor{j}.Label = dataIn{i, 4};
-%         sessionObject.Metadata.Sensor{j}.Coupling = dataIn{i, 5};
-%         sessionObject.Metadata.Sensor{j}.Voltage = dataIn{i, 6};
-%         sessionObject.Metadata.Sensor{j}.SensorManufacturer = dataIn{i, 7};
-%         sessionObject.Metadata.Sensor{j}.SensorModel = dataIn{i, 8};
-%         sessionObject.Metadata.Sensor{j}.SensorSerialNumber = dataIn{i, 9};
-%         sessionObject.Metadata.Sensor{j}.SensorSensitivity = dataIn{i, 10};
-%         sessionObject.Metadata.Sensor{j}.Unit = dataIn{i, 11};
-%         sessionObject.Metadata.Sensor{j}.Dof = dataIn{i, 12};
-%         sessionObject.Metadata.Sensor{j}.Dir = dataIn{i, 13};
+        %         sessionObject.Metadata.Sensor{j}.Index = i;
+        %         sessionObject.Metadata.Sensor{j}.Number = j;
+        %         sessionObject.Metadata.Sensor{j}.Reference = dataIn{i, 2};
+        %         sessionObject.Metadata.Sensor{j}.Channel = dataIn{i, 3};%channelData.channel;
+        %         sessionObject.Metadata.Sensor{j}.Label = dataIn{i, 4};
+        %         sessionObject.Metadata.Sensor{j}.Coupling = dataIn{i, 5};
+        %         sessionObject.Metadata.Sensor{j}.Voltage = dataIn{i, 6};
+        %         sessionObject.Metadata.Sensor{j}.SensorManufacturer = dataIn{i, 7};
+        %         sessionObject.Metadata.Sensor{j}.SensorModel = dataIn{i, 8};
+        %         sessionObject.Metadata.Sensor{j}.SensorSerialNumber = dataIn{i, 9};
+        %         sessionObject.Metadata.Sensor{j}.SensorSensitivity = dataIn{i, 10};
+        %         sessionObject.Metadata.Sensor{j}.Unit = dataIn{i, 11};
+        %         sessionObject.Metadata.Sensor{j}.Dof = dataIn{i, 12};
+        %         sessionObject.Metadata.Sensor{j}.Dir = dataIn{i, 13};
         sessionObject.Metadata.Sensor.Index{j} = i;
         sessionObject.Metadata.Sensor.Number{j} = j;
         sessionObject.Metadata.Sensor.Reference{j} = dataIn{i, 2};
@@ -214,6 +216,10 @@ for i = 1:m%[3:m 1:2]
         
         % Increment channels counter
         j = j + 1;
+        
+        % Update status bar
+        set(handles.statusStr, 'String', ['Added sensor ', num2str(j), ' of ', num2str(length(activated)), ' ...']);
+        drawnow(); pause(0.1);
     end
 end
 
