@@ -136,7 +136,10 @@ dataIn = get(handles.channelsTable, 'data');
 [m, n] = size(dataIn);
 activated = find([dataIn{:, 1}] == 1);
 j = 1;
-
+jj = 1;
+channelNumber = [];
+cardName = '';
+first = 1;
 
 for i = activated%1:m%[3:m 1:2]
     channelData.index = i;
@@ -161,9 +164,16 @@ for i = activated%1:m%[3:m 1:2]
         %   Add channel to session
         chan = textscan(channelData.channel, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
         
-        if strcmp(channelData.coupling, 'IEPE')
-            sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
-        else
+        tic
+        % piece of shit code, but i blame Mathworks for a poor
+        % implementation too (or is it NI)
+        if strcmp(channelData.coupling, 'Voltage')
+            % dumpt the found IEPE channels
+            if ~isempty(channelNumber)
+                %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
+                sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
+            end
+            
             analogChan = sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
             %analogChan.EnhancedAliasRejectionEnable = lowFreq;
             
@@ -172,8 +182,65 @@ for i = activated%1:m%[3:m 1:2]
             elseif strcmp(channelData.coupling, 'DC')
                 analogChan.Coupling = 'DC';
             end
+            
+            jj = 1;
+            channelNumber = [];
+        else
+            if  (j && jj == 1)
+                tmpSlotNumber = regexp(chan{1}{1, 2},'\d','match');
+                channelNumber(jj) = str2num([tmpSlotNumber{:}]);
+                cardName = chan{1}{1, 1};
+            else
+                if strcmp(cardName, chan{1}{1,1})
+                    tmpSlotNumber = regexp(chan{1}{1, 2},'\d','match');
+                    channelNumber(jj) = str2num([tmpSlotNumber{:}]);
+                else
+                    %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
+                    sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
+                    
+                    
+                    % Start with the next set
+                    cardName = chan{1}{1, 1};
+                    if strcmp(channelData.coupling, 'Voltage')
+                        % dumpt the found IEPE channels
+                        if ~isempty(channelNumber)
+                            %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
+                            sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
+                        end
+                        
+                        analogChan = sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
+                        %analogChan.EnhancedAliasRejectionEnable = lowFreq;
+                        
+                        if strcmp(channelData.coupling, 'AC')
+                            analogChan.Coupling = 'AC';
+                        elseif strcmp(channelData.coupling, 'DC')
+                            analogChan.Coupling = 'DC';
+                        end
+                        
+                        jj = 1;
+                        channelNumber = [];
+                    else
+                        jj = 1;
+                        channelNumber = [];
+                        
+                        tmpSlotNumber = regexp(chan{1}{1, 2},'\d','match');
+                        channelNumber(jj) = str2num([tmpSlotNumber{:}]);
+                    end
+                end
+                
+            end
+        end
+        jj = jj + 1;
+        
+        % If the lats card make an addition
+        if i == activated(end)
+            if ~isempty(channelNumber)
+                sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
+            end
         end
         
+        times(j) = toc;
+        assignin('base','times',times)
         %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
         %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
         
@@ -251,8 +318,10 @@ if (isempty(sessionObject.session.Channels))
     drawnow();
     
 else
-    % Allocate memory for measurement
-    allocateMemory(handles);
+    if get(handles.monitor,'Value') ~=1 
+        % Allocate memory for measurement
+        allocateMemory(handles);
+    end
     
     set(handles.statusStr, 'String', 'Measurement in progress ...');
     drawnow();
