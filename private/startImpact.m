@@ -11,7 +11,7 @@ CHdata = get(handles.channelsTable, 'data');
 % Check if any channels was added to the session
 if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     % Add listener
-    impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logDataTA(src, event));
     
     % Start impact
     %impact.session.startForeground();
@@ -102,8 +102,8 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     daq.reset;
     
     % Save data
-    Nt=dataObject.nt;
-    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,impact);
+    %Nt=dataObject.nt;
+    dataOut = data2WS(2,frdsys,impact);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();

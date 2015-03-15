@@ -11,7 +11,7 @@ CHdata = get(handles.channelsTable, 'data');
 % Check if any channels was added to the session
 if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.reference)
     % Add listener
-    periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logDataTA(src, event));
     
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
@@ -78,8 +78,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     daq.reset;
     
     % Save data
-    Nt=dataObject.nt;
-    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,periodic);
+    %Nt=dataObject.nt;
+    dataOut = data2WS(2,frdsys,periodic);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();

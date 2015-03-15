@@ -16,7 +16,8 @@ Loads = eval(get(handles.fun3,'String'));
 % Check if any channels was added to the session
 if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.reference)
     % Add listener
-    steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    
     tic
     %                                                     Initiate and test
     NCyclesInBlock=8;%                    Minimum number of periods in AI block
@@ -43,7 +44,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     DAQ.ical = [tmpTable{:,10}];
     ical = DAQ.ical(CH.active);Refch=find(CH.active==CH.reference);
     %names=DAQ.name(CH.active);
-    names = CH.active;
+    names = {tmpTable{CH.active,4}}; %CH.active;
     
     
     ItoBuffer=1;Imax=Nf;Iprocessed=0;
@@ -264,8 +265,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     daq.reset;
     
     % Save data
-    Nt=dataObject.nt;
-    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,steppedSine);
+    %Nt=dataObject.nt;
+    dataOut = data2WS(2,frdsys,steppedSine);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
