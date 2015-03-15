@@ -11,20 +11,10 @@ if opt==1,
   dataOut.Data{1} = ts;
   dataOut.Metadata = varargin{3}.Metadata;
 elseif opt==2
-  frddata=varargin{3};
+  frddata=varargin{1};
   assignin('base','FRDsys',frddata);
   dataOut.Data{1} = frddata;
-  dataOut.Metadata = varargin{4}.Metadata;
-elseif opt==3
-  t=varargin{1};
-  data=varargin{2};
-  frddata=varargin{3};
-  ts=timeseries(data,t);
-  assignin('base','DAQts',ts);
-  assignin('base','FRDsys',frddata);
-  dataOut.Data{1} = ts;
-  dataOut.Data{2} = frddata;
-  dataOut.Metadata = varargin{4}.Metadata;
+  dataOut.Metadata = varargin{2}.Metadata;
 else
   error('Unknown opt')
 end

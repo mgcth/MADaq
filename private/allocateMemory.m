@@ -15,6 +15,14 @@ if Chact==0,error('Seems that no channels are active');end
 memmax=sv.PhysicalMemory.Available;
 ntmax=round(memmax/4/Chact/2/2);% Don't use more that half of available memory, only half of that for now
 dataObject.nt=0;
-dataObject.t=zeros(ntmax,1);
-dataObject.data=zeros(ntmax,Chact);
-dataObject.ntmax=ntmax;
+dataObject.t=0;
+dataObject.data=0;
+dataObject.ntmax=0;
+
+% Do real allocation
+if get(handles.dataLogg,'Value') == 1 || get(handles.monitor,'Value') == 1
+    dataObject.nt=0;
+    dataObject.t=zeros(ntmax,1);
+    dataObject.data=zeros(ntmax,Chact);
+    dataObject.ntmax=ntmax;
+end

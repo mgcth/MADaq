@@ -13,7 +13,7 @@ CH = steppedSine.channelInfo;
 % Check if any channels was added to the session
 if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.reference)
     % Add listener
-    steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
     
     % Start steppedSine
     %steppedSine.session.startForeground();
@@ -121,8 +121,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     daq.reset;
     
     % Save data
-    Nt=dataObject.nt;
-    dataOut = data2WS(2,dataObject.t(1:Nt),dataObject.data(1:Nt,:),frdsys,multisine);
+    %Nt=dataObject.nt;
+    dataOut = data2WS(2,frdsys,multisine);
     
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
