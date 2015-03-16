@@ -1,0 +1,17 @@
+body {
+width: 1000px;
+display: block
+}
+
+.titlepage p, .titlepage pre {
+width: 800px;
+display: inline;
+}
+
+.book {
+width: 1000px;
+}
+
+.mediaobject img {
+width: 1000px;
+}

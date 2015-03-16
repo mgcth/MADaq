@@ -7,14 +7,14 @@ if opt==1,
   t=varargin{1};
   data=varargin{2};
   ts=timeseries(data,t);
-  assignin('base','DAQts',ts);
-  dataOut.Data{1} = ts;
+  dataOut.Data = ts;
   dataOut.Metadata = varargin{3}.Metadata;
+  assignin('base','DAQts',dataOut);
 elseif opt==2
   frddata=varargin{1};
-  assignin('base','FRDsys',frddata);
-  dataOut.Data{1} = frddata;
+  dataOut.Data = frddata;
   dataOut.Metadata = varargin{2}.Metadata;
+  assignin('base','FRDsys',dataOut);
 else
   error('Unknown opt')
 end

@@ -1,7 +1,14 @@
 function plotPreview(src, event)
 % Handles the plotting for the preview
 
+global handles_
+
 preview = getappdata(0, 'previewStruct');
+
+CH = preview.channelInfo;
+tmpTable = get(handles_.channelsTable,'Data');
+ical = [tmpTable{:,10}];
+ical = diag(ical(CH.active));
 
 try
     if (preview.logging.freeLogging)
@@ -25,7 +32,7 @@ end
 t = circshift(t, -m);
 d = circshift(d, -m);
 t(dataLen - m + 1:dataLen, :) = event.TimeStamps;
-d(dataLen - m + 1:dataLen, 1:n) = event.Data;
+d(dataLen - m + 1:dataLen, 1:n) = (ical * event.Data')';
 
 %   Update master monitor
 %     oldFilterData = filterData .* 0.9;

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stylesheet_registry xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+   <stylesheet id="madaq" transformtype="html"><!--2015-mar-16 11:04:16-->
+      <name>MADaq</name>
+      <description>MADaq HTML stylesheet</description>
+      <filename>$matlabroot/sys/namespace/docbook/v4/xsl/html/docbook_rptgen.xsl</filename>
+      <xsl_code>
+         <xsl:param name="html.stylesheet">madaq.css</xsl:param>
+         <xsl:variable name="callout.graphics">0</xsl:variable>
+         <xsl:variable name="show.comments">0</xsl:variable>
+      </xsl_code>
+   </stylesheet>
+</stylesheet_registry>

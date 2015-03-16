@@ -261,7 +261,11 @@ for i = activated%1:m%[3:m 1:2]
         %         sessionObject.Metadata.Sensor{j}.Dir = dataIn{i, 13};
         sessionObject.Metadata.Sensor.Index{j} = i;
         sessionObject.Metadata.Sensor.Number{j} = j;
-        sessionObject.Metadata.Sensor.Reference{j} = dataIn{i, 2};
+        if dataIn{i, 2}
+            sessionObject.Metadata.Sensor.Reference{j} = 'Yes';
+        else
+            sessionObject.Metadata.Sensor.Reference{j} = 'No';
+        end
         sessionObject.Metadata.Sensor.Channel{j} = dataIn{i, 3};%channelData.channel;
         sessionObject.Metadata.Sensor.Label{j} = dataIn{i, 4};
         sessionObject.Metadata.Sensor.Coupling{j} = dataIn{i, 5};
@@ -285,7 +289,7 @@ for i = activated%1:m%[3:m 1:2]
         j = j + 1;
         
         % Update status bar
-        set(handles.statusStr, 'String', ['Added sensor ', num2str(j), ' of ', num2str(length(activated)), ' ...']);
+        set(handles.statusStr, 'String', ['Added sensor ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
         drawnow(); pause(0.1);
     end
 end
@@ -304,6 +308,10 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
             
             % Increment channels counter
             j = j + 1;
+            
+            % Update status bar
+            set(handles.statusStr, 'String', ['Added output ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
+            drawnow(); pause(0.1);
         end
     end
 end
