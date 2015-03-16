@@ -1,6 +1,8 @@
 function dataOut = startMonitor(hObject, eventdata, handles)
 
-global dataOutTmp
+global dataOutTmp handles_
+
+handles_ = handles;
 
 dataOut = dataOutTmp;
 

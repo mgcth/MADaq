@@ -30,7 +30,7 @@ if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
     try
         dataIn = dataOut.Data;
         dataIn.UserData = dataOut.Metadata;
-        viblab_report(dataIn)
+        viblab_report(dataIn,handles)
     catch
         %errordlg('Something wrong with the report generation.')
     end

@@ -3,12 +3,15 @@ function viblab_report(varargin)
 
 %Written: 2015-03-08, Thomas Abrahamsson, Chalmers University of Technology
 
-RPT=viblab_report_code(varargin{1});
+RPT=viblab_report_code(varargin{1},varargin{2});
 report(RPT);
 
 
 
-function RPT=viblab_report_code(Data);
+function RPT=viblab_report_code(Data,handles)
+
+%Copy the stylesheet
+copyfile([handles.homePath '\private\madaq.css'],pwd)
 
 %%                                                              Unpack data
 assignin('base','RPTdta',Data);% Data need to be put in Workspace (as
@@ -26,8 +29,13 @@ PhotoFolder=[Folder filesep 'Photos' filesep];
 try, Photos=ls([PhotoFolder '*.jpg']);catch, Photos=[];end
 
 %%                                                            Create report
-RPT = RptgenML.CReport('Description','A vibration test report',...
-    'Format','html-rtf','Stylesheet','!print-NoOptions','DirectoryType','pwd');
+%RPT = RptgenML.CReport('Description','A vibration test report',...
+%    'Format','doc-rtf','Stylesheet','!print-NoOptions','DirectoryType','pwd');
+RPT = RptgenML.CReport('Description','A vibration test report','DirectoryType','pwd','Stylesheet',...
+'madaq','isIncrementFilename',true,...
+'FilenameName',Title,...
+'FilenameType','other');
+%RPT = RptgenML.CReport('isIncrementFilename',true);
 % RPT = RptgenML.CReport('Description','A vibration test report',...
 % 'Format','dom-docx','Stylesheet','default-rg-docx','DirectoryType','pwd');
 
@@ -58,8 +66,8 @@ end
 if ~isempty(Picture)
     Image = rptgen.cfr_image('MaxViewportSize',[7 9],'FileName',Picture,...
         'Caption','Test Setup');
-    Image = rptgen.cfr_image('Scaling','Fixed size','Size',[800 400],'FileName',Picture,...
-        'Caption','Test Setup');
+%     Image = rptgen.cfr_image('MaxViewportSize',[7 9],'FileName',Picture,...
+%         'Caption','Test Setup');
     set(Titlepage,'ImageComp',Image);
 end
 setParent(Titlepage,RPT);
@@ -189,28 +197,28 @@ for I=1:size(Photos,1)
         end
         %Image = rptgen.cfr_image('FileName',Picture,...
         %'DocHorizAlign','center','MaxViewportSize',[7 9],'Caption',Caption);
-        Image = rptgen.cfr_image('Scaling','Fixed size','FileName',Picture,...
-            'DocHorizAlign','center','Size',[800 400],'Caption',Caption);
+        Image = rptgen.cfr_image('FileName',Picture,...
+        'DocHorizAlign','center','MaxViewportSize',[7 9],'Caption',Caption);
         setParent(Image,Section);
         U=U+1;
     end
-    %   if strcmpi(deblank(Photos(I,:)),['Sensor' int2str(Y) '.jpg'])
-    %     Paragraph = rptgen.cfr_paragraph('ParaTitle','4.1');
-    %     Text = rptgen.cfr_text;
-    %     set(Paragraph,'ParaTextComp',Text);
-    %     Picture=[Folder '\Photos\' deblank(Photos(I,:))];
-    %     [~,pictname,~]=fileparts(Picture);
-    %     try
-    %       Evalc=['type('''  Folder filesep 'Photos' filesep pictname '.txt'')'];
-    %       Caption=['Figure 2.' int2str(U+Y-1) evalc(Evalc)];
-    %     catch
-    %       Caption=['Figure 2.' int2str(U+Y-1) '. Sensor y' int2str(U)];
-    %     end
-    %     Image = rptgen.cfr_image('FileName',Picture,...
-    %     'DocHorizAlign','center','MaxViewportSize',[7 9],'Caption',Caption);
-    %     setParent(Image,Section);
-    %     Y=Y+1;
-    %   end
+%       if strcmpi(deblank(Photos(I,:)),['Sensor' int2str(Y) '.jpg'])
+%         Paragraph = rptgen.cfr_paragraph('ParaTitle','4.1');
+%         Text = rptgen.cfr_text;
+%         set(Paragraph,'ParaTextComp',Text);
+%         Picture=[Folder '\Photos\' deblank(Photos(I,:))];
+%         [~,pictname,~]=fileparts(Picture);
+%         try
+%           Evalc=['type('''  Folder filesep 'Photos' filesep pictname '.txt'')'];
+%           Caption=['Figure 2.' int2str(U+Y-1) evalc(Evalc)];
+%         catch
+%           Caption=['Figure 2.' int2str(U+Y-1) '. Sensor y' int2str(U)];
+%         end
+%         Image = rptgen.cfr_image('FileName',Picture,...
+%         'DocHorizAlign','center','MaxViewportSize',[7 9],'Caption',Caption);
+%         setParent(Image,Section);
+%         Y=Y+1;
+%       end
 end
 
 %%                                            Section 3: Measurement system
