@@ -20,8 +20,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     
     tic
     %                                                     Initiate and test
-    NCyclesInBlock=8;%                    Minimum number of periods in AI block
-    NBlocks=4;%                           Number of blocks in AO buffer
+    NCyclesInBlock=8*2;%                    Minimum number of periods in AI block
+    NBlocks=4*2;%                           Number of blocks in AO buffer
     HarmOrder=2;
     Ny=length(CH.active);Nf=length(Freqs);
     
@@ -45,6 +45,20 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     ical = DAQ.ical(CH.active);Refch=find(CH.active==CH.reference);
     %names=DAQ.name(CH.active);
     names = {tmpTable{CH.active,4}}; %CH.active;
+    
+    
+    
+    % Preallocate
+    nActive = length(CH.active);
+    
+    RN = zeros(nActive,Nf);
+    RH = RN;
+    RS = RN;
+    PW = RN;
+    %Yc = zeros(nActive,20); % 20 harcoded in harmonics.m
+    meanY = zeros(nActive,Nf);
+    covY = zeros(nActive*2,nActive*2,Nf);
+    stdY = zeros(nActive,Nf);
     
     
     ItoBuffer=1;Imax=Nf;Iprocessed=0;
