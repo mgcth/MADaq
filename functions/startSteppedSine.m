@@ -1,4 +1,4 @@
-function dataOut = startSteppedSine_foreground(hObject, eventdata, handles)
+function dataOut = startSteppedSine(hObject, eventdata, handles)
 
 global DAQ dataObject HFRFGUI CH
 
@@ -20,8 +20,8 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     
     tic
     %                                                     Initiate and test
-    NCyclesInBlock=8*2;%                    Minimum number of periods in AI block
-    NBlocks=4*2;%                           Number of blocks in AO buffer
+    NCyclesInBlock=8;%                    Minimum number of periods in AI block
+    NBlocks=4;%                           Number of blocks in AO buffer
     HarmOrder=2;
     Ny=length(CH.active);Nf=length(Freqs);
     
