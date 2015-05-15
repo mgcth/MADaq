@@ -56,8 +56,8 @@ while 1,
     if rank(A)==min(size(A)),break;end
     K=K+1;
 end
-%K=nf; % For stepped sine
-DAQ.y=[];
+K=nf; % For stepped sine
+
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
     % Add listener
@@ -76,16 +76,18 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     opt = [];
     H0 = [];
     H = [];
-    Ysav = [];
-    Y =[];
-    yy = [];
-    uu = [];
+    ySave = [];
     firstRun = 0;
+    Y = [];
+    y = [];
+    YY = [];
     
     % ------------------------------------- Loop over number of frequency sets
     for I=1:K
         I
         haveData = false;
+        haveReadData = true;
+        haveDataContinous = false;
         firstTime = true;
         
         % Set up load
@@ -100,71 +102,73 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         % Collect data until after stationarity obtained
         iret=-1;
         ynotused=[];
-        
-        % Find stationarity
+              
+        KK = 0;
+        C = 0;
         O = 0;
-        while O < 40%iret == -1% && OO < 100
+        
+        if I > 1
+            pause(0.1);
+        end
+        
+        if firstRun == 0
+            firstRun = firstRun + 1;
+            nidaqMultisinePutSineDataInline(multisine.session, [])
+            startBackground(multisine.session);
+            %pause(1);
+        end
+        
+        while iret == -1% && OO < 100
             O = O + 1;
-            % Collect test data (for now by simulation)
-            tic
-            %J = J + 1;
-            %ua = u((J-1) * blockSize + [1:blockSize]);
-            %multisine.session.queueOutputData(ua(:));
-            %get(multisine.session)
+            %nidaqMultisinePutSineDataInline(multisine.session, [])
             %tic
-            if firstRun == 0
-                firstRun = firstRun + 1;
-                nidaqMultisinePutSineDataInline(multisine.session, [])
-                startBackground(multisine.session);
-                pause(1);
-            end
-            %multisine.session.ScansQueued
-            %tic
-            %[y,xend] = simo_multisine_testsys(ua,x0);
-            pause(1000*Ts-toc);
-            %pause(0.5);
-            
-            %x0 = xend;
-            %ynoise = randn(size(y));ynoise=nl*norm(y)/norm(ynoise)*ynoise;
-            %Y = [ua; y+ynoise];
-            %             Y = y';
-            %
-            %             % Estimate transfer functions
-            %             Y=[ynotused Y];
-            %             if J==1
-            %                 [iret,H,ynotused,C,opt]=simostationarityengine(Y,Ts,w/2/pi,refch,Ncyc,Ct);
-            %                 H0=H;
-            %             else
-            %                 [iret,H,ynotused,C]=simostationarityengine(Y,Ts,w/2/pi,refch,Ncyc,Ct,H0,opt);
-            %                 H0=H;
-            %             end
+            %pause(100*Ts-toc);
+            pause(0.0001);
             
             % Estimate transfer functions
-            Ysav=[ynotused Y];
+            %ySave = [ynotused y];
+            %Ysav2 = [Ysav2 Y];
+            %figure(3)
+            %plot(Ysav2(1,:))
+            %Y = [];
             if haveData == true
+                ySave = [ynotused y];
+                haveReadData = true;
+                haveData = false;
+                
+                %YY = [YY y];
+            end
+            
+            if haveDataContinous == true
                 if firstTime == true
-                    [iret,H,ynotused,C,opt]=simostationarityengine(Ysav,Ts,w,refch,Ncyc,Ct);
+                    [iret,H,ynotused,C,KK,opt]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ct);
                     H0=H;
                     firstTime = false;
                 else
                     %if norm(H0)>eps,keyboard,end
-                    %if size(Ysav,2) >= 50000,keyboard,end
-                    [iret,H,ynotused,C]=simostationarityengine(Ysav,Ts,w,refch,Ncyc,Ct,H0,opt);
+                    %if size(ySave,2) >= 50000,keyboard,end
+                    [iret,H,ynotused,C,KK]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ct,H0,opt);
                     %C
                     %[iret,H,ynotused,C]=simostationarityengine(Y,Ts,w/2/pi,refch,Ncyc,Ct,H0);
                     H0=H;
                 end
             end
             
+            %disp(['I = ', num2str(I), ', O = ' num2str(O), ', C = ', num2str(C), ', K = ', num2str(KK), ', queue = ', num2str(multisine.session.ScansQueued)])
+            %multisine.session.ScansQueued
+            
             %yy = [yy Y];
             %uu = [uu u];
-            %if I == 2
-            %    iret = -1;
-            %    yy = [yy Y];
-            %uu = [uu u];
-            %end
-            %if J == 20
+            %if O == 30
+            %    assignin('base','YY',YY);
             %    keyboard
+            %end
+            %if O == 50
+              % assignin('base','Ysav2',Ysav2);
+%                assignin('base','yyy',yyy);
+%                assignin('base','uu',uu);
+%                assignin('base','ySave',ySave);
+               %keyboard
             %end
             
             %             %
@@ -174,46 +178,44 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             %             PassDatagram(uh,'Hr',real(H));
             %             PassDatagram(uh,'Hi',imag(H));
             %             PassDatagram(uh,'C',C);
-            %toc
             
         end
         %get(multisine.session)
-        assignin('base','y',Ysav);
+        assignin('base','y',ySave);
         
         % Obtain statistics
         Hs=[];
         for JJ=1:Nstat
+            haveReadData = true;
+            ynotused = [];
+            haveData = false;
+            haveDataContinous = false;
+            Ctmean = 0.9;
             %JJ
             iret=-1;
             OO = 0;
-            while OO < 10%iret==-1% && OO < 100
+            while iret==-1% && OO < 100
                 OO = OO + 1;
-                tic
                 
-                % Collect test data (for now by simulation)
-                %J=J+1;
-                %ua=u((J-1)*1000+[1:1000]);
-                %[y,xend]=simo_multisine_testsys(ua,x0);
-                
-                multisine.session.ScansQueued
-                pause(1000*Ts-toc);
-                %y=DAQ.y;
-                %x0=xend;
-                %ynoise=randn(size(y));ynoise=nl*norm(y)/norm(ynoise)*ynoise;
-                %Y=[ua;y+ynoise];
-                %Y = y';
-                
+                %tic
+                %pause(100*Ts-toc);
+                pause(0.0001)
+
                 % Estimate transfer functions
-                %Y=[ynotused Y];
-                %[iret,H,ynotused,C]=simostationarityengine(Y,Ts,w/2/pi,refch,Ncyc,Ct,H0,opt);
-                %H0=H;
+                if haveData == true
+                    ySave = [ynotused y];
+                    haveReadData = true;
+                    haveData = false;
+                end
                 
-                % Estimate transfer functions
-                Ysav=[ynotused Y];
-                [iret,H,ynotused,C]=simostationarityengine(Ysav,Ts,w,refch,Ncyc,Ct,H0,opt);
-                H0=H;
+                if haveDataContinous == true
+                    [iret,H,ynotused,C,KK]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ctmean,H0,opt);
+                    H0=H;
+                end
                 
-                %toc
+                %disp(['I = ', num2str(I), ', JJ = ' , num2str(JJ), ', OO = ' num2str(OO), ', C = ', num2str(C), ', K = ', num2str(KK), ', queue = ', num2str(multisine.session.ScansQueued)])
+                %multisine.session.ScansQueued
+                
             end
             Hs(:,:,:,JJ)=H;
         end
@@ -231,7 +233,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     delete(LReqrd);
     delete(LErr);
     set(frdsys,'Frequency',Freqs,'Ts',Tsd);
-    
+    assignin('base','frdsys',frdsys);
     % Clean-up
     multisine.session.release();
     delete(multisine.session);
@@ -258,17 +260,25 @@ clear -global dataObject
         u = zeros(1,size(tArg,2));
         for II = 1:nw, u = u + loads.* sin(om(II) * tArg + fi(II)); end
         src.queueOutputData(u(:));
-        %J = J + 1;
         blockSizeInPutData = blockSizeInPutData + blockSize;
-        tStart = tArg(end) + Ts;
-        
+        tStart = tArg(end) + Ts; % corect but there is still a jump
+        %uu = [uu u];
     end
 
     function nidaqMultisineGetDataInline(src, event)
         %t=event.TimeStamps;
-        Y=event.Data.';
+        if haveReadData == true
+            y=event.Data.';
+        else
+            y = [y event.Data'];
+        end
+        
+        %Y = [Y y];
         
         haveData = true;
+        haveReadData = false;
+        
+        haveDataContinous = true;
         
     end
 
