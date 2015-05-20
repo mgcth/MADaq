@@ -1,6 +1,6 @@
 function dataOut = startMultisine(hObject, eventdata, handles)
 
-global dataObject HFRFGUI CH UDP plotK Xsave Xsave_
+global dataObject HFRFGUI CH UDP plotK% Xsave Xsave_ Zsave
 plotK = 0;
 Xsave = [];
 Xsave_ = [];
@@ -32,7 +32,7 @@ nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
 %Ct = 0.997;
-Ct = 0.9997;
+Ct = 0.99;
 
 
 % Start up parallel Matlab process that has GUI
@@ -50,7 +50,7 @@ Ct = 0.9997;
 %PassDatagram(uh,'ny',ny); % Pass ny
 
 % Some (yet) hardcoded numbers
-Ncyc=20;% Number of lowest frequency sinusoidal that data block should cover
+Ncyc=10;% Number of lowest frequency sinusoidal that data block should cover
 Nstat=20;% Number of block evaluations for statistics
 
 % Initiate
@@ -58,14 +58,14 @@ frdsys=frd(NaN*zeros(length(CH.active)-length(CH.reference),length(CH.reference)
 
 % Obtain good number of frequencies K that can be used simulaneously
 Nblock=ceil(Ncyc/Ts/min(Freqs));
-K=floor(nf/1);% Start guess for number of frequency sets (not too few)
+K=floor(nf/10);% Start guess for number of frequency sets (not too few)
 while 1,
     ind=1:K:nf;
     [~,~,~,A]=harmcoeff(randn(nu+ny,Nblock),Ts,Freqs(ind));
     if rank(A)==min(size(A)),break;end
     K=K+1;
 end
-K=nf; % For stepped sine
+%K=nf; % For stepped sine
 
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
@@ -131,20 +131,21 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             
             % Estimate transfer functions
             if haveData == true
-                ySave = [ynotused y];
+                ynotused = [ynotused y];
                 haveReadData = true;
                 haveData = false;
             end
             
             if haveDataContinous == true
                 if firstTime == true
-                    [iret,H,ynotused,C,opt]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ct);
+                    [iret,H,ynotused,C,opt]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct);
                     H0=H;
+                    
                     if ~isempty(opt)
                         firstTime = false;
                     end
                 else
-                    [iret,H,ynotused,C]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ct,H0,opt);
+                    [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct,H0,opt);
                     H0=H;
                 end
             end
@@ -181,12 +182,16 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         
         % Obtain statistics
         Hs=[];
+        Ctmean_input = 0.9;
+        Ctmean = Ctmean_input;
+        CtmeanChanged = false;
+        
         for JJ=1:Nstat
             haveReadData = true;
             ynotused = [];
             haveData = false;
             haveDataContinous = false;
-            Ctmean = 0.9;
+            
             %JJ
             iret=-1;
             OO = 0;
@@ -199,14 +204,19 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
 
                 % Estimate transfer functions
                 if haveData == true
-                    ySave = [ynotused y];
+                    ynotused = [ynotused y];
                     haveReadData = true;
                     haveData = false;
                 end
                 
                 if haveDataContinous == true
-                    [iret,H,ynotused,C]=simostationarityengine(ySave,Ts,w,refch,Ncyc,Ctmean,H0,opt);
+                    [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ctmean,H0,opt);
                     H0=H;
+                    
+                    if CtmeanChanged == true
+                        Ctmean = Ctmean_input;
+                        CtmeanChanged = false;
+                    end
                 end
                 
                 if multisine.session.IsRunning == 0%multisine.session.ScansQueued == 0
@@ -218,6 +228,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     %get(multisine.session)
                     startBackground(multisine.session);
                     pause(0.1);
+                    Ctmean = Ct;
+                    CtmeanChanged = true;
                 end
                 
                 %disp(['I = ', num2str(I), ', JJ = ' , num2str(JJ), ', OO = ' num2str(OO), ', C = ', num2str(C), ', K = ', num2str(KK), ', queue = ', num2str(multisine.session.ScansQueued)])

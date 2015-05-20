@@ -18,7 +18,7 @@ function [iret,H,ynotused,C,opt]=simostationarityengine(y,Ts,f,refch,Ncyc,Ct,H0,
 %Copyleft: 2015-04-25, Thomas Abrahamsson, Chalmers University of Technology
 
 %% 
-global plotK Xsave Xsave_
+global plotK %Xsave Xsave_ Zsave
 
 if nargin<6, Ct=0.999;end
 
@@ -58,7 +58,7 @@ while 1,
     ynotused=y(:,K*Nblock+1:end);
   else
     K=K+1; plotK = plotK + 1;
-    %if K == 1
+    %if plotK == 2
     %    keyboard
     %end
     [c,yr,yl]=harmcoeff(y(:,Kdata),Ts,f,opt);
@@ -72,7 +72,10 @@ while 1,
     nmax=max([nH nH0]);nmin=min([nH nH0]);
     C=(nmin/nmax)*sqrt(mac(H(:),H0(:)));
     H0=H;
-    Xsave = [Xsave (nmin/nmax)];
+    
+    %Xsave = [Xsave (nmin/nmax)];
+    %figure(10)
+    %plot(Xsave)
     
     %Xsave = [Xsave yr];
     %Xsave_ = [Xsave_ (y(:,Kdata))];
