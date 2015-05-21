@@ -1,4 +1,10 @@
-function dataOut = startSteppedSine(hObject, eventdata, handles)
+function dataOut = steppedSine_startSteppedSine(hObject, eventdata, handles)
+
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
 
 global DAQ dataObject HFRFGUI CH
 
@@ -16,7 +22,7 @@ Loads = eval(get(handles.fun3,'String'));
 % Check if any channels was added to the session
 if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.reference)
     % Add listener
-    %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logData(src, event));
     
     tic
     %                                                     Initiate and test
@@ -39,7 +45,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     DAQ.y=[];
     
     %                                                          Initiate GUI
-    frf_gui;
+    steppedSine_frf_gui;
     tmpTable = get(handles.channelsTable,'Data');
     DAQ.ical = [tmpTable{:,10}];
     ical = DAQ.ical(CH.active);Refch=find(CH.active==CH.reference);
@@ -55,7 +61,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     RH = RN;
     RS = RN;
     PW = RN;
-    %Yc = zeros(nActive,20); % 20 harcoded in harmonics.m
+    %Yc = zeros(nActive,20); % 20 harcoded in steppedSine_harmonics.m
     meanY = zeros(nActive,Nf);
     covY = zeros(nActive*2,nActive*2,Nf);
     stdY = zeros(nActive,Nf);
@@ -88,7 +94,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         if AIBlockSize~=AICurrentBS || DAQ.ErrorState;%       Those require RESET
             
             if ItoBuffer>1
-                nidaqPutSineData(steppedSine.session,[]);
+                steppedSine_nidaqPutSineData(steppedSine.session,[]);
             end
             
             
@@ -114,9 +120,9 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
             end
             
             %                                                         Set up listeners
-            LReqrd=steppedSine.session.addlistener('DataRequired',@nidaqPutSineData0);
-            LAvail=steppedSine.session.addlistener('DataAvailable',@nidaqGetData);
-            LErr = steppedSine.session.addlistener('ErrorOccurred',@nidaqError);
+            LReqrd=steppedSine.session.addlistener('DataRequired',@steppedSine_steppedSine_nidaqPutSineData0);
+            LAvail=steppedSine.session.addlistener('DataAvailable',@steppedSine_nidaqGetData);
+            LErr = steppedSine.session.addlistener('ErrorOccurred',@steppedSine_nidaqError);
             
             %                                     Set up for continuous running of DAQ
             steppedSine.session.IsContinuous=true;
@@ -148,7 +154,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         NextBlockEndAddress=DAQ.NextBlockEndAddress(end,1);
         
         
-        nidaqPutSineData(steppedSine.session,[]);
+        steppedSine_nidaqPutSineData(steppedSine.session,[]);
         if Reset,steppedSine.session.startBackground;end
         
         
@@ -173,7 +179,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
             Irecorded=length(DAQ.y);
             for I=Iprocessed+1:Irecorded
                 [c,RN(:,I),RH(:,I),RS(:,I),C,PW(:,I)] = ...
-                    harmonics(DAQ.y{I},Ts,Freqs(I),HarmOrder,Refch);
+                    steppedSine_harmonics(DAQ.y{I},Ts,Freqs(I),HarmOrder,Refch);
                 Yc=diag(ical)*C./repmat(ical(Refch)*C(Refch,:),size(C,1),1);
                 meanY(:,I)=mean(Yc,2);
                 if any(isnan(meanY)),keyboard,end
@@ -186,14 +192,14 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
             end
             t=DAQ.t{I}-min(DAQ.t{I});ycal=DAQ.y{I}*diag(ical);
             DAQ.y{I}=[];% When read, clear to gain memory
-            %     frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
+            %     steppedSine_frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
         catch
             disp('No data available, or problem processing data')
         end
         
         try
             if Iprocessed>1
-                frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
+                steppedSine_frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
             end
         catch,end
         
@@ -210,7 +216,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         DAQ.NextBlockEndAddress(end+1,1)=NextBlockEndAddress+DAQ.AOBufferSize;
         DAQ.NextBlockEndAddress(end,2)=Freqs(end);
         NextBlockEndAddress=DAQ.NextBlockEndAddress(end,1);
-        nidaqPutSineData(steppedSine.session,[]);
+        steppedSine_nidaqPutSineData(steppedSine.session,[]);
         pause(0.9*DAQ.AOBufferSize/Fs);
     end
     
@@ -230,7 +236,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     % disp('Ending ...')
     for I=Iprocessed+1:Nf
         [c,RN(:,I),RH(:,I),RS(:,I),C,PW(:,I)] = ...
-            harmonics(DAQ.y{I},Ts,Freqs(I),HarmOrder,Refch);
+            steppedSine_harmonics(DAQ.y{I},Ts,Freqs(I),HarmOrder,Refch);
         Yc=diag(ical)*C./repmat(ical(Refch)*C(Refch,:),size(C,1),1);
         %  Y(:,I)=mean(Yc,2);
         meanY(:,I)=mean(Yc,2);
@@ -245,7 +251,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
         %    disp(['ItoBuffer=',int2str(ItoBuffer),' Irecorded=',int2str(Irecorded),' Iprocessed=',int2str(Iprocessed)])
     end
     t=DAQ.t{I}-min(DAQ.t{I});ycal=DAQ.y{I}*diag(ical);
-    frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
+    steppedSine_frf_gui(t,ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
     
     
     

@@ -1,5 +1,11 @@
 function dataOut = startImpact(hObject, eventdata, handles)
 
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
 global dataObject
 
 % Initialaise the test setup
@@ -11,7 +17,7 @@ CHdata = get(handles.channelsTable, 'data');
 % Check if any channels was added to the session
 if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     % Add listener
-    %impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    %impact.eventListener = addlistener(impact.session, 'DataAvailable', @(src, event) logData(src, event));
     
     % Start impact
     %impact.session.startForeground();

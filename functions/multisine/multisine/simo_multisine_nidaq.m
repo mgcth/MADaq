@@ -2,6 +2,8 @@ function FRD=simo_multisine_nidaq
 % function FRD=simo_multisine_nidaq(so,freq,amplist)
 %SIMO_MULTISINE_NIDAQ
 
+%Copyleft: 2015-04-24,Thomas Abrahamsson, Chalmers University of Technology
+
 if 0,% Construct to let the appbuilder see these functions
     magphase;
     simo_multisine_GUI;

@@ -1,4 +1,4 @@
-function frf_gui(t,y,Ind,freq,FRF,stdFRF,RN,RH,RS,PW,names)
+function steppedSine_frf_gui(t,y,Ind,freq,FRF,stdFRF,RN,RH,RS,PW,names)
 %FRF_GUI
 %Alt 1:
 %         No input parameters will do an initialization

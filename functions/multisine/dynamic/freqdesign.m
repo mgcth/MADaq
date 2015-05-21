@@ -9,6 +9,8 @@ function [wc,wd,Ts]=freqdesign(flo,fup,nf)
 %     Ts : sampling Time
 % 
 
+%Copyleft: 2015-04-25, Thomas Abrahamsson, Chalmers University of Technology
+
 Ts=1/pi/sqrt(flo*fup);     % optimized sampling time for wider frequency 
                            % range in discrete-time system
 wdlo=2*atan(flo*pi*Ts);    % lower frequency in discrete system
