@@ -74,6 +74,9 @@ handles.output = hObject;
 % Get working directory
 handles.homePath = fileparts(mfilename('fullpath'));
 
+% Include these files for program to work globally (ugly?)
+addpath(genpath([handles.homePath,'/functions']));
+
 % Version
 handles.version = '0.1';
 set(handles.figure1, 'Name', ['MADaq ', handles.version]);

@@ -28,8 +28,9 @@ end
 % Check if report is to be generated
 if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
     try
-        dataIn = dataOut.Data;
-        dataIn.UserData = dataOut.Metadata;
+        %dataIn = dataOut.Data;
+        %dataIn.UserData = dataOut.Metadata;
+        dataIn = dataOut;
         viblab_report(dataIn,handles)
     catch
         %errordlg('Something wrong with the report generation.')

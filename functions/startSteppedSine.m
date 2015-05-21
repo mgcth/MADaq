@@ -1,4 +1,4 @@
-function dataOut = startSteppedSine_foreground(hObject, eventdata, handles)
+function dataOut = startSteppedSine(hObject, eventdata, handles)
 
 global DAQ dataObject HFRFGUI CH
 
@@ -45,6 +45,20 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     ical = DAQ.ical(CH.active);Refch=find(CH.active==CH.reference);
     %names=DAQ.name(CH.active);
     names = {tmpTable{CH.active,4}}; %CH.active;
+    
+    
+    
+    % Preallocate
+    nActive = length(CH.active);
+    
+    RN = zeros(nActive,Nf);
+    RH = RN;
+    RS = RN;
+    PW = RN;
+    %Yc = zeros(nActive,20); % 20 harcoded in harmonics.m
+    meanY = zeros(nActive,Nf);
+    covY = zeros(nActive*2,nActive*2,Nf);
+    stdY = zeros(nActive,Nf);
     
     
     ItoBuffer=1;Imax=Nf;Iprocessed=0;
