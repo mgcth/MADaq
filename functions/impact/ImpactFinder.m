@@ -1,4 +1,11 @@
 function impactData = ImpactFinder(data,triggerLevel,nScans)
+
+% Author: Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
 [nRow,nCol] = size(data);
 maxAmp = triggerLevel;
 triggerPosition = 0;

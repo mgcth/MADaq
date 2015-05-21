@@ -37,7 +37,7 @@ if (~running)
     %setappdata(0, 'previewStruct', preview);
     
     % Add listener
-    preview.freeLogEventListener = addlistener(preview.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    preview.freeLogEventListener = addlistener(preview.session, 'DataAvailable', @(src, event) logData(src, event));
     
     set(preview.adHocLog, 'String', 'Stop free logging');
     drawnow;

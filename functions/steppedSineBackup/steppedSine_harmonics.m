@@ -1,4 +1,4 @@
-function [c,rn,rh,rs,C,pw]=harmonics(y,Ts,f0,order,refch)
+function [c,rn,rh,rs,C,pw]=steppedSine_harmonics(y,Ts,f0,order,refch)
 % HARMONICS: Obtain harmonical components in data
 %Inputs:  y      - The discrete-time signal
 %         Ts     - The sampling rate

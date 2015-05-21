@@ -4,6 +4,7 @@ function PassDatagram(u,Name,Data)
 %         Name - The name of the matrix to be put in the caller's ws
 %         Data - The matrix to be passed
 
+%Copyleft: 2015-04-24,Thomas Abrahamsson, Chalmers University of Technology
 
 %% Test for data size
 OBSz=floor(get(u,'OutputDatagramPacketSize')/8);

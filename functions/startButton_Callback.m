@@ -4,6 +4,12 @@ function startButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
 % Check which test
 if get(handles.monitor,'Value') == 1 % if monitor
     dataOut = startMonitor(hObject, eventdata, handles);

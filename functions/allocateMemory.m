@@ -1,5 +1,28 @@
 function allocateMemory(handles)
-% Allocate memory
+% ALLOCATEMEMORY - allocate memory for acquired data
+%
+% Syntax:  allocateMemory(handles)
+%
+% Inputs:
+%    input - handles
+%
+% Outputs:
+%    output - none
+%
+% Example: 
+%    allocateMemory(handles)
+%
+% Other m-files required: folders in parent and subfolders
+% Subfunctions: none
+% MAT-files required: none
+%
+% See also: NONE
+
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
 
 global dataObject
 
@@ -13,7 +36,9 @@ Chact = sum([Chdata{:, 1}]);
 if Chact==0,error('Seems that no channels are active');end
 [uv,sv]=memory;
 memmax=sv.PhysicalMemory.Available;
-ntmax=round(memmax/4/Chact/2/2);% Don't use more that half of available memory, only half of that for now
+
+% Don't use more that half of available memory, only half of that for now
+ntmax=round(memmax/4/Chact/2/2);
 dataObject.nt=0;
 dataObject.t=0;
 dataObject.data=0;

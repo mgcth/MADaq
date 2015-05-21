@@ -1,4 +1,4 @@
-function logDataTA(src, evt)
+function logData(src, evt)
 % Add the time stamp and the data values to data.
 
 global dataObject

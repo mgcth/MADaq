@@ -1,4 +1,11 @@
 function GetImpact(src,event)
+
+% Author: Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
 persistent tempData 
 global data nScans triggerLevel scanData
 if(isempty(tempData))

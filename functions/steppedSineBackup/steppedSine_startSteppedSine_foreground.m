@@ -1,4 +1,10 @@
-function dataOut = startSteppedSine_foreground(hObject, eventdata, handles)
+function dataOut = steppedSine_startSteppedSine_foreground(hObject, eventdata, handles)
+
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
 
 global dataObject HFRFGUI CH
 
@@ -13,7 +19,7 @@ CH = steppedSine.channelInfo;
 % Check if any channels was added to the session
 if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.reference)
     % Add listener
-    steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logDataTA(src, event));
+    steppedSine.eventListener = addlistener(steppedSine.session, 'DataAvailable', @(src, event) logData(src, event));
     
     % Start steppedSine
     %steppedSine.session.startForeground();
@@ -41,7 +47,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     % AIBSmin=ceil(Fs/10);
     
     %                                                          Initiate GUI
-    frf_gui;
+    steppedSine_frf_gui;
     Refch = find(steppedSine.channelInfo.active == steppedSine.channelInfo.reference);
     tmpTable = get(handles.channelsTable,'Data');
     cal = 1./[tmpTable{steppedSine.channelInfo.active,10}];
@@ -83,7 +89,7 @@ tic
         Datause=Data(Nskip+1:Nskipandtake,:);
         
         [c,RN(:,I),RH(:,I),RS(:,I),C,PW(:,I)] = ...
-            harmonics(Datause,Ts,f,HarmOrder,Refch);
+            steppedSine_harmonics(Datause,Ts,f,HarmOrder,Refch);
         Yc=diag(ical)*C./repmat(ical(Refch)*C(Refch,:),size(C,1),1);
         meanY(:,I)=mean(Yc,2);
         if any(isnan(meanY)),keyboard,end
@@ -92,7 +98,7 @@ tic
             diag(covY(Ny+1:2*Ny,Ny+1:2*Ny)).^2);
         %
         ycal=Datause*diag(ical);
-        frf_gui(tuse-tuse(1),ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
+        steppedSine_frf_gui(tuse-tuse(1),ycal,I,Freqs,meanY,stdY,RN,RH,RS,PW,names);
     end
 toc
     % temporary

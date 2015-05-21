@@ -4,6 +4,12 @@ function scanButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user dataIn (see GUIDATA)
 
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
 % If packaged as app, .mex files not allowed so packed as .mat files and
 % renamed here
 file1mat = [handles.homePath, '\private\getTEDS.mat'];

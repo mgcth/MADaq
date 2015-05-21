@@ -1,6 +1,6 @@
 function [y,xend]=simo_multisine_testsys(u,x0)
 
-
+%Copyleft: 2015-04-24,Thomas Abrahamsson, Chalmers University of Technology
 
 %True model: P=[3600 1725 1200 2200 1320 1330 1500 5250 3600 850 1 1.4 1.2 2.2 2.5 0.9]
 P=[3600 1725 1200 2200 1320 1330 1500 5250 3600 850 1 1.4 1.2 2.2 2.5 0.9];
