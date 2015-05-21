@@ -7,6 +7,7 @@ function [wc,wd,Ts]=optFreq(flo,fup,nf)
 %     wc : frequncy lines in countinous-time system (rad/s)
 %     wd : frequncy lines in discrete-time system (rad/s)
 %     Ts : sampling Time
+% 
 % Copyright Majid Khorsand Vakilzadeh and Vahid Yaghoubi Nasrabadi (??)
 
 Ts=1/pi/sqrt(flo*fup);     % optimized sampling time for wider frequency 
