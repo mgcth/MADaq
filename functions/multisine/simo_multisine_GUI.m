@@ -18,7 +18,10 @@ ReadDatagram(u);%Now ny should be in this function's workspace
 
 %%                   Create a FRD object that will be filled in the process
 nf=length(f);
-H=NaN*zeros(ny,1,nf);
+%H=NaN*zeros(ny,1,nf);
+H=zeros(ny,1,nf);
+Hr = H;
+Hi = H;
 FRD=frd(H,2*pi*f);
 
 %%                                                               Set up GUI
@@ -39,28 +42,28 @@ catch
   statGUIg.ax=[];
   statGUIg.ny=ny;
 end
-
+%keyboard
 while 1
 %% Get indf, H and C from main process
   if exist('StopTheGUI','var'),quit,end
   if u.BytesAvailable>0
     pause(.1)
     try
-      ReadDatagram(u);% indf should be passed to workspace
-      ReadDatagram(u);% Hr=real(H) should be passed to workspace
-      ReadDatagram(u);% Hi=imag(H) should be passed to workspace
-      ReadDatagram(u);% C should be passed to workspace
+      ReadDatagram(u)% indf should be passed to workspace
+      ReadDatagram(u)% Hr=real(H) should be passed to workspace
+      ReadDatagram(u)% Hi=imag(H) should be passed to workspace
+      ReadDatagram(u)% C should be passed to workspace
       H=Hr+1i*Hi;
       FRD.ResponseData(:,1,indf)=H;
     catch
-    end  
-    statGUI(f(indf),H,FRD,C);drawnow
+    end 
+    statGUI(f(indf),indf,H,FRD,C);drawnow
   end
   while 1,if strcmpi(get(statGUIg.yseth,'Visible'),'off'),break;else,pause(0.1);end,end
 end
 
 %% ========================================================================
-function statGUI(f,H,FRD,C)
+function statGUI(f,indf,H,FRD,C)
 global statGUIg
 figure(statGUIg.fh);cla;
 uid=1;
@@ -73,7 +76,8 @@ subplot(211);opt.ax=axis;statGUIg.ax=opt.ax;
 
 if all(isnan(FRD.ResponseData(:)));opt.ax=[];end
 opt.hold=true;opt.ls='r.';opt.grid=true;
-magphase(f,squeeze(H(yid,uid,:)),opt);
+%magphase(f,squeeze(H(yid,uid,:)),opt);
+magphase(f,squeeze(FRD.ResponseData(yid,uid,indf)),opt);
 subplot(211),title(['u1->y' int2str(yid)])
 
 if C>0.999

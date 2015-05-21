@@ -42,3 +42,18 @@ if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
         %errordlg('Something wrong with the report generation.')
     end
 end
+
+% Check if write to UFF
+if get(handles.write2UFF,'Value')
+    name = handles.title1;
+    
+    if isempty(get(handles.title1,'String'))
+        name = ['dummy_', num2str(randi([1 1000],1,1))];
+    end
+    
+    if isa(dataIn,'idfrd')
+        frd2uff(name, dataIn);
+    else
+        ts2uff(name, dataIn);
+    end
+end
