@@ -20,13 +20,13 @@ elseif get(handles.dataLogg,'Value') == 1 % if standard test
 elseif get(handles.impactTest,'Value') == 1 % if impactTest
     dataOut = startImpact(hObject, eventdata, handles);
     
-elseif get(handles.periodic,'Value') == 1 % if impactTest
+elseif get(handles.periodic,'Value') == 1 % if periodic
     dataOut = startPeriodic(hObject, eventdata, handles);
     
-elseif get(handles.steppedSine,'Value') == 1 % if impactTest
-    dataOut = startSteppedSine(hObject, eventdata, handles);
+elseif get(handles.steppedSine,'Value') == 1 % if steppedSine
+    dataOut = startMultisine(hObject, eventdata, handles);
     
-elseif handles.multisine.Value == 1 % if impactTest
+elseif handles.multisine.Value == 1 % if multisine
     dataOut = startMultisine(hObject, eventdata, handles);
     
 end
