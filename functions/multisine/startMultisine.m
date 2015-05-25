@@ -57,7 +57,7 @@ PassDatagram(uh,'f',Freqs); % Pass frequency list
 PassDatagram(uh,'ny',ny); % Pass ny
 
 % Initiate
-frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),Freqs,'FrequencyUnit','Hz');
+frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
 
 % Obtain good number of frequencies K that can be used simulaneously
 Nblock=ceil(Ncyc/Ts/min(Freqs));
@@ -194,13 +194,13 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             haveData = false;
             haveDataContinous = false;
             
-            iret=-1;
+            iret = -1;
             OO = 0;
             while iret == -1
                 OO = OO + 1;
                 
                 pause(0.0001)
-
+                
                 % Estimate transfer functions
                 if haveData == true
                     ynotused = [ynotused y];
@@ -252,7 +252,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     delete(LAvail);
     delete(LReqrd);
     delete(LErr);
-    set(frdsys,'Frequency',Freqs,'Ts',Tsd);
+    %set(frdsys,'Frequency',Freqs,'Ts',Tsd);
     
     % Clean-up
     multisine.session.release();

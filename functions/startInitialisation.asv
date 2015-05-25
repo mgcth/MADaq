@@ -242,7 +242,7 @@ for i = activated%1:m%[3:m 1:2]
         end
         
         times(j) = toc;
-        %assignin('base','times',times)
+        assignin('base','times',times)
         %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
         %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
         
@@ -297,17 +297,6 @@ for i = activated%1:m%[3:m 1:2]
     end
 end
 
-for i = 1:length(activated)
-    channelData.coupling = dataIn{i, 5};
-    
-    if strcmp(channelData.coupling, 'AC')
-        sessionObject.session.Channels(i).Coupling = 'AC';
-    elseif strcmp(channelData.coupling, 'DC')
-        sessionObject.session.Channels(i).Coupling = 'DC';
-    end
-    
-end
-
 % Add output channels to periodic, steppedSine and multisine
 if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
         get(handles.multisine,'Value') == 1
@@ -316,17 +305,9 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
     j = 1;
     
     for i = 1:mm
-        channelDataOut.coupling = dataOut{i,5};
-        
         if dataOut{i,1} == 1
             chan = textscan(dataOut{i,3}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
             sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
-            
-%             if strcmp(channelDataOut.coupling, 'AC')
-%                 analogChan.Coupling = 'AC';
-%             elseif strcmp(channelDataOut.coupling, 'DC')
-%                 analogChan.Coupling = 'DC';
-%             end
             
             % Increment channels counter
             j = j + 1;
@@ -334,8 +315,6 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
             % Update status bar
             set(handles.statusStr, 'String', ['Added output ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
             drawnow(); pause(0.1);
-            
-
         end
     end
 end

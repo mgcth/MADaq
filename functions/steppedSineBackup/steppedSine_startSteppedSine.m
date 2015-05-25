@@ -47,7 +47,7 @@ if ~isempty(steppedSine.session.Channels) &&  ~isempty(steppedSine.channelInfo.r
     %                                                          Initiate GUI
     steppedSine_frf_gui;
     tmpTable = get(handles.channelsTable,'Data');
-    DAQ.ical = [tmpTable{:,10}];
+    DAQ.ical = [tmpTable{:,11}];
     ical = DAQ.ical(CH.active);Refch=find(CH.active==CH.reference);
     %names=DAQ.name(CH.active);
     names = {tmpTable{CH.active,4}}; %CH.active;

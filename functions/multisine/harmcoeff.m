@@ -13,7 +13,6 @@ function [cc,yr,yl,A]=harmcoeff(y,Ts,f,opt)
 
 %Copyleft: 2014-12-14, Thomas Abrahamsson, Chalmers University of Technology
 
-
 %%                                                                 Initiate
 if nargin<4,opt=[];end
 if ~isfield(opt,'o'),opt.o=false;end
