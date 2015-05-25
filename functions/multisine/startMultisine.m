@@ -77,7 +77,7 @@ end
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
     tmpTable = get(handles.channelsTable,'Data');
-    ical = {tmpTable{:,10}};
+    ical = {tmpTable{:,11}};
     ical = cell2mat(ical(CH.active))';
     
     % Add listener
