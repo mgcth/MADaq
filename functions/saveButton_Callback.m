@@ -91,7 +91,7 @@ if (~isempty(fileName))
         %output{10 + i, 4} = dataOut{j, 4};        %   Signal
         output{offset + i, 4} = dataOut{j, 4};     %   Label
         output{offset + i, 5} = dataOut{j, 5};     %   Coupling
-        output{offset + i, 6} = dataOut{i, 6};     %   Type (Voltage/IEPE)
+        output{offset + i, 6} = dataOut{j, 6};     %   Type (Voltage/IEPE)
         output{offset + i, 7} = dataOut{j, 7};     %   Voltage
         %output{10 + i, 7} = dataOut{j, 7};        %   Transducer type
         output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer
