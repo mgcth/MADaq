@@ -36,7 +36,7 @@ function varargout = abraDAQ(varargin)
 % Created: 02-05-2013
 % Revision: 24-02-2015 1.3 minor bug changes
 
-% Last Modified by GUIDE v2.5 21-May-2015 08:03:40
+% Last Modified by GUIDE v2.5 21-May-2015 14:58:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,6 +76,7 @@ handles.homePath = fileparts(mfilename('fullpath'));
 
 % Include these files for program to work globally (ugly?)
 addpath(genpath([handles.homePath,'/functions']));
+addpath(handles.homePath);
 
 % Version
 handles.version = '0.1';
@@ -637,3 +638,12 @@ if get(handles.autoReport,'Value')
     handles.autoReport.UserData.TesterInfo = inputdlg(prompt,dlg_title,num_lines,def);
 end
 
+
+
+% --- Executes on button press in write2UFF.
+function write2UFF_Callback(hObject, eventdata, handles)
+% hObject    handle to write2UFF (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of write2UFF

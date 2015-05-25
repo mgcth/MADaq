@@ -148,9 +148,10 @@ for i = activated%1:m%[3:m 1:2]
     channelData.channel = dataIn{i, 3};
     %channelData.signal = dataIn{i, 4};
     channelData.coupling = dataIn{i, 5};
-    channelData.voltage = dataIn{i, 6};
+    channelData.type = dataIn{i, 6};
+    channelData.voltage = dataIn{i, 7};
     %channelData.sensorType = dataIn{i, 8};
-    channelData.sensitivity = dataIn{i, 10};
+    channelData.sensitivity = dataIn{i, 11};
     
     % Check if channel is ok, if so, then add channel to monitor
     configOk =  channelData.active && ...
@@ -167,7 +168,7 @@ for i = activated%1:m%[3:m 1:2]
         tic
         % piece of shit code, but i blame Mathworks for a poor
         % implementation too (or is it NI)
-        if strcmp(channelData.coupling, 'Voltage')
+        if strcmp(channelData.type, 'Voltage')
             % dumpt the found IEPE channels
             if ~isempty(channelNumber)
                 %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
@@ -201,7 +202,7 @@ for i = activated%1:m%[3:m 1:2]
                     
                     % Start with the next set
                     cardName = chan{1}{1, 1};
-                    if strcmp(channelData.coupling, 'Voltage')
+                    if strcmp(channelData.type, 'Voltage')
                         % dumpt the found IEPE channels
                         if ~isempty(channelNumber)
                             %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
@@ -225,6 +226,7 @@ for i = activated%1:m%[3:m 1:2]
                         
                         tmpSlotNumber = regexp(chan{1}{1, 2},'\d','match');
                         channelNumber(jj) = str2num([tmpSlotNumber{:}]);
+                        
                     end
                 end
                 
@@ -232,7 +234,7 @@ for i = activated%1:m%[3:m 1:2]
         end
         jj = jj + 1;
         
-        % If the lats card make an addition
+        % If the last card make an addition
         if i == activated(end)
             if ~isempty(channelNumber)
                 sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
@@ -240,7 +242,7 @@ for i = activated%1:m%[3:m 1:2]
         end
         
         times(j) = toc;
-        assignin('base','times',times)
+        %assignin('base','times',times)
         %logging.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');%channelData.sensorType);
         %logging.session.Channels(j).Sensitivity = channelData.sensitivity;
         
@@ -269,14 +271,15 @@ for i = activated%1:m%[3:m 1:2]
         sessionObject.Metadata.Sensor.Channel{j} = dataIn{i, 3};%channelData.channel;
         sessionObject.Metadata.Sensor.Label{j} = dataIn{i, 4};
         sessionObject.Metadata.Sensor.Coupling{j} = dataIn{i, 5};
-        sessionObject.Metadata.Sensor.Voltage{j} = dataIn{i, 6};
-        sessionObject.Metadata.Sensor.Manufacturer{j} = dataIn{i, 7};
-        sessionObject.Metadata.Sensor.Model{j} = dataIn{i, 8};
-        sessionObject.Metadata.Sensor.SerialNumber{j} = dataIn{i, 9};
-        sessionObject.Metadata.Sensor.Sensitivity{j} = dataIn{i, 10};
-        sessionObject.Metadata.Sensor.Unit{j} = dataIn{i, 11};
-        sessionObject.Metadata.Sensor.Dof{j} = dataIn{i, 12};
-        sessionObject.Metadata.Sensor.Dir{j} = dataIn{i, 13};
+        sessionObject.Metadata.Sensor.Type{j} = dataIn{i, 6};
+        sessionObject.Metadata.Sensor.Voltage{j} = dataIn{i, 7};
+        sessionObject.Metadata.Sensor.Manufacturer{j} = dataIn{i, 8};
+        sessionObject.Metadata.Sensor.Model{j} = dataIn{i, 9};
+        sessionObject.Metadata.Sensor.SerialNumber{j} = dataIn{i, 10};
+        sessionObject.Metadata.Sensor.Sensitivity{j} = dataIn{i, 11};
+        sessionObject.Metadata.Sensor.Unit{j} = dataIn{i, 12};
+        sessionObject.Metadata.Sensor.Dof{j} = dataIn{i, 13};
+        sessionObject.Metadata.Sensor.Dir{j} = dataIn{i, 14};
         
         %sessionObject.Metadata.Sensor{j}.FunctionType = 1;
         
@@ -294,6 +297,17 @@ for i = activated%1:m%[3:m 1:2]
     end
 end
 
+for i = 1:length(activated)
+    channelData.coupling = dataIn{i, 5};
+    
+    if strcmp(channelData.coupling, 'AC')
+        sessionObject.session.Channels(i).Coupling = 'AC';
+    elseif strcmp(channelData.coupling, 'DC')
+        sessionObject.session.Channels(i).Coupling = 'DC';
+    end
+    
+end
+
 % Add output channels to periodic, steppedSine and multisine
 if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
         get(handles.multisine,'Value') == 1
@@ -302,9 +316,17 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
     j = 1;
     
     for i = 1:mm
+        channelDataOut.coupling = dataOut{i,5};
+        
         if dataOut{i,1} == 1
             chan = textscan(dataOut{i,3}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
             sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
+            
+%             if strcmp(channelDataOut.coupling, 'AC')
+%                 analogChan.Coupling = 'AC';
+%             elseif strcmp(channelDataOut.coupling, 'DC')
+%                 analogChan.Coupling = 'DC';
+%             end
             
             % Increment channels counter
             j = j + 1;
@@ -312,6 +334,8 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
             % Update status bar
             set(handles.statusStr, 'String', ['Added output ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
             drawnow(); pause(0.1);
+            
+
         end
     end
 end
@@ -326,7 +350,7 @@ if (isempty(sessionObject.session.Channels))
     drawnow();
     
 else
-    if get(handles.monitor,'Value') ~=1 
+    if get(handles.periodic,'Value') == 1 
         % Allocate memory for measurement
         allocateMemory(handles);
     end

@@ -62,7 +62,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     active = periodic.channelInfo.active;
     refch = periodic.channelInfo.reference;
     tmpTable = get(handles.channelsTable,'Data');
-    cal = 1./[tmpTable{:,10}];
+    cal = 1./[tmpTable{:,11}];
     yind=setdiff(active,refch);uind=refch;
     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
     

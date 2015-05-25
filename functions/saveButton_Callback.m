@@ -12,10 +12,12 @@ function saveButton_Callback(hObject, eventdata, handles)
 
 global currentState
 
-answer = inputdlg('Enter name of the file to save', 'Save configuration');
-drawnow; pause(0.1);                       %   Prevent MatLab from hanging
+%fileName = inputdlg('Enter name of the file to save', 'Save configuration');
+%drawnow; pause(0.1);                       %   Prevent MatLab from hanging
 
-if (~isempty(answer))
+[fileName,pathName] = uiputfile('conf/*.conf','Save configuration to file');
+
+if (~isempty(fileName))
     dataIn = get(handles.channelsTable, 'data');
     [m, n] = size(dataIn);
     dataOut = get(handles.outputTable, 'data');
@@ -66,16 +68,17 @@ if (~isempty(answer))
         output{offset + i, 3} = dataIn{i, 3};     %   Channel
         %output{10 + i, 4} = dataIn{i, 4};        %   Signal
         output{offset + i, 4} = dataIn{i, 4};     %   Label
-        output{offset + i, 5} = dataIn{i, 5};     %   Coupling
-        output{offset + i, 6} = dataIn{i, 6};     %   Voltage
+        output{offset + i, 5} = dataIn{i, 5};     %   Coupling (AC/DC)
+        output{offset + i, 6} = dataIn{i, 6};     %   Type (Voltage/IEPE)
+        output{offset + i, 7} = dataIn{i, 7};     %   Voltage
         %output{10 + i, 7} = dataIn{i, 7};        %   Transducer type
-        output{offset + i, 7} = dataIn{i, 7};     %   Manufacturer
-        output{offset + i, 8} = dataIn{i, 8};     %   Manufacturer ID
-        output{offset + i, 9} = dataIn{i, 9};     %   Serial number
-        output{offset + i, 10} = dataIn{i, 10};   %   Sensitivity
-        output{offset + i, 11} = dataIn{i, 11};   %   Units
-        output{offset + i, 12} = dataIn{i, 12};   %   Dof
-        output{offset + i, 13} = dataIn{i, 13};   %   Direction
+        output{offset + i, 8} = dataIn{i, 8};     %   Manufacturer
+        output{offset + i, 9} = dataIn{i, 9};     %   Manufacturer ID
+        output{offset + i, 10} = dataIn{i, 10};   %   Serial number
+        output{offset + i, 11} = dataIn{i, 11};   %   Sensitivity
+        output{offset + i, 12} = dataIn{i, 12};   %   Units
+        output{offset + i, 13} = dataIn{i, 13};   %   Dof
+        output{offset + i, 14} = dataIn{i, 14};   %   Direction
     end
     
     output{offset + m + 1, 1} = '### ###';
@@ -88,19 +91,21 @@ if (~isempty(answer))
         %output{10 + i, 4} = dataOut{j, 4};        %   Signal
         output{offset + i, 4} = dataOut{j, 4};     %   Label
         output{offset + i, 5} = dataOut{j, 5};     %   Coupling
-        output{offset + i, 6} = dataOut{j, 6};     %   Voltage
+        output{offset + i, 6} = dataOut{j, 6};     %   Type (Voltage/IEPE)
+        output{offset + i, 7} = dataOut{j, 7};     %   Voltage
         %output{10 + i, 7} = dataOut{j, 7};        %   Transducer type
-        output{offset + i, 7} = dataOut{j, 7};     %   Manufacturer
-        output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer ID
-        output{offset + i, 9} = dataOut{j, 9};     %   Serial number
-        output{offset + i, 10} = dataOut{j, 10};   %   Sensitivity
-        output{offset + i, 11} = dataOut{j, 11};   %   Units
-        output{offset + i, 12} = dataOut{j, 12};   %   Dof
-        output{offset + i, 13} = dataOut{j, 13};   %   Direction
+        output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer
+        output{offset + i, 9} = dataOut{j, 9};     %   Manufacturer ID
+        output{offset + i, 10} = dataOut{j, 10};   %   Serial number
+        output{offset + i, 11} = dataOut{j, 11};   %   Sensitivity
+        output{offset + i, 12} = dataOut{j, 12};   %   Units
+        output{offset + i, 13} = dataOut{j, 13};   %   Dof
+        output{offset + i, 14} = dataOut{j, 14};   %   Direction
         j = j + 1;
     end
     
-    file = [handles.homePath, '/conf/', answer{1,1}, '.conf'];
+    %file = [handles.homePath, '/conf/', fileName{1,1}, '.conf'];
+    file = [pathName, fileName];
     try
         if exist(file, 'file')
             delete(file);

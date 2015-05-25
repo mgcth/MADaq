@@ -13,8 +13,8 @@ function loadButton_Callback(hObject, eventdata, handles)
 global currentState
 
 % Columns in the two tables
-COLUMNSinINPUTTABLE = 13;
-COLUMNSinOUTPUTTABLE = 13;
+COLUMNSinINPUTTABLE = 14;
+COLUMNSinOUTPUTTABLE = 14;
 
 error = false;
 loadFile = false;
@@ -26,15 +26,19 @@ raw = {};
 while (~loadFile)
     d = dir(directory);
     str = {d.name};
-    [select, status] = listdlg( 'PromptString','Select a file:',...
-        'SelectionMode','single',...
-        'ListString',str);
-    drawnow; pause(0.1);                       %   Prevent MatLab from hanging
+    %[select, status] = listdlg( 'PromptString','Select a file:',...
+    %    'SelectionMode','single',...
+    %    'ListString',str);
+    %drawnow; pause(0.1);                       %   Prevent MatLab from hanging
     
-    selection = [directory, '\', d(select).name];
+    %selection = [directory, '\', d(select).name];
+    %type = exist(selection, 'file');
+    
+    [fileName,pathName] = uigetfile('conf/*.conf','Select the load file');
+    selection = string([pathName, fileName]);
     type = exist(selection, 'file');
     
-    if (status ~= 0)
+    if ~isempty(fileName)
         
         if (type == 2)      %   File
             loadFile = true;
@@ -155,7 +159,7 @@ if (~error)
     if ~isempty(SensorsInLabFile)
         [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
         CLL{1}(1,1)={' '};% Replace column header with blank
-        handles.channelsTable.ColumnFormat{9}=CLL{:};
+        handles.channelsTable.ColumnFormat{10}=CLL{:};
     end
     handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
     %%% END
@@ -180,42 +184,48 @@ if (~error)
             temp{1, 4} = '';
         end
         
-        if (ischar(raw{i, 5}))      %   Coupling
+        if (ischar(raw{i, 5}))      %   Coupling (AC/DC)
             temp{1, 5} = raw{i, 5};
         else
             temp{1, 5} = '';
         end
         
-        temp{1, 6} = raw{i, 6};     %   Voltage
-        
-        if (ischar(raw{i, 7}))      %   Manufacturer
-            temp{1, 7} = raw{i, 7};
+        if (ischar(raw{i, 6}))      %   Type (Voltage/IEPE)
+            temp{1, 6} = raw{i, 6};
         else
-            temp{1, 7} = '';
+            temp{1, 6} = '';
         end
         
-        temp{1, 8} = raw{i, 8};     %   Manufacturer ID
+        temp{1, 7} = raw{i, 7};     %   Voltage
         
-        temp{1, 9} = raw{i, 9};     %   Serial number
-        
-        temp{1, 10} = raw{i, 10};   %   Sensitivity
-        
-        if (ischar(raw{i, 11}))     %   Units
-            temp{1, 11} = raw{i, 11};
+        if (ischar(raw{i, 8}))      %   Manufacturer
+            temp{1, 8} = raw{i, 8};
         else
-            temp{1, 11} = '';
+            temp{1, 8} = '';
         end
         
-        if (ischar(raw{i, 12}))     %   Dof
+        temp{1, 9} = raw{i, 9};     %   Manufacturer ID
+        
+        temp{1, 10} = raw{i, 10};     %   Serial number
+        
+        temp{1, 11} = raw{i, 11};   %   Sensitivity
+        
+        if (ischar(raw{i, 12}))     %   Units
             temp{1, 12} = raw{i, 12};
         else
             temp{1, 12} = '';
         end
         
-        if (ischar(raw{i, 13}))     %   Direction
+        if (ischar(raw{i, 13}))     %   Dof
             temp{1, 13} = raw{i, 13};
         else
             temp{1, 13} = '';
+        end
+        
+        if (ischar(raw{i, 14}))     %   Direction
+            temp{1, 14} = raw{i, 14};
+        else
+            temp{1, 14} = '';
         end
         
         %                 if (ischar(raw{i, 3}))      %   Signal type
@@ -262,36 +272,42 @@ if (~error)
             temp{1, 5} = '';
         end
         
-        temp{1, 6} = raw{i, 6};     %   Voltage
-        
-        if (ischar(raw{i, 7}))      %   Manufacturer
-            temp{1, 7} = raw{i, 7};
+        if (ischar(raw{i, 6}))      %   Type (Voltage/IEPE)
+            temp{1, 6} = raw{i, 6};
         else
-            temp{1, 7} = '';
+            temp{1, 6} = '';
         end
         
-        temp{1, 8} = raw{i, 8};     %  Model
+        temp{1, 7} = raw{i, 7};     %   Voltage
         
-        temp{1, 9} = raw{i, 9};     %   Serial number
-        
-        temp{1, 10} = raw{i, 10};   %   Sensitivity
-        
-        if (ischar(raw{i, 11}))     %   Units
-            temp{1, 11} = raw{i, 11};
+        if (ischar(raw{i, 8}))      %   Manufacturer
+            temp{1, 8} = raw{i, 8};
         else
-            temp{1, 11} = '';
+            temp{1, 8} = '';
         end
         
-        if (ischar(raw{i, 12}))     %   Dof
+        temp{1, 9} = raw{i, 9};     %  Model
+        
+        temp{1, 10} = raw{i, 10};     %   Serial number
+        
+        temp{1, 11} = raw{i, 11};   %   Sensitivity
+        
+        if (ischar(raw{i, 12}))     %   Units
             temp{1, 12} = raw{i, 12};
         else
             temp{1, 12} = '';
         end
         
-        if (ischar(raw{i, 13}))      %   Direction
+        if (ischar(raw{i, 13}))     %   Dof
             temp{1, 13} = raw{i, 13};
         else
             temp{1, 13} = '';
+        end
+        
+        if (ischar(raw{i, 14}))      %   Direction
+            temp{1, 14} = raw{i, 14};
+        else
+            temp{1, 14} = '';
         end
         
         %                 if (ischar(raw{i, 3}))      %   Signal type

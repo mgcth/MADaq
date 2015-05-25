@@ -20,13 +20,13 @@ elseif get(handles.dataLogg,'Value') == 1 % if standard test
 elseif get(handles.impactTest,'Value') == 1 % if impactTest
     dataOut = startImpact(hObject, eventdata, handles);
     
-elseif get(handles.periodic,'Value') == 1 % if impactTest
+elseif get(handles.periodic,'Value') == 1 % if periodic
     dataOut = startPeriodic(hObject, eventdata, handles);
     
-elseif get(handles.steppedSine,'Value') == 1 % if impactTest
-    dataOut = startSteppedSine(hObject, eventdata, handles);
+elseif get(handles.steppedSine,'Value') == 1 % if steppedSine
+    dataOut = startMultisine(hObject, eventdata, handles);
     
-elseif handles.multisine.Value == 1 % if impactTest
+elseif handles.multisine.Value == 1 % if multisine
     dataOut = startMultisine(hObject, eventdata, handles);
     
 end
@@ -40,5 +40,20 @@ if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
         viblab_report(dataIn,handles)
     catch
         %errordlg('Something wrong with the report generation.')
+    end
+end
+
+% Check if write to UFF
+if get(handles.write2UFF,'Value')
+    name = handles.title1;
+    
+    if isempty(get(handles.title1,'String'))
+        name = ['dummy_', num2str(randi([1 1000],1,1))];
+    end
+    
+    if isa(dataIn,'idfrd')
+        frd2uff(name, dataIn);
+    else
+        ts2uff(name, dataIn);
     end
 end

@@ -12,18 +12,18 @@ function scanButton_Callback(hObject, eventdata, handles)
 
 % If packaged as app, .mex files not allowed so packed as .mat files and
 % renamed here
-file1mat = [handles.homePath, '\private\getTEDS.mat'];
-file1mex = [handles.homePath, '\private\getTEDS.mexw64'];
-file2mat = [handles.homePath, '\private\resetDevice.mat'];
-file2mex = [handles.homePath, '\private\resetDevice.mexw64'];
+file1mat = [handles.homePath, '\functions\teds\getTEDS.mat'];
+file1mex = [handles.homePath, '\functions\teds\getTEDS.mexw64'];
+file2mat = [handles.homePath, '\functions\teds\resetDevice.mat'];
+file2mex = [handles.homePath, '\functions\teds\resetDevice.mexw64'];
 if exist(file1mat, 'file') == 2 && exist(file2mat, 'file') == 2
     movefile(file1mat, file1mex)
     movefile(file2mat, file2mex)
 end
 
 % Columns in the two tables
-COLUMNSinINPUTTABLE = 13;
-COLUMNSinOUTPUTTABLE = 13;
+COLUMNSinINPUTTABLE = 14;
+COLUMNSinOUTPUTTABLE = 14;
 
 % Waitbar
 WB=waitbar(0);
@@ -154,18 +154,19 @@ for currentDevice = 1:length(devices)
                             dataIn(i, 3) = {chanStr};
                             %%dataIn(i, 4) = {'Input'};
                             dataIn(i, 4) = oldDataIn(i, 4);
-                            dataIn(i, 5) = {'IEPE'};
-                            %dataIn(i, 6) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            dataIn(i, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            dataIn(i, 5) = {'AC'};
+                            dataIn(i, 6) = {'IEPE'};
+                            %dataIn(i, 7) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            dataIn(i, 7) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%dataIn(i, 8) = {'IEPE'};
-                            dataIn(i, 7) = {char(manufacturer)};
-                            dataIn(i, 8) = {num2str(s.ModelNumber)};
-                            dataIn(i, 9) = {num2str(s.SerialNumber)};
-                            dataIn(i, 10) = {(s.Sensitivity) * 1000};
-                            dataIn(i, 11) = {unit};
-                            dataIn(i, 12) = oldDataIn(i, 12);
-                            dataIn(i, 13) = oldDataIn(i, 13);
+                            %%dataIn(i, 9) = {'IEPE'};
+                            dataIn(i, 8) = {char(manufacturer)};
+                            dataIn(i, 9) = {num2str(s.ModelNumber)};
+                            dataIn(i, 10) = {num2str(s.SerialNumber)};
+                            dataIn(i, 11) = {(s.Sensitivity) * 1000};
+                            dataIn(i, 12) = {unit};
+                            dataIn(i, 13) = oldDataIn(i, 12);
+                            dataIn(i, 14) = oldDataIn(i, 13);
                         else
                             % dataIn(i, :) = {false, chanStr, ' ', 'AC', devices(currentDevice).Subsystems.RangesAvailable.Max, char(manufacturer), s.ModelNumber, s.SerialNumber, s.Sensitivity, {''}, NaN, ' '};
                             dataIn(i, 1) = {false};
@@ -173,18 +174,19 @@ for currentDevice = 1:length(devices)
                             dataIn(i, 3) = {chanStr};
                             %%dataIn(i, 4) = {'Input'};
                             dataIn(i, 4) = {' '};
-                            dataIn(i, 5) = {'IEPE'};
-                            %dataIn(i, 6) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            dataIn(i, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            dataIn(i, 5) = {'AC'};
+                            dataIn(i, 6) = {'IEPE'};
+                            %dataIn(i, 7) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            dataIn(i, 7) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%dataIn(i, 8) = {'IEPE'};
-                            dataIn(i, 7) = {char(manufacturer)};
-                            dataIn(i, 8) = {num2str(s.ModelNumber)};
-                            dataIn(i, 9) = {num2str(s.SerialNumber)};
-                            dataIn(i, 10) = {(s.Sensitivity) * 1000};
-                            dataIn(i, 11) = {unit};
-                            dataIn(i, 12) = {NaN};
-                            dataIn(i, 13) = {' '};
+                            %%dataIn(i, 9) = {'IEPE'};
+                            dataIn(i, 8) = {char(manufacturer)};
+                            dataIn(i, 9) = {num2str(s.ModelNumber)};
+                            dataIn(i, 10) = {num2str(s.SerialNumber)};
+                            dataIn(i, 11) = {(s.Sensitivity) * 1000};
+                            dataIn(i, 12) = {unit};
+                            dataIn(i, 13) = {NaN};
+                            dataIn(i, 14) = {' '};
                         end
                     else
                         % fprintf('Sensor not found!\n');
@@ -196,17 +198,18 @@ for currentDevice = 1:length(devices)
                             %dataIn(i, 4) = {'Input'};
                             dataIn(i, 4) = oldDataIn(i, 4);
                             dataIn(i, 5) = {' '};
-                            dataIn(i, 6) = {NaN};
-                            %dataIn(i, 8) = {'Voltage'};
-                            dataIn(i, 7) = {' '};
-                            dataIn(i, 8) = {num2str(NaN)};
+                            dataIn(i, 6) = {' '};
+                            dataIn(i, 7) = {NaN};
+                            %dataIn(i, 9) = {'Voltage'};
+                            dataIn(i, 8) = {' '};
                             dataIn(i, 9) = {num2str(NaN)};
-                            dataIn(i, 10) = {NaN};
-                            dataIn(i, 11) = {' '};
-                            dataIn(i, 12) = oldDataIn(i, 12);
-                            dataIn(i, 13) = oldDataIn(i, 13);
+                            dataIn(i, 10) = {num2str(NaN)};
+                            dataIn(i, 11) = {NaN};
+                            dataIn(i, 12) = {' '};
+                            dataIn(i, 13) = oldDataIn(i, 12);
+                            dataIn(i, 14) = oldDataIn(i, 13);
                         else
-                            dataIn(i, :) = {false, false, chanStr, ' ', ' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
+                            dataIn(i, :) = {false, false, chanStr, ' ', ' ',' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
                         end
                     end
                     
@@ -256,18 +259,19 @@ for currentDevice = 1:length(devices)
                             dataOut(j, 3) = {chanStr};
                             %%dataOut(j, 4) = {'Input'};
                             dataOut(j, 4) = oldDataIn(j, 4);
-                            dataOut(j, 5) = {'IEPE'};
-                            %dataOut(j, 6) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            dataOut(j, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            dataOut(j, 5) = {'AC'};
+                            dataOut(j, 6) = {'IEPE'};
+                            %dataOut(j, 7) = {max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            dataOut(j, 7) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%dataOut(j, 8) = {'IEPE'};
-                            dataOut(j, 7) = {char(manufacturer)};
-                            dataOut(j, 8) = {num2str(s.ModelNumber)};
-                            dataOut(j, 9) = {num2str(s.SerialNumber)};
-                            dataOut(j, 10) = {(s.Sensitivity) * 1000};
-                            dataOut(j, 11) = {unit};
-                            dataOut(j, 12) = oldDataIn(j, 12);
-                            dataOut(j, 13) = oldDataIn(j, 13);
+                            %%dataOut(j, 9) = {'IEPE'};
+                            dataOut(j, 8) = {char(manufacturer)};
+                            dataOut(j, 9) = {num2str(s.ModelNumber)};
+                            dataOut(j, 10) = {num2str(s.SerialNumber)};
+                            dataOut(j, 11) = {(s.Sensitivity) * 1000};
+                            dataOut(j, 12) = {unit};
+                            dataOut(j, 13) = oldDataIn(j, 12);
+                            dataOut(j, 14) = oldDataIn(j, 13);
                         else
                             % dataOut(j, :) = {false, chanStr, ' ', 'AC', devices(currentDevice).Subsystems.RangesAvailable.Max, char(manufacturer), s.ModelNumber, s.SerialNumber, s.Sensitivity, {''}, NaN, ' '};
                             dataOut(j, 1) = {false};
@@ -275,18 +279,19 @@ for currentDevice = 1:length(devices)
                             dataOut(j, 3) = {chanStr};
                             %%dataOut(j, 4) = {'Input'};
                             dataOut(j, 4) = {' '};
-                            dataOut(j, 5) = {'IEPE'};
-                            %dataOut(j, 6) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
-                            dataOut(j, 6) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
+                            dataOut(j, 5) = {'AC'};
+                            dataOut(j, 6) = {'IEPE'};
+                            %dataOut(j, 7) = {10};%max(devices(currentDevice).Subsystems.RangesAvailable.Max)};
+                            dataOut(j, 7) = {max(max(devices(currentDevice).Subsystems(1).RangesAvailable.double))};
                             %vpa(devices(currentDevice).Subsystems.RangesAvailable.Max);
-                            %%dataOut(j, 8) = {'IEPE'};
-                            dataOut(j, 7) = {char(manufacturer)};
-                            dataOut(j, 8) = {num2str(s.ModelNumber)};
-                            dataOut(j, 9) = {num2str(s.SerialNumber)};
-                            dataOut(j, 10) = {(s.Sensitivity) * 1000};
-                            dataOut(j, 11) = {unit};
-                            dataOut(j, 12) = {NaN};
-                            dataOut(j, 13) = {' '};
+                            %%dataOut(j, 9) = {'IEPE'};
+                            dataOut(j, 8) = {char(manufacturer)};
+                            dataOut(j, 9) = {num2str(s.ModelNumber)};
+                            dataOut(j, 10) = {num2str(s.SerialNumber)};
+                            dataOut(j, 11) = {(s.Sensitivity) * 1000};
+                            dataOut(j, 12) = {unit};
+                            dataOut(j, 13) = {NaN};
+                            dataOut(j, 14) = {' '};
                         end
                     else
                         % fprintf('Sensor not found!\n');
@@ -298,17 +303,18 @@ for currentDevice = 1:length(devices)
                             %dataOut(j, 4) = {'Input'};
                             dataOut(j, 4) = oldDataIn(j, 4);
                             dataOut(j, 5) = {' '};
-                            dataOut(j, 6) = {NaN};
-                            %dataOut(j, 8) = {'Voltage'};
-                            dataOut(j, 7) = {' '};
-                            dataOut(j, 8) = {num2str(NaN)};
+                            dataOut(j, 6) = {' '};
+                            dataOut(j, 7) = {NaN};
+                            %dataOut(j, 9) = {'Voltage'};
+                            dataOut(j, 8) = {' '};
                             dataOut(j, 9) = {num2str(NaN)};
-                            dataOut(j, 10) = {NaN};
-                            dataOut(j, 11) = {' '};
-                            dataOut(j, 12) = oldDataIn(j, 12);
-                            dataOut(j, 13) = oldDataIn(j, 13);
+                            dataOut(j, 10) = {num2str(NaN)};
+                            dataOut(j, 11) = {NaN};
+                            dataOut(j, 12) = {' '};
+                            dataOut(j, 13) = oldDataIn(j, 12);
+                            dataOut(j, 14) = oldDataIn(j, 13);
                         else
-                            dataOut(j, :) = {false, false, chanStr, ' ', ' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
+                            dataOut(j, :) = {false, false, chanStr, ' ', ' ',' ', NaN, ' ', NaN, NaN, NaN, ' ', NaN, ' '};
                         end
                     end
                     
@@ -331,7 +337,7 @@ SensorsInLabFile=[handles.homePath, '\conf\SensorsInLab.xlsx'];
 if ~isempty(SensorsInLabFile)
     [CLL,rawCells]=xls2cell(SensorsInLabFile,5);
     CLL{1}(1,1)={' '};% Replace column header with blank
-    handles.channelsTable.ColumnFormat{9}=CLL{:};
+    handles.channelsTable.ColumnFormat{10}=CLL{:};
 end
 handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
 

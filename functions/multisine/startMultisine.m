@@ -1,60 +1,63 @@
-function dataOut = startMultisine(hObject, eventdata, handles)
+function dataOut = startSteppedSine(hObject, eventdata, handles)
 
-global dataObject HFRFGUI CH UDP plotK% Xsave Xsave_ Zsave
-plotK = 0;
-Xsave = [];
-Xsave_ = [];
+% Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
+% (*) Chalmers University of Technology
+% Email address: mladen.gibanica@chalmers.se, thomas.abrahamsson@chalmers.se  
+% Website: https://github.com/mgcth/abraDAQ
+% May 2015; Last revision: 21-May-2015
+
+global UDP
+
 % Initialaise the test setup
 multisine = startInitialisation(hObject, eventdata, handles);
-% 2*0.03
+
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
 Chact = 0; for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1; end, end
 CH = multisine.channelInfo;
 
-% Get frequencies and loads etc...
-%[Freqs, wd, Tsd] = eval(get(handles.fun2,'String')); % should be in Hz!
-Freqs = eval(get(handles.fun2,'String')); % should be in Hz!
-Tsd = 0.001;
-
-nf = length(Freqs);
-loads = eval(get(handles.fun3,'String'));
-blockSize = 10000;
-
 % Get the sampling rate and Ts
 Fs = multisine.session.Rate;
 Ts = 1/Fs;
 
+% Get frequencies and loads etc...
+[Freqs, wd, Tsd] = eval(get(handles.fun2,'String')); % should be in Hz!
+loads = eval(get(handles.fun3,'String'));
+
+% Correlation, between 0 and 1
+Ct = eval(get(handles.fun5,'String')); % 0.997 a good value
+CtMeanInput = eval(get(handles.fun6,'String')); % 0.95 a good value
+
+% Number of lowest frequency sinusoidal that data block should cover
+Ncyc = eval(get(handles.fun4,'String')); % 10 a good value
+% Number of block evaluations for statistics
+Nstat = eval(get(handles.fun7,'String')); % 20 a good value
+
 % Data that should be given or provided by multisine
-%refch = CH.reference;
-refch = find(CH.active==CH.reference);
+refch = find(CH.active == CH.reference);
 nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
-%Ct = 0.997;
-Ct = 0.99;
-
+nf = length(Freqs);
+blockSize = 10000;
 
 % Start up parallel Matlab process that has GUI
-%startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
-%    '-r "simo_multisine_GUI"'];dos(startstr);
-%UDP.ready = false;
+startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
+   '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
+dos(startstr);
+UDP.ready = false;
 
 % Pass data to GUI process
-%instrreset;
-%uh=startUDP('Host');
-%while ~UDP.ready
-%    pause(1);
-%end
-%PassDatagram(uh,'f',Freqs); % Pass frequency list
-%PassDatagram(uh,'ny',ny); % Pass ny
-
-% Some (yet) hardcoded numbers
-Ncyc=10;% Number of lowest frequency sinusoidal that data block should cover
-Nstat=20;% Number of block evaluations for statistics
+instrreset;
+uh=startUDP('Host');
+while ~UDP.ready
+   pause(1);
+end
+PassDatagram(uh,'f',Freqs); % Pass frequency list
+PassDatagram(uh,'ny',ny); % Pass ny
 
 % Initiate
-frdsys=frd(NaN*zeros(length(CH.active)-length(CH.reference),length(CH.reference),nf),Freqs,'FrequencyUnit','Hz');
+frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
 
 % Obtain good number of frequencies K that can be used simulaneously
 Nblock=ceil(Ncyc/Ts/min(Freqs));
@@ -65,12 +68,16 @@ while 1,
     if rank(A)==min(size(A)),break;end
     K=K+1;
 end
-%K=nf; % For stepped sine
+
+% This is the definition of stepped sine
+if handles.steppedSine == 1
+    K=nf; % For stepped sine
+end
 
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
     tmpTable = get(handles.channelsTable,'Data');
-    ical = {tmpTable{:,10}};
+    ical = {tmpTable{:,11}};
     ical = cell2mat(ical(CH.active))';
     
     % Add listener
@@ -83,21 +90,21 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     multisine.session.NotifyWhenDataAvailableExceeds=blockSize;
     multisine.session.NotifyWhenScansQueuedBelow=ceil(blockSize/2);
     
-    firstRun = 0;
-
-    Zsave = [];
+    firstRun = true;
+    
+    %covH = zeros(2,2,nf);
+    
     tic
     % ------------------------------------- Loop over number of frequency sets
     for I=1:K
         I
+        C = 0;
         y = [];
         ynotused = [];
-        C = 0;
         iret = -1;
         opt = [];
         H0 = [];
-        H = [];
-        ySave = [];
+        %H = zeros(ny-nu,1);
         
         haveData = false;
         haveReadData = true;
@@ -114,19 +121,17 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         fi=2*pi*rand(nw,1);
         
         % Collect data until after stationarity obtained
-        if firstRun == 0
-            firstRun = firstRun + 1;
+        if firstRun == true
+            firstRun = false;
             nidaqMultisinePutSineDataInline(multisine.session, [])
             startBackground(multisine.session);
             pause(0.1);
         end
         
         O = 0;
-        while iret == -1% && OO < 100
+        while iret == -1
             O = O + 1;
-            %nidaqMultisinePutSineDataInline(multisine.session, [])
-            %tic
-            %pause(100*Ts-toc);
+            
             pause(0.0001);
             
             % Estimate transfer functions
@@ -144,46 +149,43 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     if ~isempty(opt)
                         firstTime = false;
                     end
+                    
+                    % Pass data to GUI process
+                    % flushoutput(uh);
+                    PassDatagram(uh,'indf',indf);
+                    PassDatagram(uh,'Hr',real(H));
+                    PassDatagram(uh,'Hi',imag(H));
+                    PassDatagram(uh,'C',C);
                 else
                     [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct,H0,opt);
                     H0=H;
+                    
+                    % Pass data to GUI process
+                    % flushoutput(uh);
+                    %PassDatagram(uh,'indf',indf);
+                    %PassDatagram(uh,'Hr',real(H));
+                    %PassDatagram(uh,'Hi',imag(H));
+                    %PassDatagram(uh,'C',C);
                 end
+                
             end
             
-            %disp(['I = ', num2str(I), ', O = ' num2str(O), ', C = ', num2str(C), ', K = ', num2str(KK), ', queue = ', num2str(multisine.session.ScansQueued)])
-            %multisine.session.ScansQueued
-            
-            if multisine.session.IsRunning == 0%multisine.session.ScansQueued == 0
+            % Reset
+            if multisine.session.IsRunning == 0
                 haveDataContinous = false;
                 haveData = false;
                 multisine.session.stop();
                 nidaqMultisinePutSineDataInline(multisine.session, [])
                 disp('was 0 in stationary')
-                %get(multisine.session)
                 startBackground(multisine.session);
                 pause(0.1);
             end
             
-            %if O == 30
-            %    assignin('base','YY',YY);
-            %    keyboard
-            %end
-            
-            %             %
-            %             % Pass data to GUI process
-            %             %     flushoutput(uh);
-            %             PassDatagram(uh,'indf',indf);
-            %             PassDatagram(uh,'Hr',real(H));
-            %             PassDatagram(uh,'Hi',imag(H));
-            %             PassDatagram(uh,'C',C);
-            
         end
-        %get(multisine.session)
         
         % Obtain statistics
-        Hs=[];
-        Ctmean_input = 0.9;
-        Ctmean = Ctmean_input;
+        Hs = [];
+        Ctmean = CtMeanInput;
         CtmeanChanged = false;
         
         for JJ=1:Nstat
@@ -192,16 +194,13 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             haveData = false;
             haveDataContinous = false;
             
-            %JJ
-            iret=-1;
+            iret = -1;
             OO = 0;
-            while iret==-1% && OO < 100
+            while iret == -1
                 OO = OO + 1;
                 
-                %tic
-                %pause(100*Ts-toc);
                 pause(0.0001)
-
+                
                 % Estimate transfer functions
                 if haveData == true
                     ynotused = [ynotused y];
@@ -214,59 +213,63 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     H0=H;
                     
                     if CtmeanChanged == true
-                        Ctmean = Ctmean_input;
+                        Ctmean = CtMeanInput;
                         CtmeanChanged = false;
                     end
                 end
                 
-                if multisine.session.IsRunning == 0%multisine.session.ScansQueued == 0
+                % Reset
+                if multisine.session.IsRunning == 0
                     haveDataContinous = false;
                     haveData = false;
                     multisine.session.stop();
                     nidaqMultisinePutSineDataInline(multisine.session, [])
                     disp('was 0 in statistics')
-                    %get(multisine.session)
                     startBackground(multisine.session);
                     pause(0.1);
                     Ctmean = Ct;
                     CtmeanChanged = true;
                 end
                 
-                %disp(['I = ', num2str(I), ', JJ = ' , num2str(JJ), ', OO = ' num2str(OO), ', C = ', num2str(C), ', K = ', num2str(KK), ', queue = ', num2str(multisine.session.ScansQueued)])
-                %multisine.session.ScansQueued
-                
             end
-            Hs(:,:,:,JJ)=H;
+            Hs(:,:,:,JJ) = H;
+            
+            %for MM = 1:K
+            %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
+            %end
         end
-        Hm=mean(Hs,4);
-        %         PassDatagram(uh,'indf',indf);
-        %         PassDatagram(uh,'Hr',real(Hm));
-        %         PassDatagram(uh,'Hi',imag(Hm));
-        %         PassDatagram(uh,'C',C);
-        frdsys.ResponseData(:,:,indf)=Hm;
         
-        
+        Hm = mean(Hs,4);
+        PassDatagram(uh,'indf',indf);
+        PassDatagram(uh,'Hr',real(Hm));
+        PassDatagram(uh,'Hi',imag(Hm));
+        PassDatagram(uh,'C',C);
+        frdsys.ResponseData(:,:,indf) = Hm;
         
     end
-    %     PassDatagram(uh,'StopTheGUI',1);
+    PassDatagram(uh,'StopTheGUI',1);
     multisine.session.stop();
     delete(LAvail);
     delete(LReqrd);
     delete(LErr);
-    set(frdsys,'Frequency',Freqs,'Ts',Tsd);
+    %set(frdsys,'Frequency',Freqs,'Ts',Tsd);
+    
     % Clean-up
     multisine.session.release();
     delete(multisine.session);
     toc
-    assignin('base','Zsave',Zsave);
     
     % Clear DAQ
     daq.reset;
+    
+    % Covariance data too
+    frdsys = idfrd(frdsys);
     
     % Calibration
     for I = 1:length(frdsys.Frequency)
         for J = 1:length(refch)
             frdsys.ResponseData(:,J,I) = diag(ical(yind)./ical(refch(J))) * frdsys.ResponseData(:,J,I);
+            %frdsys.CovarianceData(I,1,J,1:2,1:2)=[covH(I,I,J) covH(I,I+ny,J); covH(I+ny,I,J) covH(I+ny,I+ny,J)];
         end
     end
     % Save data
@@ -304,8 +307,6 @@ clear -global dataObject
         haveReadData = false;
         
         haveDataContinous = true;
-        
-        %Zsave = [Zsave event.Data'];
     end
 
 end
