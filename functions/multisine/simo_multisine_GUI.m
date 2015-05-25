@@ -45,6 +45,7 @@ catch
 end
 %keyboard
 while 1
+    %keyboard
 %% Get indf, H and C from main process
   if exist('StopTheGUI','var'),quit,end
   if u.BytesAvailable>0
