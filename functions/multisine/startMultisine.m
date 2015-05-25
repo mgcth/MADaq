@@ -92,6 +92,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     firstRun = true;
     
+    %covH = zeros(2,2,nf);
+    
     tic
     % ------------------------------------- Loop over number of frequency sets
     for I=1:K
@@ -102,7 +104,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         iret = -1;
         opt = [];
         H0 = [];
-        H = zeros(ny-nu,1);
+        %H = zeros(ny-nu,1);
         
         haveData = false;
         haveReadData = true;
@@ -147,10 +149,25 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     if ~isempty(opt)
                         firstTime = false;
                     end
+                    
+                    % Pass data to GUI process
+                    % flushoutput(uh);
+                    PassDatagram(uh,'indf',indf);
+                    PassDatagram(uh,'Hr',real(H));
+                    PassDatagram(uh,'Hi',imag(H));
+                    PassDatagram(uh,'C',C);
                 else
                     [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct,H0,opt);
                     H0=H;
+                    
+                    % Pass data to GUI process
+                    % flushoutput(uh);
+                    %PassDatagram(uh,'indf',indf);
+                    %PassDatagram(uh,'Hr',real(H));
+                    %PassDatagram(uh,'Hi',imag(H));
+                    %PassDatagram(uh,'C',C);
                 end
+                
             end
             
             % Reset
@@ -163,13 +180,6 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 startBackground(multisine.session);
                 pause(0.1);
             end
-            
-            % Pass data to GUI process
-            % flushoutput(uh);
-            PassDatagram(uh,'indf',indf);
-            PassDatagram(uh,'Hr',real(H));
-            PassDatagram(uh,'Hi',imag(H));
-            PassDatagram(uh,'C',C);
             
         end
         
@@ -224,6 +234,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             end
             Hs(:,:,:,JJ) = H;
             
+            %for MM = 1:K
+            %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
+            %end
         end
         
         Hm = mean(Hs,4);
@@ -232,7 +245,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         PassDatagram(uh,'Hi',imag(Hm));
         PassDatagram(uh,'C',C);
         frdsys.ResponseData(:,:,indf) = Hm;
-         
+        
     end
     PassDatagram(uh,'StopTheGUI',1);
     multisine.session.stop();
@@ -249,10 +262,14 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     % Clear DAQ
     daq.reset;
     
+    % Covariance data too
+    frdsys = idfrd(frdsys);
+    
     % Calibration
     for I = 1:length(frdsys.Frequency)
         for J = 1:length(refch)
             frdsys.ResponseData(:,J,I) = diag(ical(yind)./ical(refch(J))) * frdsys.ResponseData(:,J,I);
+            %frdsys.CovarianceData(I,1,J,1:2,1:2)=[covH(I,I,J) covH(I,I+ny,J); covH(I+ny,I,J) covH(I+ny,I+ny,J)];
         end
     end
     % Save data

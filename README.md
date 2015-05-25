@@ -34,6 +34,4 @@ National Instruments MATLAB Data Acquisition and Experimental Modal Analysis lib
 - Make it possible to use both input and output on the National Instruments PXI-4461 card. For some reason this does not work and the force sensor must be put on one one of the inputs of the National Instruments PXIe-4497 cards.
 - Make the window resizeable with some intelligence to it.
 - Make the addition of input channels faster. For a large input array (over 30 inputs) it gradually slows down. So much that it becomes painful to watch. Vectorized it but still not satisfied.
-- Export to Universal File Format option.
-- Style the save and load windows (system default).
 - Style the program some.
