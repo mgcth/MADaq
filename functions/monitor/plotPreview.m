@@ -7,8 +7,9 @@ preview = getappdata(0, 'previewStruct');
 
 CH = preview.channelInfo;
 tmpTable = get(handles_.channelsTable,'Data');
-ical = [tmpTable{:,10}];
-ical = diag(ical(CH.active));
+ical = {tmpTable{:,11}}; 
+ical = diag(cell2mat(ical(CH.active))');
+
 
 try
     if (preview.logging.freeLogging)
@@ -45,17 +46,20 @@ d(dataLen - m + 1:dataLen, 1:n) = (ical * event.Data')';
 %         end
 %     end
 %     bar(preview.subplots.master, filterData);
-bar(preview.subplots.master, std(d));
+hbar=bar(preview.subplots.master, std(d));
 axis(preview.subplots.master, [0 (n + 1) -0.1 5.1]);
-
+set(hbar.Parent,'FontName','Times','FontSize',8);
 
 %   Update channel monitors
 for i = 1:4
     if (i <= numberOfChannels)
-        plot(preview.subplots.handles(i), t, d(:, preview.currentMonitorRange(i)));
+        plt=plot(preview.subplots.handles(i), t, d(:, preview.currentMonitorRange(i)));
         %             axis(preview.subplots.handles(i), [min(t) max(t) preview.channelData(i).Min preview.channelData(i).Max]);
+        set(plt.Parent,'FontName','Times','FontSize',8);
         chanData = preview.channelData(preview.currentMonitorRange(i));
-        title(preview.subplots.handles(i), [chanData.channel, ' #', num2str(chanData.index)]);
+%         title(preview.subplots.handles(i), [chanData.channel, ' #', num2str(chanData.index)]);
+        tit=title(preview.subplots.handles(i), [chanData.label, ' (#', num2str(chanData.index) ')']);
+        set(tit,'FontName','Times','FontWeight','normal','FontSize',10)
     else
         cla(preview.subplots.handles(i));
         title(preview.subplots.handles(i), '');

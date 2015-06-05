@@ -62,9 +62,14 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     active = periodic.channelInfo.active;
     refch = periodic.channelInfo.reference;
     tmpTable = get(handles.channelsTable,'Data');
-    cal = 1./[tmpTable{:,11}];
+%     cal = 1./[tmpTable{:,11}];
     yind=setdiff(active,refch);uind=refch;
-    y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
+    
+    ycal=diag(cell2mat({tmpTable{yind,11}}));
+    ucal=diag(cell2mat({tmpTable{uind,11}}));
+    
+%     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
+    y=y*ycal;u=u*ucal;
     
     for II=1:size(y,2)
         [FRF(II,1,:),f] = ...
