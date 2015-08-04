@@ -79,7 +79,7 @@ elseif get(handles.impactTest,'Value') == 1 % if impactTest
     sessionObject.Metadata.TestSettings{5,1} = get(handles.fun5Text,'String');
     sessionObject.Metadata.TestSettings{5,2} = get(handles.fun5,'String');
     
-elseif get(handles.periodic,'Value') == 1 % if impactTest
+elseif get(handles.periodic,'Value') == 1 % if periodic Test
     sessionObject.Metadata.TestType = 'Periodic input';
     
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -97,7 +97,7 @@ elseif get(handles.periodic,'Value') == 1 % if impactTest
     sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
     sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
     
-elseif get(handles.steppedSine,'Value') == 1 % if impactTest
+elseif get(handles.steppedSine,'Value') == 1 % if steppedsine Test
     sessionObject.Metadata.TestType = 'Stepped sine input';
     
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -113,7 +113,7 @@ elseif get(handles.steppedSine,'Value') == 1 % if impactTest
     sessionObject.Metadata.TestSettings{6,1} = get(handles.fun6Text,'String');
     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
     
-elseif handles.multisine.Value == 1 % if impactTest
+elseif handles.multisine.Value == 1 % if multisine Test
     sessionObject.Metadata.TestType = 'Multisine input';
     
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -298,7 +298,7 @@ for i = activated%1:m%[3:m 1:2]
 end
 
 for i = 1:length(activated)
-    channelData.coupling = dataIn{i, 5};
+    channelData.coupling = dataIn{activated(i), 5};
     
     if strcmp(channelData.coupling, 'AC')
         sessionObject.session.Channels(i).Coupling = 'AC';

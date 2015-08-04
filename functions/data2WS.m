@@ -19,6 +19,11 @@ elseif opt==2
   frddata.UserData = varargin{2}.Metadata;
   dataOut = frddata;
   assignin('base','FRDsys',dataOut);
+elseif opt==3
+  ts=varargin{1};  
+  ts.UserData = varargin{2}.Metadata;
+  dataOut = ts;
+  assignin('base','DAQts',dataOut);
 else
   error('Unknown opt')
 end
