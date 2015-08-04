@@ -18,6 +18,7 @@ CHdata = get(handles.channelsTable, 'data');
 if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.reference)
     % Add listener
     %periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) logData(src, event));
+    tic
     
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
@@ -76,6 +77,10 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
             tfestimate(u,y(:,II),ones(Ndata,1),0,Ndata,Fs);
     end
     ind=find(f>=min(Fspan) & f<=max(Fspan));FRF=FRF(:,:,ind);f=f(ind);
+    
+    timeElapsed = toc
+    periodic.Metadata.TimeElapsed = timeElapsed;
+    periodic.Metadata.TestDateEnd = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
     % Make IDFRD data object
     frdsys=frd(FRF,2*pi*f,'FrequencyUnit','rad/s');

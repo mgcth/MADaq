@@ -11,7 +11,7 @@ report(RPT);
 function RPT=viblab_report_code(Data,handles)
 
 %Copy the stylesheet
-copyfile([handles.homePath '\private\madaq.css'],pwd)
+copyfile([handles.homePath '\functions\report\madaq.css'],pwd)
 
 %%                                                              Unpack data
 assignin('base','RPTdta',Data);% Data need to be put in Workspace (as

@@ -350,7 +350,7 @@ if (isempty(sessionObject.session.Channels))
     drawnow();
     
 else
-    if get(handles.periodic,'Value') == 1 
+    if get(handles.periodic,'Value') == 1 || get(handles.dataLogg,'Value') == 1 
         % Allocate memory for measurement
         allocateMemory(handles);
     end

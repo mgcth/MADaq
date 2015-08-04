@@ -39,22 +39,22 @@ nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
-blockSize = 10000;
+blockSize = 16000;
 
-% Start up parallel Matlab process that has GUI
-startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
-   '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
-dos(startstr);
-UDP.ready = false;
-
-% Pass data to GUI process
-instrreset;
-uh=startUDP('Host');
-while ~UDP.ready
-   pause(1);
-end
-PassDatagram(uh,'f',Freqs); % Pass frequency list
-PassDatagram(uh,'ny',ny); % Pass ny
+% % Start up parallel Matlab process that has GUI
+% startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
+%    '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
+% dos(startstr);
+% UDP.ready = false;
+% 
+% % Pass data to GUI process
+% instrreset;
+% uh=startUDP('Host');
+% while ~UDP.ready
+%    pause(1);
+% end
+% PassDatagram(uh,'f',Freqs); % Pass frequency list
+% PassDatagram(uh,'ny',ny); % Pass ny
 
 % Initiate
 frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
@@ -70,7 +70,7 @@ while 1,
 end
 
 % This is the definition of stepped sine
-if handles.steppedSine == 1
+if handles.steppedSine.Value == 1
     K=nf; % For stepped sine
 end
 
@@ -152,10 +152,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     
                     % Pass data to GUI process
                     % flushoutput(uh);
-                    PassDatagram(uh,'indf',indf);
-                    PassDatagram(uh,'Hr',real(H));
-                    PassDatagram(uh,'Hi',imag(H));
-                    PassDatagram(uh,'C',C);
+%                     PassDatagram(uh,'indf',indf);
+%                     PassDatagram(uh,'Hr',real(H));
+%                     PassDatagram(uh,'Hi',imag(H));
+%                     PassDatagram(uh,'C',C);
                 else
                     [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct,H0,opt);
                     H0=H;
@@ -184,7 +184,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         end
         
         % Obtain statistics
-        Hs = [];
+        Hs = zeros(size(H,1),size(H,2),size(H,3),Nstat);
         Ctmean = CtMeanInput;
         CtmeanChanged = false;
         
@@ -240,14 +240,14 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         end
         
         Hm = mean(Hs,4);
-        PassDatagram(uh,'indf',indf);
-        PassDatagram(uh,'Hr',real(Hm));
-        PassDatagram(uh,'Hi',imag(Hm));
-        PassDatagram(uh,'C',C);
+%         PassDatagram(uh,'indf',indf);
+%         PassDatagram(uh,'Hr',real(Hm));
+%         PassDatagram(uh,'Hi',imag(Hm));
+%         PassDatagram(uh,'C',C);
         frdsys.ResponseData(:,:,indf) = Hm;
         
     end
-    PassDatagram(uh,'StopTheGUI',1);
+    %PassDatagram(uh,'StopTheGUI',1);
     multisine.session.stop();
     delete(LAvail);
     delete(LReqrd);
@@ -257,7 +257,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     % Clean-up
     multisine.session.release();
     delete(multisine.session);
-    toc
+    timeElapsed = toc
+    multisine.Metadata.TimeElapsed = timeElapsed;
+    multisine.Metadata.TestDateEnd = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
     % Clear DAQ
     daq.reset;
