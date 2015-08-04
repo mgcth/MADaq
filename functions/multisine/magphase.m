@@ -3,7 +3,7 @@ function [m,p]=magphase(f,frf,opt)
 % If called by no output arguments only a plot will be made
 % No plot will be produced if output arguments are given
 %
-%Alternative use 1:
+% Alternative 1:
 %Inputs:   f    - Frequencies (in Hz) associated to frf
 %          frf  - Frequency response function (Complex)
 %          opt.linlog Set to true creates a linlog plot (else loglog)
@@ -17,20 +17,24 @@ function [m,p]=magphase(f,frf,opt)
 %          p    - Phase of frf (in degrees)
 %          opt  - See above
 %Call:     [m,p]=magphase(f,frf,opt)
-%Alternative use 2:
+%
+%Alternative 2:
 %Inputs:   [In Out;  - Identifier for input channel # (In) and output 
 %                      channel # (Out)
 %           flo fhi] - Lower and upper frequency for plotting
-%          FRD       - FRD object
+%          FRDorSS   - FRD or SS object
 %          opt       - See alternative 1 above
 %Output:   m    - Magnitude of frf
 %          p    - Phase of frf (in degrees)
-%Call:     [m,p]=magphase([In Out;flo fhi],FRD,opt)
+%Call:     [m,p]=magphase([In Out;flo fhi],FRDorSS,opt)
 
 %Modified: Nov 11, 2001 (real and imag was switched in atan2)
 %Modified: April 16, 2013 changed to use angle and added opt /TA
 %Modified: March 8, 2014 modified to also handle FRD objects /TA
 %Modified: April 28, 2014 avoid phase flip-flops /TA
+%Modified: June 29, 2015 to also treat SS objects
+%Modified: July  7, 2015 to include plot title
+
 
 
 if nargin<3,opt.linlog=true;opt.hold=false;end
@@ -40,12 +44,22 @@ if ~isfield(opt,'grid'),opt.grid=false;end
 if ~isfield(opt,'ls'),opt.ls='';end
 if ~isfield(opt,'magn'),opt.magn=false;end
 if ~isfield(opt,'ax'),opt.ax=[];end
+if ~isfield(opt,'title'),opt.title=[];end
 if strcmpi(class(frf),'frd') || strcmpi(class(frf),'idfrd')
   if min(size(f))==1
     f=f(:)';
     f(2,1)=0;f(2,2)=Inf;% Default for lower and upper frequency
   end  
 end
+if strcmpi(class(frf),'ss') || strcmpi(class(frf),'idss')
+  if get(frf,'Ts')>0,error('Cannot treat discrete-time state-space models');end
+  [Wn,zeta] = damp(frf);zetamin=min(zeta);
+  if min(size(f))==1
+    f=f(:)';
+    f(2,1)=0.8*Wn(1)/2/pi;f(2,2)=1.2*Wn(end)/2/pi;% Default for lower and upper frequency
+  end  
+end
+
 range=false;
 
 %%                                                 Get data from FRD object
@@ -70,6 +84,15 @@ if strcmpi(class(frf),'frd') || strcmpi(class(frf),'idfrd')
   frf=squeeze(frf.ResponseData(f(1,2),f(1,1),ind));
   f=f0(ind); 
 end    
+
+%%                                                  Get data from SS object
+if strcmpi(class(frf),'ss') || strcmpi(class(frf),'idss')
+  w=wlogspace(0.8*Wn(1),1.2*Wn(end),5,zetamin);
+  while length(w)>1600, w=w(1:2:end);end  
+  FRD=frd(frf,w);
+  frf=squeeze(FRD.ResponseData(f(1,2),f(1,1),:));
+  f=w/2/pi;
+end
 
 m=abs(frf);
 p=angle(frf)*180/pi;
@@ -116,8 +139,9 @@ if nargout==0,
     end
     axis tight
     ax=axis;
-    axis([round(f(1),1,'significant') (round(f(end),1,'significant')/expo+1)*expo ax(3) ax(4)]);
-    ax=axis;
+%     expo=10^floor(log10(f(end)));
+%     axis([round(f(1),1,'significant') (round(f(end),1,'significant')/expo+1)*expo ax(3) ax(4)]);
+%     ax=axis;
   else
     if range
       fr=[f(:) f(:) f(:)]';fr=fr(:);
@@ -139,7 +163,7 @@ if nargout==0,
     ax=axis;
   end
   if ~isempty(opt.ax),axis(opt.ax);end
-  title('Magnitude')
+  if ~isempty(opt.title), title(opt.title),else, title('Magnitude'),end
   xlabel('f [Hz]')
   if opt.grid, grid on,end
 %   if opt.hold, hold on,end    
@@ -159,8 +183,9 @@ if nargout==0,
       ax0=axis;
       axis([ax(1) ax(2) ax0(3) ax0(4)]);
     end  
-    v=axis;
-    axis([v(1) v(2) -200 200]);
+%     v=axis;
+%     axis([v(1) v(2) -200 200]);
+    axis([ax(1) ax(2) -200 200]);
     title('Phase')
     xlabel('f [Hz]')
     if opt.grid, grid on,end
