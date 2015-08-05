@@ -6,8 +6,6 @@ function dataOut = startSteppedSine(hObject, eventdata, handles)
 % Website: https://github.com/mgcth/abraDAQ
 % May 2015; Last revision: 21-May-2015
 
-global UDP
-
 % Initialaise the test setup
 multisine = startInitialisation(hObject, eventdata, handles);
 
@@ -41,20 +39,20 @@ yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
 blockSize = 16000;
 
-% % Start up parallel Matlab process that has GUI
-% startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
-%    '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
-% dos(startstr);
-% UDP.ready = false;
-% 
-% % Pass data to GUI process
-% instrreset;
-% uh=startUDP('Host');
-% while ~UDP.ready
-%    pause(1);
-% end
-% PassDatagram(uh,'f',Freqs); % Pass frequency list
-% PassDatagram(uh,'ny',ny); % Pass ny
+% Start up parallel Matlab process that has GUI
+startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
+   '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
+dos(startstr);
+UDP.ready = false;
+
+% Pass data to GUI process
+instrreset;
+uh=startUDP('Host');
+while ~UDP.ready
+   pause(1);
+end
+PassDatagram(uh,'f',Freqs); % Pass frequency list
+PassDatagram(uh,'ny',ny); % Pass ny
 
 % Initiate
 frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
