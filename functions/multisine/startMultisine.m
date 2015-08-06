@@ -6,10 +6,14 @@ function dataOut = startSteppedSine(hObject, eventdata, handles)
 % Website: https://github.com/mgcth/abraDAQ
 % May 2015; Last revision: 21-May-2015
 
-global UDP
-
 % Initialaise the test setup
 multisine = startInitialisation(hObject, eventdata, handles);
+
+% Ugly save here, but when PassXThrouFile, where X ca be double, string or
+% any other data type, is extended, change this
+% It is deleted at the end
+channelLabels = multisine.Metadata.Sensor.Label;
+save([tempdir,'DataContainer00'],'channelLabels');
 
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
@@ -41,20 +45,17 @@ yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
 blockSize = 16000;
 
-% % Start up parallel Matlab process that has GUI
-% startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
-%    '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
-% dos(startstr);
-% UDP.ready = false;
-% 
-% % Pass data to GUI process
-% instrreset;
-% uh=startUDP('Host');
-% while ~UDP.ready
-%    pause(1);
+% Start up parallel Matlab process that has GUI
+startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
+   '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
+dos(startstr);
+
+% readPass = 0;
+% MMF{1} = GetDoubleFromFile(1);
+% while readPass == 0
+%     pause(1)
+%     readPass = GetDoubleFromFile(MMF{1},1);
 % end
-% PassDatagram(uh,'f',Freqs); % Pass frequency list
-% PassDatagram(uh,'ny',ny); % Pass ny
 
 % Initiate
 frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
@@ -73,6 +74,22 @@ end
 if handles.steppedSine.Value == 1
     K=nf; % For stepped sine
 end
+
+% Pass data initially
+MMF{2}=PassDoubleThruFile(2,[1 nf 1 1]); % initialise Freqs
+MMF{3}=PassDoubleThruFile(3,[1 1 1 1]); % initialise ny
+MMF{4}=PassDoubleThruFile(4,[1 nf/K 1 1]); % initialise indf
+MMF{5}=PassDoubleThruFile(5,[1 ny-1 1 nf/K]); % initialise H real
+MMF{6}=PassDoubleThruFile(6,[1 ny-1 1 nf/K]); % initialise H imag
+MMF{7}=PassDoubleThruFile(7,[1 1 1 1]); % initialise C
+
+% Pass once
+PassDoubleThruFile(MMF{2},Freqs,1); % pass Freqs data
+PassDoubleThruFile(MMF{3},ny,1); % pass ny data
+PassDoubleThruFile(MMF{4},zeros(nf/K,1),1); % pass indf data
+PassDoubleThruFile(MMF{5},zeros(ny-1,1,nf/K),1); % pass H data
+PassDoubleThruFile(MMF{6},zeros(ny-1,1,nf/K),1); % pass H data
+PassDoubleThruFile(MMF{7},0,1); % pass C data
 
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
@@ -120,6 +137,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         nw=length(w);
         fi=2*pi*rand(nw,1);
         
+        % Pass data
+        PassDoubleThruFile(MMF{4},indf,1); % pass indf data
+        
         % Collect data until after stationarity obtained
         if firstRun == true
             firstRun = false;
@@ -150,24 +170,18 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                         firstTime = false;
                     end
                     
-                    % Pass data to GUI process
-                    % flushoutput(uh);
-%                     PassDatagram(uh,'indf',indf);
-%                     PassDatagram(uh,'Hr',real(H));
-%                     PassDatagram(uh,'Hi',imag(H));
-%                     PassDatagram(uh,'C',C);
                 else
                     [iret,H,ynotused,C]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ct,H0,opt);
                     H0=H;
                     
-                    % Pass data to GUI process
-                    % flushoutput(uh);
-                    %PassDatagram(uh,'indf',indf);
-                    %PassDatagram(uh,'Hr',real(H));
-                    %PassDatagram(uh,'Hi',imag(H));
-                    %PassDatagram(uh,'C',C);
                 end
                 
+                % Pass data
+                %PassDoubleThruFile(MMF{4},indf,1); % pass indf data
+                PassDoubleThruFile(MMF{5},real(H),1); % pass H data
+                PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
+                PassDoubleThruFile(MMF{7},C,1); % pass C data
+                pause(0.0001);
             end
             
             % Reset
@@ -234,16 +248,24 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             end
             Hs(:,:,:,JJ) = H;
             
+            % Pass data
+            PassDoubleThruFile(MMF{5},real(H),1); % pass H data
+            PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
+            PassDoubleThruFile(MMF{7},C,1); % pass C data
+            
             %for MM = 1:K
             %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
             %end
         end
         
         Hm = mean(Hs,4);
-%         PassDatagram(uh,'indf',indf);
-%         PassDatagram(uh,'Hr',real(Hm));
-%         PassDatagram(uh,'Hi',imag(Hm));
-%         PassDatagram(uh,'C',C);
+        
+        % Pass data
+        %PassDoubleThruFile(MMF{4},indf,1); % pass indf data
+        PassDoubleThruFile(MMF{5},real(H),1); % pass H data
+        PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
+        PassDoubleThruFile(MMF{7},C,1); % pass C data
+        
         frdsys.ResponseData(:,:,indf) = Hm;
         
     end
@@ -257,12 +279,16 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     % Clean-up
     multisine.session.release();
     delete(multisine.session);
+    
     timeElapsed = toc
     multisine.Metadata.TimeElapsed = timeElapsed;
     multisine.Metadata.TestDateEnd = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
     % Clear DAQ
     daq.reset;
+    
+    % Delete the ugly temp file
+    delete([tempdir,'DataContainer00']);
     
     % Covariance data too
     frdsys = idfrd(frdsys);
