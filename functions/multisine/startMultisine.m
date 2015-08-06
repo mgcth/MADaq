@@ -9,6 +9,12 @@ function dataOut = startSteppedSine(hObject, eventdata, handles)
 % Initialaise the test setup
 multisine = startInitialisation(hObject, eventdata, handles);
 
+% Ugly save here, but when PassXThrouFile, where X ca be double, string or
+% any other data type, is extended, change this
+% It is deleted at the end
+channelLabels = multisine.Metadata.Sensor.Label;
+save([tempdir,'DataContainer00'],'channelLabels');
+
 % Get info about channnels
 CHdata = get(handles.channelsTable, 'data');
 Chact = 0; for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1; end, end
@@ -242,6 +248,11 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             end
             Hs(:,:,:,JJ) = H;
             
+            % Pass data
+            PassDoubleThruFile(MMF{5},real(H),1); % pass H data
+            PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
+            PassDoubleThruFile(MMF{7},C,1); % pass C data
+            
             %for MM = 1:K
             %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
             %end
@@ -275,6 +286,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     % Clear DAQ
     daq.reset;
+    
+    % Delete the ugly temp file
+    delete([tempdir,'DataContainer00']);
     
     % Covariance data too
     frdsys = idfrd(frdsys);

@@ -11,6 +11,10 @@ dbstop error
 % Speed
 set(0, 'DefaultFigureRenderer', 'OpenGL'); % breaks EPS save
 
+% Load channel labels from ulgy disk saving
+channelLabels = load([tempdir,'DataContainer00']);
+channelLabels = channelLabels.channelLabels;
+
 %%                                               Get data from main process
 %instrreset;
 %u=startUDP('Client');
@@ -68,6 +72,7 @@ catch
     statGUIg.yseth=figure('Visible','off');
     statGUIg.ax=[];
     statGUIg.ny=ny;
+    statGUIg.channelLabels = channelLabels;
 end
 while 1
     %keyboard
@@ -127,7 +132,8 @@ if all(isnan(FRD.ResponseData(:)));opt.ax=[];end
 opt.hold=true;opt.ls='r.';opt.grid=true;
 %magphase(f,squeeze(H(yid,uid,:)),opt);
 magphase(f(indf),squeeze(FRD.ResponseData(yid,uid,indf)),opt);
-subplot(211),title(['u1->y' int2str(yid)])
+%subplot(211),title(['u1->y' int2str(yid)]) % hard coded for 1 input
+subplot(211),title([statGUIg.channelLabels{1} '->' statGUIg.channelLabels{yid+1}]) % hard coded for 1 input
 
 if C>0.999
     set(statGUIg.hui{1},'Back',[0 .7 0]);
