@@ -43,13 +43,13 @@ blockSize = 16000;
 startstr=['cmd /c start /min matlab -nosplash -nodesktop -minimize ' ...
    '-r "run(''',handles.homePath,'\functions\multisine\','simo_multisine_GUI'')"'];
 dos(startstr);
+readPass = 0;
 
-% readPass = 0;
-% MMF{1} = GetDoubleFromFile(1);
-% while readPass == 0
-%     pause(1)
-%     readPass = GetDoubleFromFile(MMF{1},1);
-% end
+MMF{1} = GetDoubleFromFile(1);
+while readPass == 0
+    pause(1)
+    readPass = GetDoubleFromFile(MMFi{1},1);
+end
 
 % Initiate
 frdsys=frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
@@ -70,20 +70,11 @@ if handles.steppedSine.Value == 1
 end
 
 % Pass data initially
-MMF{2}=PassDoubleThruFile(2,[1 nf 1 1]); % initialise Freqs
-MMF{3}=PassDoubleThruFile(3,[1 1 1 1]); % initialise ny
-MMF{4}=PassDoubleThruFile(4,[1 nf/K 1 1]); % initialise indf
-MMF{5}=PassDoubleThruFile(5,[1 ny-1 1 nf/K]); % initialise H real
-MMF{6}=PassDoubleThruFile(6,[1 ny-1 1 nf/K]); % initialise H imag
-MMF{7}=PassDoubleThruFile(7,[1 1 1 1]); % initialise C
-
-% Pass once
-PassDoubleThruFile(MMF{2},Freqs,1); % pass Freqs data
-PassDoubleThruFile(MMF{3},ny,1); % pass ny data
-PassDoubleThruFile(MMF{4},zeros(nf/K,1),1); % pass indf data
-PassDoubleThruFile(MMF{5},zeros(ny-1,1,nf/K),1); % pass H data
-PassDoubleThruFile(MMF{6},zeros(ny-1,1,nf/K),1); % pass H data
-PassDoubleThruFile(MMF{7},0,1); % pass C data
+MMF{2}=PassDoubleThruFile(2,[1 nf 1 1]); % initialise
+MMF{3}=PassDoubleThruFile(3,[1 1 1 1]); % initialise
+MMF{4}=PassDoubleThruFile(4,[1 nf/K 1 1]); % initialise
+MMF{5}=PassDoubleThruFile(5,[1 ny-1 1 nf]); % initialise
+MMF{6}=PassDoubleThruFile(6,[1 1 1 1]); % initialise
 
 % Check if any channels were added to the session
 if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.reference)
@@ -131,9 +122,6 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         nw=length(w);
         fi=2*pi*rand(nw,1);
         
-        % Pass data
-        PassDoubleThruFile(MMF{4},indf,1); % pass indf data
-        
         % Collect data until after stationarity obtained
         if firstRun == true
             firstRun = false;
@@ -170,11 +158,11 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     
                 end
                 
-                % Pass data
-                %PassDoubleThruFile(MMF{4},indf,1); % pass indf data
-                PassDoubleThruFile(MMF{5},real(H),1); % pass H data
-                PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
-                PassDoubleThruFile(MMF{7},C,1); % pass C data
+                PassDoubleThruFile(MMF{2},readPass,1); % pass data
+                passData.indf = indf;
+                passData.H = H;
+                passData.C = C;
+                PassDataThruFile(1,'passData',passData);
                 pause(0.0001);
             end
             
@@ -248,13 +236,14 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         end
         
         Hm = mean(Hs,4);
-        
-        % Pass data
-        %PassDoubleThruFile(MMF{4},indf,1); % pass indf data
-        PassDoubleThruFile(MMF{5},real(H),1); % pass H data
-        PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
-        PassDoubleThruFile(MMF{7},C,1); % pass C data
-        
+        %PassDatagram(uh,'indf',indf);
+        %PassDatagram(uh,'Hr',real(Hm));
+        %PassDatagram(uh,'Hi',imag(Hm));
+        %PassDatagram(uh,'C',C);
+        %passData.indf = indf;
+        %passData.H = Hm;
+        %passData.C = C;
+        %PassDataThruFile(1,'passData',passData);
         frdsys.ResponseData(:,:,indf) = Hm;
         
     end
