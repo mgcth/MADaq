@@ -47,10 +47,10 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     % Actual impact test                                Initiate and test
     Fs=impact.session.Rate;Ts=1/Fs;
     
-    nRefPoints = eval(get(handles.fun3,'String'));
-    impactsOnRef = eval(get(handles.fun4,'String'));
-    recordTime = eval(get(handles.fun2,'String'));
-    triggerLevel = eval(get(handles.fun5,'String'));
+%     nRefPoints = eval(get(handles.fun3,'String'));
+%     impactsOnRef = eval(get(handles.fun4,'String'));
+%     recordTime = eval(get(handles.fun2,'String'));
+%     triggerLevel = eval(get(handles.fun5,'String'));
     
     %
     if strcmp(lower(impact.session.Channels(1).ID(1:2)),'ao')
@@ -59,7 +59,7 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
     
 %     %
 %     nCh = length(impact.channelInfo.active);
-%     %impact.session.Rate = 51200; %HÅDKODAD!!! Är 51200.0001 från excel
+%     %impact.session.Rate = 51200; %HÅRDKODAD!!! Är 51200.0001 från excel
 %     %Fs = impact.session.Rate;
 %     nScans = recordTime*Fs;
 %     
@@ -118,10 +118,12 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
 %         iImpacts = 1;
 %     end
 
-    fcut=Fs/50;    
-    [frdsys,tssys]=ImpactTest(ChNames,ChCal,refch,RefName,fcut);
-    dataOut = data2WS(2,frdsys,impact);
-    dataOut = data2WS(3,tssys,impact);
+    fcut=str2num(impact.Metadata.TestSettings{4,2});
+    FadeTime=str2num(impact.Metadata.TestSettings{2,2});
+    RefLabel=impact.Metadata.TestSettings{5,2};
+    [frdsys,tssys]=ImpactTest(ChNames,ChCal,refch,RefLabel,fcut,FadeTime);
+    dataOut{1} = data2WS(2,frdsys,impact);
+    dataOut{2} = data2WS(3,tssys,impact);
     
     
     impact.session.stop;
