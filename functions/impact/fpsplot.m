@@ -12,6 +12,7 @@ function YLim=fpsplot(hax,t,y,YLim,fps,tw)
 if nargin<5,fps=40;end,if isempty(fps), fps=40;end
 if nargin<6,tw=1.0;end,if isempty(tw), tw=1.0;end
 if nargin<7,tit='';end,
+if isempty(YLim),Ylim=[Inf -Inf];end
 
 dt=t(2)-t(1);
 T=1/fps;

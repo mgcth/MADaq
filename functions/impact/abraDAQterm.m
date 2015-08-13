@@ -117,7 +117,9 @@ set(source,'Position',[sz(1) sz(2) 320 420]);
 %% ========================================================================
 function updateSID(FRD)
 load('abraDAQ.sid','-mat');
-FRD=idfrd(FRD);
-FRD.Utility.axinfo=[1 0.0389 0.7594 0.0973 0.0984 0 0 1];
-Data{1}=FRD;
+% FRD=idfrd(FRD);
+% FRD.Utility.axinfo=[1 0.0389 0.7594 0.0973 0.0984 0 0 1];
+Data{1}=idfrd(FRD);
+Data{1}.Utility.axinfo=[1 0.0389 0.7594 0.0973 0.0984 0 0 1];
+clear FRD
 save abraDAQ.sid -mat

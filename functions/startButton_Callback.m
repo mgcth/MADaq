@@ -31,6 +31,25 @@ elseif handles.multisine.Value == 1 % if multisine
     
 end
 
+TS=[];FRD=[];
+if iscell(dataOut)
+  for I=1:length(dataOut)
+    if strcmpi(class(dataOut{I}),'timeseries')
+      TS=dataOut{I};
+    elseif strcmpi(class(dataOut{I}),'frd') || strcmpi(class(dataOut{I}),'idfrd')
+      FRD=dataOut{I};
+    end    
+  end  
+else
+  if strcmpi(class(dataOut),'timeseries')
+    TS=dataOut;
+  elseif strcmpi(class(dataOut),'frd') || strcmpi(class(dataOut),'idfrd')
+    FRD=dataOut;
+  end    
+end
+
+abraDAQterm(TS,FRD);
+
 % Check if report is to be generated
 if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')
     try

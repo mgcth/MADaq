@@ -1,4 +1,4 @@
-function [FRD,TS]=ImpactTest(ChNames,ChCal,refch,RefName,fcut)
+function [FRD,TS]=ImpactTest(ChNames,ChCal,refch,RefName,fcut,FadeTime)
 %IMPACTTEST
 if length(ChCal)==length(ChCal(:)), ChCal=diag(ChCal);end
 
@@ -7,7 +7,7 @@ indTrainHit=[];TrainHitFound=false;hdh=[];rmsnoise=-1;biaslvl=[];
 FileName=[tempdir 'DataContainer1.mat'];
 
 %%                                                          Hard-coded data
-fps=10;Tdelay=1.0;FadeTime=30.;PreTime=0.02;WindowTime=0.2;
+fps=10;Tdelay=1.0;PreTime=0.02;WindowTime=0.2;
 Twindow=2.0;CFm=1;CrestFactor=20;
 
 %% Save data for PlotHits
@@ -75,6 +75,9 @@ while 1
       ind1=floor(etime(TrainImpactClock,Clock0)/dt);
       ind1=max([ind1 1]);ind2=floor(etime(clock,Clock0)/dt);
       if rmsnoise<0; % Get noise rms from times before training impact
+%         indstrt=max([1 ind1-100]);
+%         biaslvl=mean(y(indstrt:ind1));
+%         rmsnoise=rms(y(indstrt:ind1)-biaslvl);
         biaslvl=mean(y(1:ind1));
         rmsnoise=rms(y(1:ind1)-biaslvl);
       end
@@ -200,6 +203,7 @@ while 1
     disp('No more blocks to read. Returning.'),break
   end  
   try
+    if ~TrainHitFound,Ylim=[];end
     Ylim=fpsplot(hax(1),t(ind),y(ind),Ylim,fps,Twindow);
   catch
   end  
@@ -221,7 +225,7 @@ Kill=true;save('Data4PlotHits','Kill','-append');pause(5)
 Kill=false;save('Data4PlotHits','Kill','-append');
 
 [FRD,TS]=PlotHitsPost;
-abraDAQterm(TS,FRD);
+% abraDAQterm(TS,FRD);
 
 % TSC=TSCc{1};
 % TSC=TSCc;
