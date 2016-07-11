@@ -12,21 +12,27 @@ function startButton_Callback(hObject, eventdata, handles)
 
 % Check which test
 if get(handles.monitor,'Value') == 1 % if monitor
+    TestType='monitor';
     dataOut = startMonitor(hObject, eventdata, handles);
     
 elseif get(handles.dataLogg,'Value') == 1 % if standard test
+    TestType='logging';
     dataOut = startLogg(hObject, eventdata, handles);
     
 elseif get(handles.impactTest,'Value') == 1 % if impactTest
+    TestType='impact';
     dataOut = startImpact(hObject, eventdata, handles);
     
 elseif get(handles.periodic,'Value') == 1 % if periodic
+    TestType='periodic';
     dataOut = startPeriodic(hObject, eventdata, handles);
     
 elseif get(handles.steppedSine,'Value') == 1 % if steppedSine
+    TestType='steppedsine';
     dataOut = startMultisine(hObject, eventdata, handles);
     
 elseif handles.multisine.Value == 1 % if multisine
+    TestType='multisine';
     dataOut = startMultisine(hObject, eventdata, handles);
     
 end
@@ -48,7 +54,11 @@ else
   end    
 end
 
-abraDAQterm(TS,FRD);
+if strcmpi(TestType,'impact') || strcmpi(TestType,'periodic') || ...
+    strcmpi(TestType,'steppedsine') || strcmpi(TestType,'multisine') || ...
+     strcmpi(TestType,'logging')
+  abraDAQterm(TS,FRD);
+end
 
 % Check if report is to be generated
 if get(handles.autoReport,'Value') && ~get(handles.monitor,'Value')

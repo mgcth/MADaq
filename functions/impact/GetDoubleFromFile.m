@@ -1,6 +1,6 @@
 function varargout=GetDoubleFromFile(varargin)
-%% GetDoubleFromFile  Get data that are apassed by the PassDoubleThruFile
-% The function is called 1:st time for initiation and then repatedly to get
+%% GetDoubleFromFile  Get data that are passed by the PassDoubleThruFile
+% The function is called 1:st time for initiation and then repeatedly to get
 % data. It can also be called to get info about how many data blocks that 
 % put on the file and the clock info from the passing procedure
 % Initiation

@@ -41,7 +41,8 @@ Data=zeros(mData,BlockNt,SizeData(1));
 Data(:,:,1:BlocksRead)=Dread;
 
 %%                                  Call to procedure that collects impacts
-MMF{2}=PassDoubleThruFile(2,[12 mData (FadeSamples+PreSamples) 1]);
+% MMF{2}=PassDoubleThruFile(2,[12 mData (FadeSamples+PreSamples) 1]);
+MMF{2}=PassDoubleThruFile(2,[20 mData (FadeSamples+PreSamples) 1]);
 strt='cmd /c start /min matlab -nosplash -nodesktop -minimize -r "PlotHitsPre;"';
 dos(strt);
 
@@ -51,8 +52,10 @@ WBpos=get(WB,'Position');WBpos(1:2)=[50 50];set(WB,'Position',WBpos);
 
 %%                                                    Start collecting data
 Ylim=[inf -inf];NewHitDetected=false;HitNo=0;HitCrestFactor=CrestFactor;
+hitfeedbackalready=false;
 while 1
   if (BlocksRead>=MaxNoBlocks) || get(hui(1),'Value'),break;end
+  if HitNo>20,break,end;% Not more than 20 hits allowed
   
 %%                           Load all data that is available at this moment 
   BlocksAvail=GetDoubleFromFile(MMF{1});
@@ -154,6 +157,13 @@ while 1
       HitEndSample=BlocksRead*BlockNt;
       set(hp(1),'Back',[1 0 0],'Title','DON''T HIT AGAIN RIGHT NOW!');
       set(hui(6),'Back',[1 0 0]);
+      if ~hitfeedbackalready
+        FeedbackString=get(hui(5),'String');
+        Nstrings=length(FeedbackString);
+        FeedbackString{Nstrings+1}=sprintf(['Hit ' int2str(HitNo+1) ' detected.']);
+        set(hui(5),'String',FeedbackString,'Value',Nstrings+1);
+        hitfeedbackalready=true;
+      end
     else
       HitNo=HitNo+1;HitEndSample=indHits+FadeSamples;
       indLastHit=HitEndSample;
@@ -163,13 +173,10 @@ while 1
       Ytmp=Ytmp(:,(indHits-PreSamples+1):(indHits+FadeSamples));
       Ytmp=WindowY(Ytmp,refch,PreSamples,WindowSamples);
       PassDoubleThruFile(MMF{2},Ytmp(:),HitNo);      
-      FeedbackString=get(hui(5),'String');
-      Nstrings=length(FeedbackString);
-      FeedbackString{Nstrings+1}=sprintf(['Hit ' int2str(HitNo) ' detected.']);
-      set(hui(5),'String',FeedbackString,'Value',Nstrings+1);
       set(hp(1),'Back',[.5 1 .5],'Title','Data Film');
       set(hui(6),'Back',[.5 1 .5]);
       save('Data4PlotHits','plotch','-append');
+      hitfeedbackalready=false;
     end
     ind=(indHits-PreSamples):HitEndSample;
     hplt(2).XData=t(ind);hplt(2).YData=yref(ind);

@@ -5,7 +5,11 @@ kHz2Hz = 1000;
 Hz2kHz = 0.001;
 
 % Update status bar
-set(handles.statusStr, 'String', 'Setting up system ...');
+if handles.CalibrateButton.Value
+  set(handles.statusStr, 'String', 'Calibrating ...');
+else    
+  set(handles.statusStr, 'String', 'Setting up system ...');
+end  
 drawnow();
 
 % Get channel data
@@ -19,26 +23,38 @@ sessionObject.channelInfo.reference = channelData.reference;
 daq.reset;
 sessionObject.session = daq.createSession('ni');
 
+if ~handles.CalibrateButton.Value
 % If monitor, make it continuous
-if get(handles.monitor, 'Value') == 1
+  if get(handles.monitor, 'Value') == 1
     sessionObject.freeLogging = false;
     sessionObject.normLogging = false;
     sessionObject.session.IsContinuous = true;
-end
+  end
 
 % If data logging, set the time
-if get(handles.dataLogg, 'Value') == 1
-    sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
+  if get(handles.dataLogg, 'Value') == 1
+    TimeString=[get(handles.fun2, 'String') '       '];
+    if strcmpi(TimeString(1:7),'default')
+      sessionObject.session.DurationInSeconds=60;%Default
+    else
+      sessionObject.session.DurationInSeconds = eval(get(handles.fun2, 'String'));
+    end  
+  end
 end
 
 % Set rate
-sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
+RateString=[get(handles.fun1, 'String') '       '];
+if strcmpi(RateString(1:7),'default')
+  sessionObject.session.Rate=20000;%Default
+else
+  sessionObject.session.Rate = eval(get(handles.fun1, 'String')) * kHz2Hz;
+end
 
 % Collect info
 % Name and email
-sessionObject.Metadata.Tester = handles.autoReport.UserData.TesterInfo{1};
-sessionObject.Metadata.Email = handles.autoReport.UserData.TesterInfo{2};
-sessionObject.Metadata.Affiliation = handles.autoReport.UserData.TesterInfo{3};
+try,sessionObject.Metadata.Tester = handles.autoReport.UserData.TesterInfo{1};catch,end
+try,sessionObject.Metadata.Email = handles.autoReport.UserData.TesterInfo{2};catch,end
+try,sessionObject.Metadata.Affiliation = handles.autoReport.UserData.TesterInfo{3};catch,end
 
 % Date
 sessionObject.Metadata.TestDate = datestr(now,'mm-dd-yyyy HH:MM:SS');
@@ -51,7 +67,9 @@ sessionObject.Metadata.TestTitles{4} = get(handles.title4, 'String');
 
 % Measurement type and options
 % Check which test
-if get(handles.monitor,'Value') == 1 % if monitor
+if handles.CalibrateButton.Value
+    
+elseif get(handles.monitor,'Value') == 1 % if monitor
     sessionObject.Metadata.TestType = 'Monitor';
     
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -197,7 +215,9 @@ for i = activated%1:m%[3:m 1:2]
                     channelNumber(jj) = str2num([tmpSlotNumber{:}]);
                 else
                     %sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'IEPE');
-                    sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
+                    for jjj=1:length(channelNumber)
+                      sessionObject.session.addAnalogInputChannel(cardName, channelNumber(jjj), 'IEPE');
+                    end
                     
                     
                     % Start with the next set
@@ -309,7 +329,8 @@ for i = 1:length(activated)
 end
 
 % Add output channels to periodic, steppedSine and multisine
-if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
+if ~handles.CalibrateButton.Value
+  if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 || ...
         get(handles.multisine,'Value') == 1
     dataOut = get(handles.outputTable, 'data');
     [mm, nn] = size(dataOut);
@@ -338,7 +359,8 @@ if get(handles.periodic,'Value') == 1 || get(handles.steppedSine,'Value') == 1 |
 
         end
     end
-end
+  end
+end  
 
 % Check if any channels was added to the session
 if (isempty(sessionObject.session.Channels))
@@ -355,7 +377,11 @@ else
         allocateMemory(handles);
     end
     
-    set(handles.statusStr, 'String', 'Measurement in progress ...');
+    if handles.CalibrateButton.Value
+      set(handles.statusStr, 'String', 'Calibration in progress ...');
+    else    
+      set(handles.statusStr, 'String', 'Measurement in progress ...');
+    end  
     drawnow();
     
     % Sync and reject alias if low freqency

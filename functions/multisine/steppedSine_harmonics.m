@@ -1,4 +1,4 @@
-function [c,rn,rh,rs,C,pw]=steppedSine_harmonics(y,Ts,f0,order,refch)
+function [c,rn,rh,rs,C,pw,yf]=steppedSine_harmonics(y,Ts,f0,order,refch)
 % HARMONICS: Obtain harmonical components in data
 %Inputs:  y      - The discrete-time signal
 %         Ts     - The sampling rate
@@ -11,7 +11,8 @@ function [c,rn,rh,rs,C,pw]=steppedSine_harmonics(y,Ts,f0,order,refch)
 %         rs  - Stationarity indicator
 %         C   - Cycle per cycle complex amplitudes
 %         pw  - Phase wrap during block
-%Call:    [c,rn,rh,rs,C]=harmonics(y,Ts,f0,order,refch)
+%         yf  - Full regression reconstruction
+%Call:    [c,rn,rh,rs,C,pw,yf]=harmonics(y,Ts,f0,order,refch)
 
 %Created: 2010-08-14, TA
 
@@ -68,6 +69,7 @@ end
 Nshifts=20;C=zeros(Ny,Nshifts);
 Ishift=1:round((Nt-N)/Nshifts):Nt-N;tshift=t(Ishift);
 
+try
 if nargout>3
   for I=1:Nshifts
     for II=1:Ny
@@ -82,3 +84,6 @@ if nargout>3
     pw(I)=std(phase(C(I,:)./C(refch,:)));
   end    
 end
+catch
+  C=NaN;rs=NaN;pw=NaN;
+end  

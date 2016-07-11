@@ -11,6 +11,22 @@ CellEditData=varargin{2};
 rawCells=varargin{3};
 
 ind=CellEditData.Indices;row=ind(1);col=ind(2);
+if col==1
+  if CellEditData.NewData
+    if isempty(deblank(Table.Data{row,4}))
+      Table.Data{row,4}=Table.Data{row,3};   
+    end  
+    if isempty(deblank(Table.Data{row,5}))
+      Table.Data{row,5}='AC';   
+    end  
+    if isempty(deblank(Table.Data{row,6}))
+      Table.Data{row,6}='Volt';   
+    end  
+    if isnan(Table.Data{row,7})
+      Table.Data{row,7}='10';   
+    end  
+  end    
+end    
 if col~=10,return;end
 
 was=CellEditData.PreviousData;

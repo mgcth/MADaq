@@ -1,12 +1,12 @@
-function [t,u]=nidaq_noise(f0,f1,Ts,T)
-%NIDAQ_NOISE Generates a random noise signal
+function [t,u]=abradaq_noise(f0,f1,Ts,T)
+%ABRADAQ_NOISE Generates a random noise signal
 %Inputs: f0   - Cut-on frequency of noise
 %        f1   - Cut-off frequency of noise
-%        Ts   - Discrete time steps
+%        Ts   - Discrete time step
 %        T    - Duration of noise signal
 %Output: t    - Discrete times for u
 %        u    - Noise signal
-%Call:   [t,u]=nidaq_noise(f0,f1,Ts,T)
+%Call:   [t,u]=abradaq_noise(f0,f1,Ts,T)
 
 %Created: 2011-03-03. Thomas Abrahamsson
 

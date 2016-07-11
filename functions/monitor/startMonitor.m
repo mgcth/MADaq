@@ -98,10 +98,11 @@ if (~running)
         %%%%%%%%%%%%%%%%%%%%%%%%
         
         %   Ad Hoc Logging Button
-        preview.adHocLog = uicontrol(preview.figure,    'Style', 'pushbutton', ...
-            'Position', [120 10 150 25], ...
-            'String', 'Start free logging', ...
-            'Callback', @previewAdHocLog);
+%         preview.adHocLog = uicontrol(preview.figure,    'Style', 'pushbutton', ...
+%             'Position', [120 10 150 25], ...
+%             'String', 'Start free logging', ...
+%             'Callback', @previewAdHocLog);
+%         
         %   Duration Log Button
         %             preview.normLog = uicontrol(preview.figure, 'Style', 'pushbutton', ...
         %                                                         'Position', [280 10 150 25], ...
@@ -112,7 +113,7 @@ if (~running)
         preview.eventListener = addlistener(preview.session, 'DataAvailable', @plotPreview);
         
         %   Start monitoring
-        set(handles.startButton, 'String', 'Stop monitor');
+        set(handles.startButton, 'String', 'Stop monitor','BackGround',[1 0 0]);
         
         %             try preview.session.AutoSyncDSA = true; catch, end
         %             disp(['DSA enabled: ', num2str(preview.session.AutoSyncDSA)]);
@@ -125,5 +126,5 @@ if (~running)
     
 else
     closePreview (hObject, eventdata, handles);
-    set(handles.startButton, 'String', 'Start measurement');
+    set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
 end

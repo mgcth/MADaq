@@ -9,6 +9,7 @@ function dataOut = startPeriodic(hObject, eventdata, handles)
 global dataObject
 
 % Initialaise the test setup
+set(handles.startButton, 'String', 'Working!','BackGround',[1 0 0]);
 periodic = startInitialisation(hObject, eventdata, handles);
 
 % Get info about channnels
@@ -23,28 +24,81 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     % Actual periodic test                                Initiate and test
     Fs=periodic.session.Rate;Ts=1/Fs;
     
-    [t,Load]=eval(char(get(handles.fun3,'String')));
+    Fspan=eval(get(handles.fun7,'String'));
+    if length(Fspan)<2,errordlg('Frequency range must be given with lower and upper limits');end
+    CyclesStr=[get(handles.fun4,'String') '       '];
+    if strcmpi(CyclesStr(1:7),'default')
+      Cycles=10;  
+    else    
+      Cycles=str2double(get(handles.fun4,'String'));
+    end
+    SkippsStr=[get(handles.fun5,'String') '       '];
+    if strcmpi(SkippsStr(1:7),'default')
+      Skipps=1;
+    else    
+      Skipps=str2double(get(handles.fun5,'String'));
+    end
+    TendStr=[get(handles.fun2,'String') '       '];
+    if strcmpi(TendStr(1:7),'default')
+      Tend=20;  
+    else
+      Tend=str2double(get(handles.fun2,'String'));
+    end
+    
+    try
+      [t,Load]=eval(char(get(handles.fun3,'String')));
+    catch
+      [t,Load]=abradaq_noise(Fspan(1),Fspan(2),Ts,Tend);
+      warndlg('No peridic function definition given. Using a random signal. See e.g.: abradaq_chirp or abradaq_noise.','Periodic Excitation');
+    end  
     MaxAmpl=eval(get(handles.fun6,'String'));
-    MaxLoad=max(abs(Load));Fspan=eval(get(handles.fun7,'String'));
-    Cycles=str2double(get(handles.fun4,'String'));Skipps=str2double(get(handles.fun5,'String'));
-    Tend=str2double(get(handles.fun2,'String'));
+    MaxLoad=max(abs(Load));
+
+    
     dt=t(2)-t(1);
-    t(end+1)=t(end)+dt;t(end+1)=Tend;
-    Load(end+1)=0;Load(end+1)=0;
+    if Tend<t(end)
+        ind=find(t<Tend);
+        t=t(ind);t(end+1)=t(end)+dt;
+        Load=Load(ind);Load(end+1)=0;
+    elseif Tend>t(end)
+        t(end+1)=Tend;
+        Load(end+1)=0;
+    end    
+%     t(end+1)=t(end)+dt;t(end+1)=Tend;
+%     if any(~diff(t)),inddiff=find(diff(t)==0),t(inddiff+1)=t(inddiff+1)+10*eps;end
+%     Load(end+1)=0;Load(end+1)=0;
+    
     Ts=1/Fs;
     Load=interp1(t,(MaxAmpl/MaxLoad)*Load,t(1):Ts:t(end));
     
     Refch=find(periodic.channelInfo.active == periodic.channelInfo.reference);
     Nch=length(periodic.channelInfo.active);
     Ych=setdiff(1:Nch,Refch);
+
+%                                                      Get calibration data
+    active = periodic.channelInfo.active;
+    refch = periodic.channelInfo.reference;
+    tmpTable = get(handles.channelsTable,'Data');
+    yind=setdiff(active,refch);uind=refch;
+    
+    ycal=diag(cell2mat({tmpTable{yind,11}}));
+    ucal=diag(cell2mat({tmpTable{uind,11}}));
+
+%%                               Give one period of data to find load level    
+    qd=0.01*Load(:)/norm(Load(:),'inf');
+    queueOutputData(periodic.session,qd);
+    [y,times,Trigt]=periodic.session.startForeground();
+    u=y(:,Refch)*ucal;
+    LoadFactor=0.01*MaxAmpl/norm(u,'inf')/norm(Load(:),'inf');
+
     
     Ndata=length(Load);
-    WaitTime=Cycles*Ndata*Ts;
+    WaitTime=(Cycles+Skipps)*Ndata*Ts;
     set(handles.statusStr, 'String', sprintf('Shaking about %5.2f s. Please wait ...', WaitTime));
     drawnow();
     
     qd=[];
-    for I=1:Cycles;qd=[qd;Load(:)];end
+    for I=1:Cycles;qd=[qd;LoadFactor*Load(:)];end
     %y = [];
     %periodic.eventListener = addlistener(periodic.session, 'DataAvailable', @(src, event) tempPeriodic(src, event));
     
@@ -59,17 +113,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     set(handles.statusStr, 'String', 'Estimating transfer functions. Please wait ...');
     drawnow();
     
-    %                                                        Do calibration
-    active = periodic.channelInfo.active;
-    refch = periodic.channelInfo.reference;
-    tmpTable = get(handles.channelsTable,'Data');
-%     cal = 1./[tmpTable{:,11}];
-    yind=setdiff(active,refch);uind=refch;
     
-    ycal=diag(cell2mat({tmpTable{yind,11}}));
-    ucal=diag(cell2mat({tmpTable{uind,11}}));
-    
-%     y=y*diag(1./cal(yind));u=u*diag(1./cal(uind));
+%                                                            Do calibration
     y=y*ycal;u=u*ucal;
     
     for II=1:size(y,2)
@@ -78,7 +123,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     end
     ind=find(f>=min(Fspan) & f<=max(Fspan));FRF=FRF(:,:,ind);f=f(ind);
     
-    timeElapsed = toc
+    timeElapsed = toc;
     periodic.Metadata.TimeElapsed = timeElapsed;
     periodic.Metadata.TestDateEnd = datestr(now,'mm-dd-yyyy HH:MM:SS');
     
@@ -96,7 +141,8 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     % Save data
     %Nt=dataObject.nt;
     dataOut = data2WS(2,frdsys,periodic);
-    
+
+    set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
 else

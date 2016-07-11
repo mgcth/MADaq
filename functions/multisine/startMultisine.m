@@ -1,4 +1,4 @@
-function dataOut = startSteppedSine(hObject, eventdata, handles)
+function dataOut = startMultisine(hObject, eventdata, handles)
 
 % Author: Mladen Gibanica(*)(**) and Thomas Abrahamsson(*)
 % (*) Chalmers University of Technology
@@ -7,9 +7,10 @@ function dataOut = startSteppedSine(hObject, eventdata, handles)
 % May 2015; Last revision: 21-May-2015
 
 % Initialaise the test setup
+set(handles.startButton, 'String', 'Working!','BackGround',[1 0 0]);
 multisine = startInitialisation(hObject, eventdata, handles);
 
-% Ugly save here, but when PassXThrouFile, where X ca be double, string or
+% Ugly save here, but when PassXThrouFile, where X can be double, string or
 % any other data type, is extended, change this
 % It is deleted at the end
 channelLabels = multisine.Metadata.Sensor.Label;
@@ -25,17 +26,43 @@ Fs = multisine.session.Rate;
 Ts = 1/Fs;
 
 % Get frequencies and loads etc...
-[Freqs, wd, Tsd] = eval(get(handles.fun2,'String')); % should be in Hz!
+% [Freqs, wd, Tsd] = eval(get(handles.fun2,'String')); % should be in Hz!
+Freqs = eval(get(handles.fun2,'String')); % should be in Hz!
 loads = eval(get(handles.fun3,'String'));
 
 % Correlation, between 0 and 1
-Ct = eval(get(handles.fun5,'String')); % 0.997 a good value
-CtMeanInput = eval(get(handles.fun6,'String')); % 0.95 a good value
+CtStr=[get(handles.fun5,'String') '       '];
+if strcmpi(CtStr(1:7),'default')
+  Ct=.99;  
+else 
+  Ct = eval(get(handles.fun5,'String')); % 0.997 a good value
+  if Ct>.999,Ct=.999;end
+  if Ct<.8,Ct=.8;end
+end
+
+CtMeanStr=[get(handles.fun6,'String') '       '];
+if strcmpi(CtMeanStr(1:7),'default')
+  CtMeanInput=.95;  
+else 
+  CtMeanInput = eval(get(handles.fun6,'String')); % 0.95 a good value
+  if CtMeanInput>.99,CtMeanInput=.99;end
+  if CtMeanInput<.8,CtMeanInput=.8;end  
+end
 
 % Number of lowest frequency sinusoidal that data block should cover
-Ncyc = eval(get(handles.fun4,'String')); % 10 a good value
+NCycStr=[get(handles.fun4,'String') '       '];
+if strcmpi(NCycStr(1:7),'default')
+  Ncyc=10;  
+else 
+  Ncyc = eval(get(handles.fun4,'String')); % 10 a good value
+end  
 % Number of block evaluations for statistics
-Nstat = eval(get(handles.fun7,'String')); % 20 a good value
+NStatStr=[get(handles.fun7,'String') '       '];
+if strcmpi(NStatStr(1:7),'default')
+  Nstat=20;  
+else 
+  Nstat = eval(get(handles.fun7,'String')); % 20 a good value
+end
 
 % Data that should be given or provided by multisine
 refch = find(CH.active == CH.reference);
@@ -96,6 +123,21 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     tmpTable = get(handles.channelsTable,'Data');
     ical = {tmpTable{:,11}};
     ical = cell2mat(ical(CH.active))';
+    
+ 
+    
+
+%%                      Give one chirp sweep to find appropriate load level    
+    ucal=diag(cell2mat({tmpTable{CH.reference,11}}));
+    [t,Load]=abradaq_chirp(min(Freqs),10,max(Freqs),Ts);
+    qd=0.01*Load(:)/norm(Load(:),'inf');
+    queueOutputData(multisine.session,qd);
+    [y,times]=multisine.session.startForeground();
+    u=y(:,refch)*ucal;
+    MaxAmpl=max(loads);
+    LoadFactor=0.01*MaxAmpl/norm(u,'inf')/norm(Load(:),'inf');
+    loads=LoadFactor*loads;
+    
     
     % Add listener
     LAvail=addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
@@ -303,7 +345,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     % Save data
     %Nt=dataObject.nt;
     dataOut = data2WS(2,frdsys,multisine);
-    
+   
+    set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
     set(handles.statusStr, 'String', 'READY!  IDFRD and DAQ data available at workbench.');
     drawnow();
 else

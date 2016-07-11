@@ -54,9 +54,9 @@ if (~isempty(fileName))
     output{9, 5} = get(handles.steppedSine, 'Value');
     output{9, 6} = get(handles.multisine, 'Value');
     output{10, 1} = get(handles.autoReport, 'Value');
-    output{10, 2} = handles.autoReport.UserData.TesterInfo{1};
-    output{10, 3} = handles.autoReport.UserData.TesterInfo{2};
-    output{10, 4} = handles.autoReport.UserData.TesterInfo{3};
+    try,output{10, 2} = handles.autoReport.UserData.TesterInfo{1};catch,end
+    try,output{10, 3} = handles.autoReport.UserData.TesterInfo{2};catch,end
+    try,output{10, 4} = handles.autoReport.UserData.TesterInfo{3};catch,end
     output{11, 1} = '###';
     % % MG (mod end)
     
@@ -74,6 +74,9 @@ if (~isempty(fileName))
         %output{10 + i, 7} = dataIn{i, 7};        %   Transducer type
         output{offset + i, 8} = dataIn{i, 8};     %   Manufacturer
         output{offset + i, 9} = dataIn{i, 9};     %   Manufacturer ID
+        if ~ischar(dataIn{i,10})
+            dataIn{i,10}=num2str(dataIn{i,10});
+        end
         output{offset + i, 10} = dataIn{i, 10};   %   Serial number
         output{offset + i, 11} = dataIn{i, 11};   %   Sensitivity
         output{offset + i, 12} = dataIn{i, 12};   %   Units

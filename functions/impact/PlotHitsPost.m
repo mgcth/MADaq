@@ -11,7 +11,7 @@ hf=figure('CloseRequestFcn',@PackAndLeave);
 set(zoom(hf),'ActionPostCallback','global GCA,GCA=gca;');
 GCA=[];
 
-SetAct=ones(12,1);
+SetAct=ones(20,1);
 
 %%                                         Load data passed from ImpactTest
 load('Data4PlotHits.mat','refch','plotch','fcut','ChNames');
@@ -79,8 +79,11 @@ end
 function [hf,hax]=PostPlotHitsGUI(Y,hf)
 global SetAct hp
 NY=length(Y);NWcols=2;NWrows=2;
-if NY>12, NWcols=5;NWrows=4;elseif NY>9, NWcols=4;NWrows=3;
-elseif NY>6, NWcols=3;NWrows=3;elseif NY>4, NWcols=3;NWrows=2;end  
+if NY>16, NWcols=5;NWrows=4;
+elseif NY>12, NWcols=4;NWrows=4;
+elseif NY>9, NWcols=4;NWrows=3;
+elseif NY>6, NWcols=3;NWrows=3;
+elseif NY>4, NWcols=3;NWrows=2;end  
 
 %%                                                       Open figure window
 MonPos=get(0,'MonitorPositions');MonPos=MonPos(1,:);

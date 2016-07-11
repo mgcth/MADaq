@@ -36,10 +36,10 @@ if strcmpi(class(Proc),'double');%          Initiate the data transfer file
     if exist(FileName,'file'),error('File is locked. It may be associated with a memmapfile object. Try to clear that.');end
   end
   try
-    [f, msg] = fopen(FileName,'wb');
+    [fh, msg] = fopen(FileName,'wb');
     D=varargin{2};
     nD=prod(D);
-    fwrite(f,[zeros(nD,1);clock';D(:);0],'double');% Room for data+clock+size+No blocks passed
+    fwrite(fh,[zeros(nD,1);clock';D(:);0],'double');% Room for data+clock+size+No blocks passed
     varargout{2}=0;
   catch
     lasterr
@@ -47,7 +47,7 @@ if strcmpi(class(Proc),'double');%          Initiate the data transfer file
     varargout{2}=-1;
     return
   end  
-  fclose(f);
+  fclose(fh);
   varargout{1}=memmapfile(FileName, 'Writable', true, 'Format', 'double');
 elseif strcmpi(class(Proc),'memmapfile') && nargin==3;%          Write data
   try
