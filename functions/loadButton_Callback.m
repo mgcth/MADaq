@@ -12,6 +12,8 @@ function loadButton_Callback(hObject, eventdata, handles)
 
 global currentState
 
+set(handles.startButton, 'String', 'Loading!','BackGround',[1 0 0]);
+
 % Columns in the two tables
 COLUMNSinINPUTTABLE = 14;
 COLUMNSinOUTPUTTABLE = 14;
@@ -35,7 +37,8 @@ while (~loadFile)
     %type = exist(selection, 'file');
     
     [fileName,pathName] = uigetfile('conf/*.conf','Select the load file');
-    selection = string([pathName, fileName]);
+%     selection = string([pathName, fileName]);
+    selection = [pathName fileName];
     type = exist(selection, 'file');
     
     if ~isempty(fileName)
@@ -288,6 +291,9 @@ if (~error)
         
         temp{1, 9} = raw{i, 9};     %  Model
         
+        if ~ischar(raw{i,10})
+            raw{i,10}=num2str(raw{i,10});
+        end
         temp{1, 10} = raw{i, 10};     %   Serial number
         
         temp{1, 11} = raw{i, 11};   %   Sensitivity
@@ -333,6 +339,7 @@ if (~error)
     
     %   Update status bar
     set(handles.statusStr, 'String', [selection, ' is now loaded ...']);
-    
+    set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
+
     guidata(hObject, handles);
 end

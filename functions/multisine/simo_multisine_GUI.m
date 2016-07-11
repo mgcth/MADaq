@@ -126,6 +126,33 @@ opt.hold=false;opt.linlog=false;opt.ls='k';opt.grid=true;
 if isempty(statGUIg.ax), opt.ax=[];end
 %keyboard
 magphase([uid yid;f(1) f(end)],FRD,opt);
+subplot(211);
+set(gca,'Xlim',[f(1) f(end)]);
+line(f(indf),FRD.ResponseData(yid,uid,indf),'Color','red','Marker','o')
+subplot(212);
+set(gca,'Xlim',[f(1) f(end)]);
+line(f(indf),180*phase(FRD.ResponseData(yid,uid,indf))/pi,'Color','red','Marker','o')
+
+
+if C>0.999
+    set(statGUIg.hui{1},'Back',[0 .7 0]);
+elseif C>.98
+    set(statGUIg.hui{1},'Back',[1 .7 0]);
+else
+    set(statGUIg.hui{1},'Back',[.9 0 0]);
+end
+end
+
+%% ========================================================================
+function statGUI_(f,indf,H,FRD,C)
+global statGUIg
+figure(statGUIg.fh);cla;
+uid=1;
+try, yid=get(statGUIg.hpop,'Value');catch, yid=1;end
+opt.hold=false;opt.linlog=false;opt.ls='k';opt.grid=true;
+if isempty(statGUIg.ax), opt.ax=[];end
+%keyboard
+magphase([uid yid;f(1) f(end)],FRD,opt);
 subplot(211);opt.ax=axis;statGUIg.ax=opt.ax;
 
 if all(isnan(FRD.ResponseData(:)));opt.ax=[];end

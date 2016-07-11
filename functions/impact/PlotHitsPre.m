@@ -19,7 +19,7 @@ while 1,
   load('Data4PlotHits.mat','Kill');
   if Kill,quit,end
   try
-    if etime(clock,cl0)>2;% Check every 2s
+    if etime(clock,cl0)>1;% Check every 1s
       load('Data4PlotHits.mat','plotch');
       NBlocksRead=DoThePlot(hf,MMF,NBlocksRead);
       cl0=clock;
@@ -60,7 +60,9 @@ function [hf,hax]=PlotHitsGUI(Y,hf)
 global SetAct hp
 delete(hf.Children);
 NY=length(Y);NWcols=2;NWrows=2;
-if NY>12, NWcols=5;NWrows=4;elseif NY>9, NWcols=4;NWrows=3;
+if NY>16, NWcols=5;NWrows=4;
+elseif NY>12, NWcols=4;NWrows=4;
+elseif NY>9, NWcols=4;NWrows=3;
 elseif NY>4, NWcols=3;NWrows=3;end  
 
 %%                                                       Open figure window

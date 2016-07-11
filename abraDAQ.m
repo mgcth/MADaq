@@ -1,5 +1,5 @@
 function varargout = abraDAQ(varargin)
-% ABRADAQ MATLAB code for abraDAQ.fig
+% abraDAQ MATLAB code for abraDAQ.fig
 %
 % Syntax:  output = abraDAQ()
 %
@@ -36,7 +36,7 @@ function varargout = abraDAQ(varargin)
 % Created: 02-05-2013
 % Revision: 24-02-2015 1.3 minor bug changes
 
-% Last Modified by GUIDE v2.5 21-May-2015 14:58:12
+% Last Modified by GUIDE v2.5 10-May-2016 09:32:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -101,13 +101,19 @@ global currentState
 currentState= cell(6,9);
 
 % Start with monitor and make other things invisible
-set(handles.fun1,'String','50')
-currentState{1,1} = get(handles.fun1,'String');
-currentState{2,1} = get(handles.fun1,'String');
-currentState{3,1} = get(handles.fun1,'String');
-currentState{4,1} = get(handles.fun1,'String');
-currentState{5,1} = get(handles.fun1,'String');
-currentState{6,1} = get(handles.fun1,'String');
+%Monitor
+set(handles.fun1,'String','20');
+currentState{1,1} = 'Default (20)';
+%Logging
+currentState{2,1} = 'Default (20)';currentState{2,2} = 'Default (60)';
+%Impact
+currentState{3,1} = 'Default (20)';currentState{3,2} = 'Default (20)';currentState{3,4} = 'Default (1000)';currentState{3,5} = 'None';
+%Periodic
+currentState{4,1} = 'Default (20)';currentState{4,2} = 'Default (20)';currentState{4,4} = 'Default (10)';currentState{4,5} = 'Default (1)';
+%Stepped sine
+currentState{5,1} = 'Default (20)';currentState{5,4} = 'Default (10)';currentState{5,5} = 'Default (0.99)';currentState{5,6} = 'Default (0.95)';currentState{5,7} = 'Default (20)';
+%Multisine
+currentState{6,1} = 'Default (20)';currentState{6,4} = 'Default (10)';currentState{6,5} = 'Default (0.99)';currentState{6,6} = 'Default (0.95)';currentState{6,7} = 'Default (20)';
 set(handles.fun2Text,'visible','off')
 set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')
@@ -124,6 +130,15 @@ set(handles.fun8Text,'visible','off')
 set(handles.fun8,'visible','off')
 set(handles.fun9Text,'visible','off')
 set(handles.fun9,'visible','off')
+
+SensorsInLabFile=[handles.homePath filesep 'conf' filesep 'SensorsInLab.xlsx'];
+set(handles.sensorDataBaseText,'String',['( Sensor data from: ' SensorsInLabFile ')']);
+
+if verLessThan('daq','3.7')
+    h=warndlg('Your Data Acquisition Toolbox might be too old','Toolbox Check');
+    Pos=h.Position;
+    h.Position=[50 100 Pos(3) Pos(4)];
+end
 
 % UIWAIT makes abraDAQ wait for user response (see UIRESUME)
 % uiwait(handles.figure1);

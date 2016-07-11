@@ -9,6 +9,7 @@ function dataOut = startLogg(hObject, eventdata, handles)
 global dataObject
 
 % Initialaise the test setup
+set(handles.startButton, 'String', 'Logging!','BackGround',[1 0 0]);
 logging = startInitialisation(hObject, eventdata, handles);
 
 set(handles.statusStr, 'String', 'Measurement in progress NOW!...');
@@ -39,6 +40,7 @@ if (~isempty(logging.session.Channels))
     dataOut = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:),logging);
     
     set(handles.statusStr, 'String', 'READY!  DAQ data available at workbench.');
+    set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
     drawnow();
 end
 

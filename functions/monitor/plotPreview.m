@@ -47,8 +47,12 @@ d(dataLen - m + 1:dataLen, 1:n) = (ical * event.Data')';
 %     end
 %     bar(preview.subplots.master, filterData);
 hbar=bar(preview.subplots.master, std(d));
-axis(preview.subplots.master, [0 (n + 1) -0.1 5.1]);
+% axis(preview.subplots.master, [0 (n + 1) -0.1 5.1]);
 set(hbar.Parent,'FontName','Times','FontSize',8);
+indact=find(cell2mat(handles_.channelsTable.Data(:,1)));
+preview.subplots.master.XTick=1:preview.subplots.master.XTick(end);
+preview.subplots.master.XTickLabel=handles_.channelsTable.Data(indact,3);
+preview.subplots.master.XTickLabelRotation=90;
 
 %   Update channel monitors
 for i = 1:4

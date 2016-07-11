@@ -91,8 +91,9 @@ hui(13)=uicontrol('Parent',hp(1),'Style','Check','String','Plot frequency respon
 if isempty(FRD),set(hui(13),'enable','off');end
 
 hp(2)=uipanel(hf);set(hp(2),'Position',[0 .20 1 .45],'Title','Data Processing')
-hui(21)=uicontrol('Parent',hp(2),'Style','Check','String','Convert to mobility and receptance',...
+hui(21)=uicontrol('Parent',hp(2),'Style','Check','String','Establish mobility and receptance',...
   'Position',[8 82 300 20],'BackgroundColor',[.9 .9 .9]);
+if isempty(FRD),set(hui(21),'enable','off');end
 hui(22)=uicontrol('Parent',hp(2),'Style','Check','String','Write Universal file (UFF)',...
   'Position',[8 60 300 20],'BackgroundColor',[.9 .9 .9]);
 if ~exist('writeuff','file'),set(hui(22),'enable','off');end
@@ -103,9 +104,10 @@ set(hui(23),'enable','off');
 hui(24)=uicontrol('Parent',hp(2),'Style','Check','String','Start ident TB',...
   'Position',[8 16 300 20],'BackgroundColor',[.9 .9 .9]);
 if ~exist('ident','file'),set(hui(24),'enable','off');end
+if isempty(FRD),set(hui(24),'enable','off');end
 
 hp(3)=uipanel(hf);set(hp(3),'Position',[0 .0 1 .20],'Title','Terminate')
-hui(31)=uicontrol('Parent',hp(3),'Style','Radio','String','Leave abraDAQ',...
+hui(31)=uicontrol('Parent',hp(3),'Style','Radio','String','Execute termination commands',...
   'Position',[8 15 300 20],'BackgroundColor',[.9 .9 .9]);
 
 

@@ -23,5 +23,5 @@ if (~isempty(preview))
     end
 end
 
-set(handles.startButton, 'String', 'Start measurement');
+set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
 drawnow();
