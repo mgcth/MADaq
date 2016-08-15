@@ -140,6 +140,10 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
     
     % Save data
     %Nt=dataObject.nt;
+    
+    % NAME THE OUTPUTS AND INPUTS, NOTE THAT IT WORKS ONLY FOR ONE INPUT...
+    frdsys.InputName=periodic.Metadata.Sensor.Label(1);
+    frdsys.OutputName=periodic.Metadata.Sensor.Label(2:end);
     dataOut = data2WS(2,frdsys,periodic);
 
     set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
