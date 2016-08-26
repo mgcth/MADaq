@@ -87,7 +87,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
 %%                               Give one period of data to find load level    
     qd=0.01*Load(:)/norm(Load(:),'inf');
     queueOutputData(periodic.session,qd);
-    [y,times,Trigt]=periodic.session.startForeground();
+    [y,times,Trigt]=periodic.session.startForeground();%% One 1st extra for electronics to warm up
     u=y(:,Refch)*ucal;
     LoadFactor=0.01*MaxAmpl/norm(u,'inf')/norm(Load(:),'inf');
 
