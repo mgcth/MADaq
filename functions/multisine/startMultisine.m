@@ -344,6 +344,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     end
     % Save data
     %Nt=dataObject.nt;
+    
+    % NAME THE OUTPUTS AND INPUTS, NOTE THAT IT WORKS ONLY FOR ONE INPUT...
+    frdsys.InputName=multisine.Metadata.Sensor.Label(1);
+    frdsys.OutputName=multisine.Metadata.Sensor.Label(2:end);
     dataOut = data2WS(2,frdsys,multisine);
    
     set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
