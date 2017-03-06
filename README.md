@@ -5,7 +5,7 @@ National Instruments MATLAB Data Acquisition and Experimental Modal Analysis lib
 ## Measurement functions:
 - Monitor sensor activity
 - Data logging
-- Impact testing (in progress)
+- Impact testing
 - Periodic input
 - Stepped sinus
 - Multisine

@@ -4,8 +4,8 @@ function [wc,wd,Ts]=freqdesign(flo,fup,nf)
 %     fup: upper frequency range (Hz)
 %     nf: number of frequencies
 % outputs:
-%     wc : frequncy lines in countinous-time system (rad/s)
-%     wd : frequncy lines in discrete-time system (rad/s)
+%     wc : frequncy lines in countinous-time system (Hz) .. old(rad/s)
+%     wd : frequncy lines in discrete-time system (Hz) .. old(rad/s)
 %     Ts : sampling Time
 % 
 
@@ -17,3 +17,7 @@ wdlo=2*atan(flo*pi*Ts);    % lower frequency in discrete system
 wdup=2*atan(fup*pi*Ts);    % upper frequency in discrete system
 wd=linspace(wdlo,wdup,nf); 
 wc=tan(wd/2)*2/Ts;
+
+% rad/s to Hz
+wc = wc/2/pi;
+wd = wd/2/pi;
