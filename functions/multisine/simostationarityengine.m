@@ -43,7 +43,7 @@ end
 
 %%                                                    Initial call to get A
 if nargin<8
-  [~,~,yl,A]=harmcoeff(y(:,1:1+Nblock-1),Ts,f);
+  [~,~,~,yl,A,~]=harmcoeff2(y(:,1:1+Nblock-1),Ts,f);
   opt.A=A;
 end  
 
@@ -61,7 +61,7 @@ while 1,
     %if plotK == 2
     %    keyboard
     %end
-    [c,yr,yl]=harmcoeff(y(:,Kdata),Ts,f,opt);
+    [c,yr,~,yl,~,~]=harmcoeff2(y(:,Kdata),Ts,f,opt);
     cu=repmat(c(:,indu),1,length(indy));
     H(:,1,:)=(c(:,indy)./cu).';
     

@@ -92,7 +92,7 @@ Nblock=ceil(Ncyc/Ts/min(Freqs));
 K=floor(nf/10);% Start guess for number of frequency sets (not too few)
 while 1,
     ind=1:K:nf;
-    [~,~,~,A]=harmcoeff(randn(nu+ny,Nblock),Ts,Freqs(ind));
+    [~,~,~,~,A,~]=harmcoeff2(randn(nu+ny,Nblock),Ts,Freqs(ind));
     if rank(A)==min(size(A)),break;end
     K=K+1;
 end
