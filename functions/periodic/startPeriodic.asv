@@ -204,15 +204,15 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         
         % SET BY USER
         N = 20000;
-        fmin = 40; % Hz
-        fmax = 500; % Hz
+        fmin = 40;
+        fmax = 500;
         nf = 200;
         
         % input signal amplitude
         amp = 50; %50 tested
         
         % realisations
-        M = 10;
+        M = 20;
         
         % periods
         P = 10;

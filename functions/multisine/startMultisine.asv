@@ -246,9 +246,6 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         end
         
         % Obtain statistics
-        %coherenceValue = zeros();
-        %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
-        
         Hs = zeros(size(H,1),size(H,2),size(H,3),Nstat);
         YU = zeros(size(H,3),ny,Nstat);
         Ctmean = CtMeanInput;
@@ -312,8 +309,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         end
         
         % coherence?
-        for cii = 1:length(yind)
-            for cjj = 1:length(refch)
+        for cii = 1:length(y
+            for cjj = 1:nu
                 Ym = YU(:,yind(cii),:);
                 Um = YU(:,refch(cjj),:);
                 coherence(cii,cjj,indf) = sqrt(abs(mean(Ym.*conj(Um),3)).^2 ./ ...
@@ -325,10 +322,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         
         
         % is this noise estimate correct?
-        for nny = 1:size(Hs,1)
-            for nnu = 1:size(Hs,2)
+        for ny = 1:size(Hs,1)
+            for nu = 1:size(Hs,2)
                 for kf = 1:size(Hs,3)
-                    Hcov(nny,nnu,indf(kf),:,:) = cov([real(squeeze(Hs(nny,nnu,kf,:,:))) imag(squeeze(Hs(nny,nnu,kf,:,:)))]);
+                    Hcov(ny,nu,indf(kf),:,:) = cov([real(squeeze(Hs(ny,nu,kf,:,:))) imag(squeeze(Hs(ny,nu,kf,:,:)))]);
                 end
             end
         end
@@ -356,9 +353,6 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     timeElapsed = toc
     multisine.Metadata.TimeElapsed = timeElapsed;
     multisine.Metadata.TestDateEnd = datestr(now,'mm-dd-yyyy HH:MM:SS');
-    
-    % save coherence
-    multisine.Metadata.Coherence = coherence;
     
     % Clear DAQ
     daq.reset;
