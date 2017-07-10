@@ -353,7 +353,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     %fprintf('Increased load for freq %6.4f from %6.4f ',Freqs(indf(indii)),loads(indii))
                     
                     % only increase a bit, otherwise unbuonded amplitude levels possible
-                    if loads(indii) < stepLoadFactor^timesIncrease*loadsDefault
+                    if stepLoadFactor*loads(indii) < stepLoadFactor^timesIncrease*loadsDefault
                         ampChanged = 1;
                         loads(indii) = loads(indii)*stepLoadFactor;
                     else
