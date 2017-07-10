@@ -102,6 +102,7 @@ dos(startstr);
 % Initiate
 frdsys = frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
 coherence = zeros(length(yind),length(refch),nf); % preallocate
+coherenceAmplitude = zeros(nf,1);
 
 % This is the definition of stepped sine
 if handles.steppedSine.Value == 1
@@ -191,13 +192,13 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         firstTime = true;
         
         % Set up load
-        indf=I:K:nf;
+        indf = I:K:nf;
         tStart = Ts;
         blockSizeInPutData = blockSize;
-        w=Freqs(indf);
+        w = Freqs(indf);
         om = 2 * pi * w;
-        nw=length(w);
-        fi=2*pi*rand(nw,1);
+        nw = length(w);
+        fi = 2*pi*rand(nw,1);
         
         % Pass data
         PassDoubleThruFile(MMF{4},indf,1); % pass indf data
@@ -263,10 +264,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         %coherenceValue = zeros();
         %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
         coherenceValue = 0;
-        minCoherenceValue = 0; % good value around 0.5-0.6
-        loadFactorIncrease = 1.25; % small increments take longer time
-        maxFactorIncrease = 2; % dont want to damadge the shaker
-        timesIncrease = log(maxFactorIncrease)/log(loadFactorIncrease);
+        minCoherenceValue = 0.75; % good value around 0.5 - 0.6
+        stepLoadFactor = 1.5; % small increments take longer time (1.25 good)
+        maxFactorIncrease = 2.3; % dont want to damadge the shaker (2 good)
+        timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
         loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
         firstStatRun = true;
         while any(find(coherenceValue < minCoherenceValue)) || firstStatRun == true
@@ -343,27 +344,48 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 end
             end
             
+            % loop over all frequencies in this freq step
             for indii = 1:length(indf)
+                ampChanged = 0;
                 coherenceValue(indii) = min(squeeze(coherence(:,:,indf(indii)))); % assume only one input
                 
                 if coherenceValue(:,indii) < minCoherenceValue
-                    fprintf('Increased load for freq %6.4f from %6.4f ',Freqs((I-1)+indii),loads(indii))
+                    %fprintf('Increased load for freq %6.4f from %6.4f ',Freqs(indf(indii)),loads(indii))
                     
-                    % only increase a bit, otherwise unbuonded amplitude
-                    % level possible
-                    if loads(indii) < loadFactorIncrease^timesIncrease*loadsDefault
-                        loads(indii) = loads(indii)*loadFactorIncrease; % 25% more amplitude if coherence low
+                    % only increase a bit, otherwise unbuonded amplitude levels possible
+                    if loads(indii) < stepLoadFactor^timesIncrease*loadsDefault
+                        ampChanged = 1;
+                        loads(indii) = loads(indii)*stepLoadFactor;
                     else
                         coherenceValue(:,indii) = minCoherenceValue;
                     end
-                    fprintf('to %6.2f. \n',loads(indii))
+                    %fprintf('to %6.2f. \n',loads(indii))
+%                 else % values with good coherence, put amplitude a bit lower
+%                     % only decrease a bit here, too
+%                     if loads(indii) > (2-stepLoadFactor)^timesIncrease*loadsDefault
+%                         ampChanged = 2;
+%                         loads(indii) = loads(indii)*(2-stepLoadFactor);
+%                     else
+%                         % do nothing, should just pass through
+%                         %coherenceValue(:,indii) = minCoherenceValue;
+%                     end
                 end
                 
-                fprintf('Min coherence value for freq %6.4f is %6.4f, and amplitude %6.4f (default %6.4f). \n',Freqs((I-1)+indii),coherenceValue(indii),loads(indii),loadsDefault)
+                fprintf('Min coh. for freq %0.2f is %0.2f, and amplitude %0.4f (default %0.4f)',Freqs(indf(indii)),coherenceValue(indii),loads(indii),loadsDefault)
+                
+                if ampChanged == 1
+                    fprintf(' amp INCREASED.\n')
+                elseif ampChanged == 2
+                    fprintf(' amp decreased.\n')
+                else
+                    fprintf('.\n')
+                end
+                
+                coherenceAmplitude(indf(indii)) = coherenceValue(indii);
             end
             
         end
-            
+        
         Hm = mean(Hs,4);
         
         
@@ -402,6 +424,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     % save coherence
     multisine.Metadata.Coherence = coherence;
+    multisine.Metadata.CoherenceAmplitude = coherenceAmplitude;
+    multisine.Metadata.CoherenceMinValue = minCoherenceValue;
+    multisine.Metadata.CoherenceStepLoadFactor = stepLoadFactor;
+    multisine.Metadata.CoherenceMaxLoadFactor = maxFactorIncrease;
     
     % Clear DAQ
     daq.reset;

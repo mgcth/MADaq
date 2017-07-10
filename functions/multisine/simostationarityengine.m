@@ -73,7 +73,7 @@ while 1,
     nH=norm(H(:),'inf');nH0=norm(H0(:),'inf');
     nmax=max([nH nH0]);nmin=min([nH nH0]);
     C=(nmin/nmax)*sqrt(mac(H(:),H0(:)));
-    fprintf('Kdata = %u. Corr C = %6.2f. Cond A = %6.2f \n',length(Kdata),C,cond(regA))
+    fprintf('Kdata = %u. Corr C = %0.4f. Cond A = %0.4f.',length(Kdata),C,cond(regA))
     H0=H;
     
     %Xsave = [Xsave (nmin/nmax)];
@@ -94,14 +94,23 @@ while 1,
     %plot(plotKData,y(1,Kdata) - mean(y(1,Kdata)),'b');
     %hold on;
     %plot(plotKData,yr(1,:),'r');
+    
+
   end
-  if C>Ct
-      if iret == 0
-        H111 = abs(H(1,1,1));
-        fprintf('H(1,1,1) = %6.2f \n',H111)
-      end
-    %if iret==0,keyboard,end
-    break
-  end
+  
+    if C>Ct
+        if iret == 0
+            H111 = abs(H(1,1,1));
+            fprintf(' H(1,1,1) = %0.4f.',H111)
+        end
+        %if iret==0,keyboard,end
+        %break
+    end
+    
+    fprintf('\n')
+    
+    if C>Ct
+        break
+    end  
 end
 
