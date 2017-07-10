@@ -70,7 +70,7 @@ nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
-blockSize = 1500;
+blockSize = 3000; % 1500 was good
 
 K = nf/SimFreq; % now TRUE!, not true before when only SimFreq
 Ncyc = 10;

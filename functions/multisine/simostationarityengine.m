@@ -27,7 +27,7 @@ c = 0; % dummy for now
 %%                                                                 Initiate
 [ny,nt]=size(y);nf=length(f);
 if ny<2,error('At least two signals need to be in y');end
-Nblock=2000;%ceil(Ncyc/Ts/min(f));
+Nblock=3000; %2000 was good,  %ceil(Ncyc/Ts/min(f));
 indu=refch;indy=setdiff(1:ny,indu);
 
 if size(y,2)<Nblock
@@ -52,6 +52,7 @@ end
 %%                                                                  Do work
 if nargin<7, H0(ny-1,1,nf)=0;end
 K=0;iret=0;ynotused=[];
+condA = 0;
 while 1,  
   Kdata=[1:Nblock]+K*Nblock;
   if Kdata(end)>nt
@@ -73,7 +74,10 @@ while 1,
     nH=norm(H(:),'inf');nH0=norm(H0(:),'inf');
     nmax=max([nH nH0]);nmin=min([nH nH0]);
     C=(nmin/nmax)*sqrt(mac(H(:),H0(:)));
-    fprintf('Kdata = %u. Corr C = %0.4f. Cond A = %0.4f. \n',length(Kdata),C,cond(regA))
+    if K == 1
+        condA = cond(regA);
+    end
+    fprintf('Kdata = %u. Corr C = %0.4f. Cond A = %0.4f. \n',Nblock,C,condA)
     H0=H;
     
     %Xsave = [Xsave (nmin/nmax)];
