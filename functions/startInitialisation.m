@@ -130,6 +130,8 @@ elseif get(handles.steppedSine,'Value') == 1 % if steppedsine Test
     sessionObject.Metadata.TestSettings{5,2} = get(handles.fun5,'String');
     sessionObject.Metadata.TestSettings{6,1} = get(handles.fun6Text,'String');
     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
+    sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
+    sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
     
 elseif handles.multisine.Value == 1 % if multisine Test
     sessionObject.Metadata.TestType = 'Multisine input';
@@ -146,6 +148,8 @@ elseif handles.multisine.Value == 1 % if multisine Test
     sessionObject.Metadata.TestSettings{5,2} = get(handles.fun5,'String');
     sessionObject.Metadata.TestSettings{6,1} = get(handles.fun6Text,'String');
     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
+    sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
+    sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
     
 end
 
