@@ -377,7 +377,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 elseif ampChanged == 2
                     fprintf(' amp decreased.\n')
                 else
-                    fprintf('.\n')
+                    %fprintf('.\n')
                 end
                 
                 coherenceAmplitude(indf(indii)) = coherenceValue(indii);
