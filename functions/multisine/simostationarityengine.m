@@ -27,7 +27,7 @@ c = 0; % dummy for now
 %%                                                                 Initiate
 [ny,nt]=size(y);nf=length(f);
 if ny<2,error('At least two signals need to be in y');end
-Nblock=1500; %2000 was good,  %ceil(Ncyc/Ts/min(f));
+Nblock=2000; %2000 was good,  %ceil(Ncyc/Ts/min(f));
 indu=refch;indy=setdiff(1:ny,indu);
 
 if size(y,2)<Nblock
