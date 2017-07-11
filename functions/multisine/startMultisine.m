@@ -70,7 +70,7 @@ nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
-blockSize = 3000; % 1500 was good
+blockSize = 4000; % 1500 was good
 
 K = nf/SimFreq; % now TRUE!, not true before when only SimFreq
 Ncyc = 10;
@@ -264,7 +264,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         %coherenceValue = zeros();
         %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
         coherenceValue = 0;
-        minCoherenceValue = 0.75; % good value around 0.5 - 0.6
+        minCoherenceValue = 0.95; % good value around 0.5 - 0.6
         stepLoadFactor = 1.5; % small increments take longer time (1.25 good)
         maxFactorIncrease = 2.3; % dont want to damadge the shaker (2 good)
         timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
