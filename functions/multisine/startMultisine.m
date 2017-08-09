@@ -36,7 +36,7 @@ if strcmpi(CtStr(1:7),'default')
     Ct=.99;
 else
     Ct = eval(get(handles.fun5,'String')); % 0.997 a good value
-    if Ct>.999,Ct=.999;end
+    if Ct>.99999,Ct=.9999;end
     if Ct<.8,Ct=.8;end
 end
 
@@ -70,18 +70,18 @@ nu = length(CH.reference); % number of inputs
 ny = length(CH.active); % number of outputs
 yind = 1:ny; yind(refch) = [];
 nf = length(Freqs);
-blockSize = 1500;
+blockSize = Fs;%1500; % 1500 was good, sample rate in Hz a good value?
 
-K = SimFreq; % notr true
+K = nf/SimFreq; % now TRUE!, not true before when only SimFreq
 Ncyc = 10;
 % Obtain good number of frequencies K that can be used simulaneously
-Nblock = ceil(Ncyc/Ts/min(Freqs));
-while 1,
-    ind = 1:K:nf;
-    [~,~,~,~,A,~] = harmcoeff2(randn(nu+ny,Nblock),Ts,Freqs(ind));
-    if rank(A) == min(size(A)),break;end
-    K = K + 1;
-end
+% Nblock = ceil(Ncyc/Ts/min(Freqs));
+% while 1,
+%     ind = 1:K:nf;
+%     [~,~,~,~,A,~] = harmcoeff2(randn(nu+ny,Nblock),Ts,Freqs(ind));
+%     if rank(A) == min(size(A)),break;end
+%     K = K + 1;
+% end
 
 % if
 %     fprintf('The time for each period will be approximately %6.2f s. ',)
@@ -101,6 +101,8 @@ dos(startstr);
 
 % Initiate
 frdsys = frd(NaN*zeros(ny-nu,length(CH.reference),nf),2*pi*Freqs,'FrequencyUnit','rad/s');
+coherence = zeros(length(yind),length(refch),nf); % preallocate
+coherenceAmplitude = zeros(nf,1);
 
 % This is the definition of stepped sine
 if handles.steppedSine.Value == 1
@@ -133,26 +135,39 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     
     %%                      Give one chirp sweep to find appropriate load level
-    ucal=diag(cell2mat({tmpTable{CH.reference,11}}));
-    [t,Load]=abradaq_chirp(min(Freqs),10,max(Freqs),Ts);
-    qd=0.01*Load(:)/norm(Load(:),'inf');
+    ucal = diag(cell2mat({tmpTable{CH.reference,11}}));
+    [t,Load] = abradaq_chirp(min(Freqs),10,max(Freqs),Ts);
+    qd = 0.01*Load(:)/norm(Load(:),'inf');
     queueOutputData(multisine.session,qd);
-    [y,times]=multisine.session.startForeground();
-    u=y(:,refch)*ucal;
-    MaxAmpl=max(loads);
-    LoadFactor=0.01*MaxAmpl/norm(u,'inf')/norm(Load(:),'inf');
-    loads=LoadFactor*loads;
-    
+    [y,times] = multisine.session.startForeground();
+    u = y(:,refch)*ucal;
+    MaxAmpl = max(loads);
+    LoadFactor = 0.01*MaxAmpl/norm(u,'inf')/norm(Load(:),'inf');
+    if LoadFactor > 1
+        choiceText = sprintf('Load factor high = %6.2f. Risk of damadge. Continue? Y/N [N]',LoadFactor);
+        choice = input(choiceText);
+        
+        if isempty(choice)
+            error('Amplitude too high.');
+        elseif strmpci(choice,'N')
+            error('Amplitude too high.');
+        else
+            % go on
+        end
+    end
+    loads = LoadFactor*loads;
+    loadsDefault = loads;
+    loads = loadsDefault*ones(1,SimFreq);
     
     % Add listener
-    LAvail=addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
-    LReqrd=addlistener(multisine.session, 'DataRequired', @nidaqMultisinePutSineDataInline);
+    LAvail = addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
+    LReqrd = addlistener(multisine.session, 'DataRequired', @nidaqMultisinePutSineDataInline);
     LErr = addlistener(multisine.session, 'ErrorOccurred', @nidaqMultisineErrorInline);
     
     % Set up for continuous running of DAQ
     multisine.session.IsContinuous = true;
-    multisine.session.NotifyWhenDataAvailableExceeds=blockSize;
-    multisine.session.NotifyWhenScansQueuedBelow=ceil(blockSize/2);
+    multisine.session.NotifyWhenDataAvailableExceeds=ceil(blockSize/10);%ceil(blockSize/2); if blockSize is sample rate this is 1/10th of a second
+    multisine.session.NotifyWhenScansQueuedBelow=ceil(blockSize/2);%ceil(blockSize/2);
     
     firstRun = true;
     
@@ -161,7 +176,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     tic
     % ------------------------------------- Loop over number of frequency sets
     for I = 1:K
-        fprintf('____ FREQUENCY STEP %u ____\n', I)
+        fprintf('____ FREQUENCY STEP %u of %u ____\n', I, K)
         
         C = 0;
         y = [];
@@ -177,13 +192,13 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         firstTime = true;
         
         % Set up load
-        indf=I:K:nf;
+        indf = I:K:nf;
         tStart = Ts;
         blockSizeInPutData = blockSize;
-        w=Freqs(indf);
+        w = Freqs(indf);
         om = 2 * pi * w;
-        nw=length(w);
-        fi=2*pi*rand(nw,1);
+        nw = length(w);
+        fi = 2*pi*rand(nw,1);
         
         % Pass data
         PassDoubleThruFile(MMF{4},indf,1); % pass indf data
@@ -248,79 +263,154 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         % Obtain statistics
         %coherenceValue = zeros();
         %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
-        
-        Hs = zeros(size(H,1),size(H,2),size(H,3),Nstat);
-        YU = zeros(size(H,3),ny,Nstat);
+        coherenceValue = 0;
+        minCoherenceValue = 0;% good value around 0.5 - 0.6
+        stepLoadFactor = 1.55;%1.5; % small increments take longer time (1.25 good)
+        maxFactorIncrease = 2.5;%2.3; % dont want to damadge the shaker (2 good)
+        timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
+        loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
+        firstStatRun = true;
         Ctmean = CtMeanInput;
         CtmeanChanged = false;
-        
-        for JJ=1:Nstat
-            haveReadData = true;
-            ynotused = [];
-            haveData = false;
-            haveDataContinous = false;
+        while any(find(coherenceValue < minCoherenceValue)) || firstStatRun == true
+            firstStatRun = false;
+            Hs = zeros(size(H,1),size(H,2),size(H,3),Nstat);
+            YU = zeros(size(H,3),ny,Nstat);
+            %Ctmean = CtMeanInput;
+            %CtmeanChanged = false;
             
-            iret = -1;
-            OO = 0;
-            while iret == -1
-                OO = OO + 1;
+            for JJ=1:Nstat
+                haveReadData = true;
+                ynotused = [];
+                haveData = false;
+                haveDataContinous = false;
                 
-                pause(0.0001)
-                
-                % Estimate transfer functions
-                if haveData == true
-                    ynotused = [ynotused y];
-                    haveReadData = true;
-                    haveData = false;
-                end
-                
-                if haveDataContinous == true
-                    [iret,H,ynotused,C,~,yuc]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ctmean,H0,opt);
-                    H0=H;
+                iret = -1;
+                OO = 0;
+                while iret == -1
+                    OO = OO + 1;
                     
-                    if CtmeanChanged == true
-                        Ctmean = CtMeanInput;
-                        CtmeanChanged = false;
+                    pause(0.0001)
+                    
+                    % Estimate transfer functions
+                    if haveData == true
+                        ynotused = [ynotused y];
+                        haveReadData = true;
+                        haveData = false;
                     end
+                    
+                    if haveDataContinous == true
+                        [iret,H,ynotused,C,~,yuc]=simostationarityengine(ynotused,Ts,w,refch,Ncyc,Ctmean,H0,opt);
+                        H0=H;
+                        
+                        if CtmeanChanged == true && C >= Ct && iret == 0
+                            %fprintf('Ctmean = %u, C = %u \n',Ctmean,C)
+                            Ctmean = CtMeanInput;
+                            CtmeanChanged = false;
+                        end
+                    end
+                    
+                    % Reset
+                    if multisine.session.IsRunning == 0
+                        haveDataContinous = false;
+                        haveData = false;
+                        multisine.session.stop();
+                        nidaqMultisinePutSineDataInline(multisine.session, [])
+                        disp('System reset in statistics. Waiting for stationarity again.')
+                        startBackground(multisine.session);
+                        pause(0.1);
+                        Ctmean = Ct;
+                        CtmeanChanged = true;
+                    end
+                    
                 end
+                fprintf('\b Saved to statistics. \n')
                 
-                % Reset
-                if multisine.session.IsRunning == 0
-                    haveDataContinous = false;
-                    haveData = false;
-                    multisine.session.stop();
-                    nidaqMultisinePutSineDataInline(multisine.session, [])
-                    disp('was 0 in statistics')
-                    startBackground(multisine.session);
-                    pause(0.1);
-                    Ctmean = Ct;
-                    CtmeanChanged = true;
-                end
+                Hs(:,:,:,JJ) = H;
+                YU(:,:,JJ) = yuc;
                 
+                % Pass data
+                PassDoubleThruFile(MMF{5},real(H),1); % pass H data
+                PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
+                PassDoubleThruFile(MMF{7},C,1); % pass C data
+                
+                %for MM = 1:K
+                %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
+                %end
             end
-            Hs(:,:,:,JJ) = H;
-            YU(:,:,JJ) = yuc;
             
-            % Pass data
-            PassDoubleThruFile(MMF{5},real(H),1); % pass H data
-            PassDoubleThruFile(MMF{6},imag(H),1); % pass H data
-            PassDoubleThruFile(MMF{7},C,1); % pass C data
+            % coherence?
+            for cii = 1:length(yind)
+                for cjj = 1:length(refch)
+                    Ym = YU(:,yind(cii),:);
+                    Um = YU(:,refch(cjj),:);
+                    coherence(cii,cjj,indf) = sqrt(abs(mean(Ym.*conj(Um),3)).^2 ./ ...
+                        (mean(abs(Um).^2,3) .* mean(abs(Ym).^2,3)));
+                end
+            end
             
-            %for MM = 1:K
-            %    covH(:,:,indf(MM)) = cov([real(H(:,:,MM)) imag(H(:,:,MM))]);
-            %end
+            % loop over all frequencies in this freq step
+            anyAmpChange = 0;
+            for indii = 1:length(indf)
+                ampChanged = 0;
+                coherenceValue(indii) = min(squeeze(coherence(:,:,indf(indii)))); % assume only one input
+                
+                if coherenceValue(:,indii) < minCoherenceValue
+                    %fprintf('Increased load for freq %6.4f from %6.4f ',Freqs(indf(indii)),loads(indii))
+                    
+                    % only increase a bit, otherwise unbuonded amplitude levels possible
+                    if stepLoadFactor*loads(indii) < stepLoadFactor^timesIncrease*loadsDefault
+                        ampChanged = 1;
+                        loads(indii) = loads(indii)*stepLoadFactor;
+                    else
+                        coherenceValue(:,indii) = minCoherenceValue;
+                    end
+                    %fprintf('to %6.2f. \n',loads(indii))
+%                 else % values with good coherence, put amplitude a bit lower
+%                     % only decrease a bit here, too
+%                     if loads(indii) > (2-stepLoadFactor)^timesIncrease*loadsDefault
+%                         ampChanged = 2;
+%                         loads(indii) = loads(indii)*(2-stepLoadFactor);
+%                     else
+%                         % do nothing, should just pass through
+%                         %coherenceValue(:,indii) = minCoherenceValue;
+%                     end
+                end
+                
+                if ampChanged == 1
+                    fprintf('Min coh. for freq %0.2f is %0.2f, and amplitude %0.4f (default %0.4f)',Freqs(indf(indii)),coherenceValue(indii),loads(indii),loadsDefault)
+                    fprintf(' amp INCREASED.\n')
+                    anyAmpChange = 1;
+                elseif ampChanged == 2
+                    fprintf(' amp decreased.\n')
+                    anyAmpChange = 1;
+                else
+                    %fprintf('.\n')
+                end
+                
+                coherenceAmplitude(indf(indii)) = coherenceValue(indii);
+            end
+            
+            % if amplitude changed
+            % reset the correlation value as we will have new transient
+            if anyAmpChange == 1
+                Ctmean = Ct;
+                CtmeanChanged = true;
+                fprintf('Waiting 1 second to load new input data. \n')
+                pause(1) % this should suffice to put in new load as the queued data is 1 second at a time
+%                 haveDataContinous = false;
+%                 haveData = false;
+%                 multisine.session.stop();
+%                 nidaqMultisinePutSineDataInline(multisine.session, [])
+%                 disp('System reset in statistics. Waiting for stationarity again.')
+%                 startBackground(multisine.session);
+%                 pause(0.1);
+%                 Ctmean = Ct;
+%                 CtmeanChanged = true;
+            end
+            
         end
         
-        % coherence?
-        for cii = 1:length(yind)
-            for cjj = 1:length(refch)
-                Ym = YU(:,yind(cii),:);
-                Um = YU(:,refch(cjj),:);
-                coherence(cii,cjj,indf) = sqrt(abs(mean(Ym.*conj(Um),3)).^2 ./ ...
-                    (mean(abs(Um).^2,3) .* mean(abs(Ym).^2,3)));
-            end
-        end
-            
         Hm = mean(Hs,4);
         
         
@@ -359,6 +449,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     % save coherence
     multisine.Metadata.Coherence = coherence;
+    multisine.Metadata.CoherenceAmplitude = coherenceAmplitude;
+    multisine.Metadata.CoherenceMinValue = minCoherenceValue;
+    multisine.Metadata.CoherenceStepLoadFactor = stepLoadFactor;
+    multisine.Metadata.CoherenceMaxLoadFactor = maxFactorIncrease;
     
     % Clear DAQ
     daq.reset;
@@ -398,7 +492,9 @@ clear -global dataObject
     function nidaqMultisinePutSineDataInline(src, event)
         tArg = tStart:Ts:blockSizeInPutData * Ts;
         u = zeros(1,size(tArg,2));
-        for II = 1:nw, u = u + loads.* sin(om(II) * tArg + fi(II)); end
+        for II = 1:nw
+            u = u + loads(II).* sin(om(II) * tArg + fi(II));
+        end
         src.queueOutputData(u(:));
         blockSizeInPutData = blockSizeInPutData + blockSize;
         tStart = tArg(end) + Ts;
@@ -407,7 +503,7 @@ clear -global dataObject
     function nidaqMultisineGetDataInline(src, event)
         %t=event.TimeStamps;
         if haveReadData == true
-            y=event.Data.';
+            y = event.Data.';
         else
             y = [y event.Data'];
         end

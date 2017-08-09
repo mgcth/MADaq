@@ -249,7 +249,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         
         
         WaitTime=(M*(P+Pr)+1)*N*Ts;
-        set(handles.statusStr, 'String', sprintf('Shaking about %5.2f s. Please wait ...', WaitTime));
+        set(handles.statusStr, 'String', sprintf('Shaking about %5.2f s (and then some). Please wait ...', WaitTime));
         drawnow();
         
         
