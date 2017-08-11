@@ -155,10 +155,13 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             % go on
         end
     end
-    loads = LoadFactor*loads;
-    loadsDefault = loads*ones(1,nf);
-    loadsDefault = 
+    %loads = LoadFactor*loads;
+    %loadsDefault = loads;
     %loads = loadsDefault*ones(1,SimFreq);
+    
+    loadsDefault = LoadFactor*loads*ones(1,nf);
+    loadAmpChangeIndex = find(Freqs >= 300 & Freqs <= 400);
+    loadsDefault(loadAmpChangeIndex) = loadsDefault(loadAmpChangeIndex)*0.3125; % from 0.8 to 0.25 in 300-400 Hz region
     
     % Add listener
     LAvail = addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
@@ -258,7 +261,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 haveData = false;
                 multisine.session.stop();
                 nidaqMultisinePutSineDataInline(multisine.session, [])
-                disp('was 0 in stationary')
+                disp('System restarted while looking for stationarity. Starting over.')
                 startBackground(multisine.session);
                 pause(0.1);
             end
@@ -273,7 +276,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         stepLoadFactor = 1.5;%1.55;%1.5; % small increments take longer time (1.25 good)
         maxFactorIncrease = 2.4;%2.5;%2.3; % dont want to damadge the shaker (2 good)
         timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
-        loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
+        %loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
+        loads = loadsDefault(indf);
         firstStatRun = true;
         Ctmean = CtMeanInput;
         CtmeanChanged = false;
@@ -364,7 +368,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     %fprintf('Increased load for freq %6.4f from %6.4f ',Freqs(indf(indii)),loads(indii))
                     
                     % only increase a bit, otherwise unbuonded amplitude levels possible
-                    if stepLoadFactor*loads(indii) < stepLoadFactor^timesIncrease*loadsDefault
+                    if stepLoadFactor*loads(indii) < stepLoadFactor^timesIncrease*loadsDefault(indii)
                         ampChanged = 1;
                         loads(indii) = loads(indii)*stepLoadFactor;
                     else
@@ -383,7 +387,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 end
                 
                 if ampChanged == 1
-                    fprintf('Min coh. for freq %0.2f is %0.2f, and amplitude %0.4f (default %0.4f)',Freqs(indf(indii)),coherenceValue(indii),loads(indii),loadsDefault)
+                    fprintf('Min coh. for freq %0.2f is %0.2f, and amplitude %0.4f (default %0.4f)',Freqs(indf(indii)),coherenceValue(indii),loads(indii),loadsDefault(indii))
                     fprintf(' amp INCREASED.\n')
                     anyAmpChange = 1;
                 elseif ampChanged == 2
@@ -458,6 +462,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     multisine.Metadata.CoherenceMinValue = minCoherenceValue;
     multisine.Metadata.CoherenceStepLoadFactor = stepLoadFactor;
     multisine.Metadata.CoherenceMaxLoadFactor = maxFactorIncrease;
+    
+    multisine.Metadata.LoadVector = loadsDefault;
     
     % Clear DAQ
     daq.reset;
