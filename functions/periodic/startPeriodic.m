@@ -209,16 +209,16 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         nf = 200;
         
         % input signal amplitude
-        amp = 50; %50 tested
+        amp = 100;%50; %50 tested
         
         % realisations
-        M = 10;
+        M = 20;
         
         % periods
         P = 10;
         
         % transient periods
-        Pr = 3;
+        Pr = 5;
         
         % frequency resolution
         fLeaveOut = 1; % 1 for no leave out

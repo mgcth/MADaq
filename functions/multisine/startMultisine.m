@@ -175,8 +175,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     
     tic
     % ------------------------------------- Loop over number of frequency sets
-    for I = 1:K
+    for I = 78:K
         fprintf('____ FREQUENCY STEP %u of %u ____\n', I, K)
+        pause(0.5); % let new input data load
         
         C = 0;
         y = [];
@@ -265,8 +266,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
         coherenceValue = 0;
         minCoherenceValue = 0;% good value around 0.5 - 0.6
-        stepLoadFactor = 1.55;%1.5; % small increments take longer time (1.25 good)
-        maxFactorIncrease = 2.5;%2.3; % dont want to damadge the shaker (2 good)
+        stepLoadFactor = 1.5;%1.55;%1.5; % small increments take longer time (1.25 good)
+        maxFactorIncrease = 2.4;%2.5;%2.3; % dont want to damadge the shaker (2 good)
         timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
         loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
         firstStatRun = true;
@@ -397,7 +398,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 Ctmean = Ct;
                 CtmeanChanged = true;
                 fprintf('Waiting 1 second to load new input data. \n')
-                pause(1) % this should suffice to put in new load as the queued data is 1 second at a time
+                pause(0.5) % this should suffice to put in new load as the queued data is 1 second at a time
 %                 haveDataContinous = false;
 %                 haveData = false;
 %                 multisine.session.stop();
