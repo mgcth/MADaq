@@ -160,10 +160,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     %loads = loadsDefault*ones(1,SimFreq);
     
     loadsDefault = LoadFactor*loads*ones(1,nf);
-    %loadAmpChangeIndex1 = find(Freqs >= 39 & Freqs <= 300);
-    %loadsDefault(loadAmpChangeIndex1) = loadsDefault(loadAmpChangeIndex1)*2; % from 0.8 to 0.25 in 300-400 Hz region
-    %loadAmpChangeIndex2 = find(Freqs > 300 & Freqs <= 501);
-    %loadsDefault(loadAmpChangeIndex2) = loadsDefault(loadAmpChangeIndex2)*0.5; % from 0.8 to 0.25 in 300-400 Hz region
+    loadAmpChangeIndex = find(Freqs >= 300 & Freqs <= 400);
+    loadsDefault(loadAmpChangeIndex) = loadsDefault(loadAmpChangeIndex)*0.3125; % from 0.8 to 0.25 in 300-400 Hz region
     
     % Add listener
     LAvail = addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
@@ -184,18 +182,6 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     for I = 1:K
         fprintf('____ FREQUENCY STEP %u of %u ____\n', I, K)
         
-        % Set up load
-        indf = I:K:nf;
-        loads = loadsDefault(indf);
-        tStart = Ts;
-        blockSizeInPutData = blockSize;
-        w = Freqs(indf);
-        om = 2 * pi * w;
-        nw = length(w);
-        fi = 2*pi*rand(nw,1);
-        
-        pause(1.25); % let new input data load
-        
         C = 0;
         y = [];
         ynotused = [];
@@ -208,6 +194,19 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         haveReadData = true;
         haveDataContinous = false;
         firstTime = true;
+        
+        % Set up load
+        indf = I:K:nf;
+        tStart = Ts;
+        blockSizeInPutData = blockSize;
+        w = Freqs(indf);
+        om = 2 * pi * w;
+        nw = length(w);
+        fi = 2*pi*rand(nw,1);
+        
+        loads = loadsDefault(indf);
+        
+        pause(1); % let new input data load
         
         % Pass data
         PassDoubleThruFile(MMF{4},indf,1); % pass indf data
@@ -262,7 +261,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 haveData = false;
                 multisine.session.stop();
                 nidaqMultisinePutSineDataInline(multisine.session, [])
-                disp('System restarted while waiting for stationarity. Starting over.')
+                disp('System restarted while looking for stationarity. Starting over.')
                 startBackground(multisine.session);
                 pause(0.1);
             end
@@ -407,7 +406,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                 Ctmean = Ct;
                 CtmeanChanged = true;
                 fprintf('Waiting 1 second to load new input data. \n')
-                pause(1.25) % this should suffice to put in new load as the queued data is 1 second at a time
+                pause(0.5) % this should suffice to put in new load as the queued data is 1 second at a time
 %                 haveDataContinous = false;
 %                 haveData = false;
 %                 multisine.session.stop();

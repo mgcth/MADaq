@@ -209,16 +209,16 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         nf = 200;
         
         % input signal amplitude
-        amp = 100;%50; %50 tested
+        amp = 50;%50; %50 tested
         
         % realisations
-        M = 20;
+        M = 10;
         
         % periods
-        P = 10;
+        P = 5;
         
         % transient periods
-        Pr = 5;
+        Pr = 3;
         
         % frequency resolution
         fLeaveOut = 1; % 1 for no leave out
@@ -452,6 +452,12 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         periodic.Metadata.Cyn = Cyn(:,:,bins+1);
         periodic.Metadata.Cyun = Cyun(:,:,bins+1);
         periodic.Metadata.bins = bins;
+        
+        periodic.Metadata.Periods = P;
+        periodic.Metadata.Realisations = M;
+        periodic.Metadata.StationarityPeriods = Pr;
+        periodic.Metadata.Amplitude = amp;
+        periodic.Metadata.Samples = N;
         
         timeElapsed = toc
         periodic.Metadata.TimeElapsed = timeElapsed;
