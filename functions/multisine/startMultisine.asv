@@ -155,11 +155,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
             % go on
         end
     end
-    %loads = LoadFactor*loads;
-    %loadsDefault = loads*ones(1,nf);
+    loads = LoadFactor*loads;
+    loadsDefault = loads*ones(1,nf);
+    loadsDefault = 
     %loads = loadsDefault*ones(1,SimFreq);
-    
-    loadsDefault = loadsDefault(find(Freqs >= 39 & Freqs <= 300)
     
     % Add listener
     LAvail = addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
