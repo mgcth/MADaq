@@ -209,7 +209,7 @@ if ~isempty(periodic.session.Channels) && ~isempty(periodic.channelInfo.referenc
         nf = 200;
         
         % input signal amplitude
-        amp = 50;%50; %50 tested
+        amp = 1;%50; %50 tested
         
         % realisations
         M = 10;

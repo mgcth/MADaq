@@ -162,8 +162,10 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     loadsDefault = LoadFactor*loads*ones(1,nf);
     %loadAmpChangeIndex1 = find(Freqs >= 39 & Freqs <= 300);
     %loadsDefault(loadAmpChangeIndex1) = loadsDefault(loadAmpChangeIndex1)*2; % from 0.8 to 0.25 in 300-400 Hz region
-    %loadAmpChangeIndex2 = find(Freqs > 300 & Freqs <= 501);
-    %loadsDefault(loadAmpChangeIndex2) = loadsDefault(loadAmpChangeIndex2)*0.5; % from 0.8 to 0.25 in 300-400 Hz region
+    loadAmpChangeIndex2 = find(Freqs > 300 & Freqs <= 501);
+    loadsDefault(loadAmpChangeIndex2) = loadsDefault(loadAmpChangeIndex2)*0.5; % from 0.8 to 0.25 in 300-400 Hz region
+    
+    loadsTrue = loadsDefault;
     
     % Add listener
     LAvail = addlistener(multisine.session, 'DataAvailable', @nidaqMultisineGetDataInline);
@@ -273,9 +275,9 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
         %coherenceValue = zeros();
         %while coherenceValue < 0.9 %%% EXPERIMENTAL FEATURE
         coherenceValue = 0;
-        minCoherenceValue = 0;% good value around 0.5 - 0.6
-        stepLoadFactor = 1.5;%1.55;%1.5; % small increments take longer time (1.25 good)
-        maxFactorIncrease = 2.4;%2.5;%2.3; % dont want to damadge the shaker (2 good)
+        minCoherenceValue = 0.6;% good value around 0.5 - 0.6
+        stepLoadFactor = 2;%1.55;%1.5; % small increments take longer time (1.25 good)
+        maxFactorIncrease = 4;%2.5;%2.3; % dont want to damadge the shaker (2 good)
         timesIncrease = log(maxFactorIncrease)/log(stepLoadFactor);
         %loads = loadsDefault*ones(1,SimFreq); % reset for every new frequency step
         loads = loadsDefault(indf);
@@ -372,6 +374,7 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
                     if stepLoadFactor*loads(indii) < stepLoadFactor^timesIncrease*loadsDefault(indii)
                         ampChanged = 1;
                         loads(indii) = loads(indii)*stepLoadFactor;
+                        loadsTrue(indf(indii)) = loads(indii);
                     else
                         coherenceValue(:,indii) = minCoherenceValue;
                     end
@@ -464,7 +467,8 @@ if ~isempty(multisine.session.Channels) &&  ~isempty(multisine.channelInfo.refer
     multisine.Metadata.CoherenceStepLoadFactor = stepLoadFactor;
     multisine.Metadata.CoherenceMaxLoadFactor = maxFactorIncrease;
     
-    multisine.Metadata.LoadVector = loadsDefault;
+    multisine.Metadata.LoadVectorDefault = loadsDefault;
+    multisine.Metadata.LoadVectorTrue = loadsTrue;
     
     % Clear DAQ
     daq.reset;
