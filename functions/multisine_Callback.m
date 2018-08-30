@@ -15,12 +15,13 @@ global currentState
 % Hint: get(hObject,'Value') returns toggle state of multisine
 val = get(hObject,'Value');
 if (val)
-    set(handles.monitor, 'Value', 0);
-    set(handles.dataLogg, 'Value', 0);
+%     set(handles.monitor, 'Value', 0);
+%     set(handles.dataLogg, 'Value', 0);
     set(handles.impactTest, 'Value', 0);
     set(handles.periodic, 'Value', 0);
-    set(handles.steppedSine, 'Value', 0);
+%     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 1);
+    set(handles.Oscilloscope, 'Value', 0);
     
     set(handles.fun1,'string',currentState{6,1})
     set(handles.fun2Text,'visible','on')
@@ -32,7 +33,7 @@ if (val)
     set(handles.fun3,'visible','on')
     set(handles.fun3,'string',currentState{6,3})
     set(handles.fun4Text,'visible','on')
-    set(handles.fun4Text,'string','Min. # cycles:')
+    set(handles.fun4Text,'string','Simultane. freq.:')
     set(handles.fun4,'visible','on')
     set(handles.fun4,'string',currentState{6,4})
     set(handles.fun5Text,'visible','on')

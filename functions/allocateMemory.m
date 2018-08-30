@@ -44,10 +44,10 @@ dataObject.t=0;
 dataObject.data=0;
 dataObject.ntmax=0;
 
-% Do real allocation
-if get(handles.dataLogg,'Value') == 1 || get(handles.monitor,'Value') == 1
-    dataObject.nt=0;
-    dataObject.t=zeros(ntmax,1);
-    dataObject.data=zeros(ntmax,Chact);
-    dataObject.ntmax=ntmax;
-end
+% % Do real allocation
+% if get(handles.dataLogg,'Value') == 1 || get(handles.monitor,'Value') == 1
+%     dataObject.nt=0;
+%     dataObject.t=zeros(ntmax,1);
+%     dataObject.data=zeros(ntmax,Chact);
+%     dataObject.ntmax=ntmax;
+% end

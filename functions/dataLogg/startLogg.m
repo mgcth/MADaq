@@ -20,6 +20,12 @@ pause(1)
 CHdata = get(handles.channelsTable, 'data');
 Chact=0;for i=1:size(CHdata,1),if CHdata{i,1},Chact=Chact+1;end,end
 
+% calibration info
+CH = logging.channelInfo;
+tmpTable = get(handles.channelsTable,'Data');
+ical = {tmpTable{:,11}};
+ical = diag(cell2mat(ical(CH.active))');
+
 %   Check if any channels were added to the session
 if (~isempty(logging.session.Channels))
     % Add listener
@@ -37,7 +43,7 @@ if (~isempty(logging.session.Channels))
     
     % Save data
     Nt=dataObject.nt;
-    dataOut = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:),logging);
+    dataOut = data2WS(1,dataObject.t(1:Nt),dataObject.data(1:Nt,:) * ical,logging);
     
     set(handles.statusStr, 'String', 'READY!  DAQ data available at workbench.');
     set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);

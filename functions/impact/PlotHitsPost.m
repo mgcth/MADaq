@@ -1,79 +1,92 @@
-function [FRDout,TSout]=PlotHitsPost
-% dbstop error
-global Y refch plotch fcut SetAct ChNames hp Leave TS FRD
-global GCA
+function [FRDout,TSout]=PlotHitsPost(YY,refch,y2ch)
+% % dbstop error
+% global Y refch plotch fcut SetAct ChNames hp Leave TS FRD
+global Impact SetAct GCA Y
+Impact.y2ch=y2ch;
+% global ImpactTestData
 WS=warning;warning('off');
-TS=[];
+% TS=[]; 
 
 %% Initiate
-hf=figure('CloseRequestFcn',@PackAndLeave);
-% set(zoom(hf),'ActionPostCallback','disp(''hej'')');
-set(zoom(hf),'ActionPostCallback','global GCA,GCA=gca;');
+Impact.hd=figure('MenuBar','none','CloseRequestFcn','PackAndLeave;');
+uimenu(Impact.hd,'Label','Done','CallBack','PackAndLeave;')
+set(zoom(Impact.hd),'ActionPostCallback','global GCA,GCA=gca;');
 GCA=[];
+Y=YY;
 
 SetAct=ones(20,1);
 
-%%                                         Load data passed from ImpactTest
-load('Data4PlotHits.mat','refch','plotch','fcut','ChNames');
-
-%%                                                    Initiate data channel
-[MMF,Iret]=GetDoubleFromFile(2);
-
-%%                                             Plot and wait for Leave=true
-DoPostPlot(hf,MMF);
-Leave=false;
+%%     ,                                       Plot and wait for Leave=true
+hax=DoPostPlot(Impact.hd,YY,refch,y2ch);
+Impact.Leave=false;
 while 1,
-  pause(1)
-  if Leave
-%     close(hf),
+  pause(.5)
+  if Impact.Leave
     break
   end
-  if ~isempty(GCA),RefreshPlot2(GCA);GCA=[];tic,end
-  if strcmpi(get(zoom(hf),'Enable'),'off'), RefreshPlot;end
+  if ~isempty(GCA),RefreshPlot2(GCA,hax,YY,refch,Impact.y2ch);GCA=[];tic,end
+  if strcmpi(get(zoom(Impact.hd),'Enable'),'off'), RefreshPlot(hax,YY,refch,Impact.y2ch);end
 end
 
-FRDout=FRD;
-TSout=TS;
+FRDout=Impact.FRD;
+TSout=Impact.TS;
 warning(WS);
-
+end
 
 %% ========================================================================
-function DoPostPlot(hf,MMF)
-global Y refch plotch hpyy hax
-[NBlocks,~,Size,Iret]=GetDoubleFromFile(MMF);
-for I=1:NBlocks
-  D=GetDoubleFromFile(MMF,I);
-  Y{I}=reshape(D,Size(2),Size(3));
-end  
-[hf,hax]=PostPlotHitsGUI(Y,hf);
+function hax=DoPostPlot(hf,YY,refch,y2ch)
+% global Y refch plotch hpyy hax
+
+[~,hax]=PostPlotHitsGUI(YY,hf);
 try
-  for I=1:length(Y)  
-    hpyy{I}=plotyy(hax(I),Y{I}(end,:)-Y{I}(end,1),Y{I}(plotch,:),Y{I}(end,:)-Y{I}(end,1),Y{I}(refch,:));
-    set(hpyy{I},'XLim',[0 Y{I}(end,end)-Y{I}(end,1)]);
-    set(hpyy{I},'ButtonDownFcn',@ChList);
+  for I=1:length(YY)
+    t=YY{I}(end,:)-YY{I}(end,1);
+    yp=detrend(YY{I}(y2ch,:)); 
+    yp=yp-median(yp); yp=yp/norm(yp,inf);
+    yr=YY{I}(refch,:); yr=yr-median(yr); yr=yr/norm(yr,inf);
+    plot(hax(I),t,yp,t,yr);
+    set(gca,'XLim',[0 t(end)-t(1)]);
+    set(gca,'ButtonDownFcn',@ChList);
+%     hpyy{I}=plotyy(hax(I),t,yp,t,yr);
+%     set(hpyy{I},'XLim',[0 t(end)-t(1)]);
+%     set(hpyy{I},'ButtonDownFcn',@ChList);
   end
 catch
 end
-
-%% ========================================================================
-function RefreshPlot
-global Y refch plotch hpyy hax
-for I=1:length(Y)  
-  hpyy{I}=plotyy(hax(I),Y{I}(end,:)-Y{I}(end,1),Y{I}(plotch,:),Y{I}(end,:)-Y{I}(end,1),Y{I}(refch,:));
-  set(hpyy{I},'XLim',[0 Y{I}(end,end)-Y{I}(end,1)]);
-  set(hpyy{I},'ButtonDownFcn',@ChList);
 end
 
 %% ========================================================================
-function RefreshPlot2(GCA)
-global Y refch plotch hpyy hax
+function RefreshPlot(hax,Y,refch,plotch)
+for I=1:length(Y)
+  t=Y{I}(end,:)-Y{I}(end,1);
+  yp=detrend(Y{I}(plotch,:)); 
+  yp=yp-median(yp); yp=yp/norm(yp,inf);
+  yr=Y{I}(refch,:); yr=yr-median(yr); yr=yr/norm(yr,inf);
+  plot(hax(I),t,yp,t,yr);
+  set(hax(I),'XLim',[0 t(end)-t(1)]);
+  set(hax(I),'ButtonDownFcn',@ChList);
+%   hpyy{I}=plotyy(hax(I),t,yp,t,yr);
+%   set(hpyy{I},'XLim',[0 Y{I}(end,end)-Y{I}(end,1)]);
+%   set(hpyy{I},'ButtonDownFcn',@ChList);
+end
+end
+
+%% ========================================================================
+function RefreshPlot2(GCA,hax,Y,refch,plotch)
 XLim=get(GCA,'XLim');YLim=get(GCA,'YLim');
 for I=1:length(Y)  
-  hpyy{I}=plot(hax(I),Y{I}(end,:)-Y{I}(end,1),Y{I}(plotch,:));
+  t=Y{I}(end,:)-Y{I}(end,1);
+  yp=detrend(Y{I}(plotch,:));
+  yp=yp-median(yp); yp=yp/norm(yp,inf);
+  yr=Y{I}(refch,:); yr=yr-median(yr); yr=yr/norm(yr,inf);
+  plot(hax(I),t,yp,t,yr);
   set(hax(I),'XLim',XLim,'YLim',YLim);
-  set(hpyy{I},'ButtonDownFcn',@ChList);
+  set(hax(I),'ButtonDownFcn',@ChList);
+%     hpyy{I}=plotyy(hax(I),t,yp,t,yr);
+%   set(hax(I),'XLim',XLim,'YLim',YLim);
+%   set(hpyy{I},'ButtonDownFcn',@ChList);
 end
-
+end
 
 %% ========================================================================
 function [hf,hax]=PostPlotHitsGUI(Y,hf)
@@ -90,7 +103,7 @@ MonPos=get(0,'MonitorPositions');MonPos=MonPos(1,:);
 FigPos=[590 MonPos(4)-500 560 420];
 hf=figure(hf);
 set(hf,'Position',FigPos);
-set(hf,'Name','impactGUI - Hit Selector','NumberTitle','off',...
+set(hf,'Name','Hit Selector','NumberTitle','off',...
        'SizeChangedFcn',@sc);
 %%                                                                     Menu     
 hm(1)=uimenu('Label','Estimate FRF','CallBack',@EstFRF);
@@ -117,23 +130,27 @@ for I=1:NWrows
     end
   end
 end
+end
 
 function myCBF(varargin)
 N=nargin
+end
 
 %%
 function ChList(source,callbackdata)
-global ChNames hp
-hui=uicontrol('Parent',hp(1),'Style','listbox','String',ChNames,...
-  'Position',[1 1 155 60],'BackgroundColor',[1 1 1],...
+global Impact
+ChNames=Impact.Metadata.Sensor.Label;
+hui=uicontrol('Parent',gcf,'Style','listbox','String',ChNames,...
+  'Position',[10 10 160 80],'BackgroundColor',[1 1 1],...
   'ForegroundColor',[0 0 0],'CallBack',@ChSelect);
+end
 
 function ChSelect(source,callbackdata)
-global plotch
-plotch=get(source,'Value');
-RefreshPlot;
+global Impact
+Impact.y2ch=get(source,'Value');
+% RefreshPlot;
 delete(source);
-
+end
 
 %%
 function ToggleActive(source,callbackdata)
@@ -146,6 +163,7 @@ if st
 else
   SetAct(No)=1;set(hp,'Back',[.5 1 .5]);
 end
+end
 
 %%
 function sc(source,callbackdata)
@@ -153,6 +171,7 @@ sz=get(source,'Position');
 if (sz(3)<560 | sz(4)<480)
   sz(3:4)=[560 480];
   set(source,'Position',sz);
+end
 end
 
 %%
@@ -169,6 +188,7 @@ if ~isempty(ind)
 
   [ny,nt]=size(Ytot);
   [FRF,f] = tfestimate(Ytot(refch,:),Ytot(plotch,:),nt,0,nt,1/dt);
+  
   FRD=frd(FRF,2*pi*f);
 
   hffrf=figure;
@@ -178,39 +198,123 @@ if ~isempty(ind)
   if fcut<f(2),fcut=f(end);end
   magphase([1 1;0 fcut],FRD,opt); 
 end  
-
-%%
-function PackAndLeave(source,callbackdata)
-global Y refch fcut SetAct Leave TS FRD
-
-t=Y{1}(end,:);t=t-t(1);dt=t(2)-t(1);
-[ny,nt]=size(Y{1}(1:end-1,:));
-
-J=0;ytot=zeros(ny,nt);ylong=[];
-for I=1:length(Y)
-  if SetAct(I)
-    J=J+1;
-    yts{J}=timeseries(Y{I}(1:(end-1),:),t,'Name',['Y' int2str(J)]);
-    ytot=ytot+Y{I}(1:(end-1),:);
-    ylong=[ylong Y{I}(1:(end-1),:)];
-  end  
 end
-TS=timeseries(ytot,t,'Name','Y');
-UserDataTS.refch=refch;
-UserDataTS.Y=yts;
-TS.UserData=UserDataTS;
 
-respch=setdiff(1:ny,refch);
-
-if ~isempty(ytot)
-  [F,f] = tfestimate(ytot(refch,:)',ytot(respch,:)',nt,0,nt,1/dt);
-  indf=find(f<=fcut);
-  FRF(:,1,:)=F(indf,:).';
-  FRD=frd(FRF,2*pi*f(indf));
-  Cxy = mscohere(ylong(refch,:)',ylong(respch,:)',nt,0,nt,1/dt);
-  UserDataFRD.Coherence(:,1,:) = Cxy(indf,:)';
-  FRD.UserData=UserDataFRD;
-end  
-
-Leave=true;
-closereq;
+% %%
+% function PackAndLeave(source,callbackdata)
+% % global Y refch fcut SetAct Leave TS FRD
+% global Impact Y SetAct
+% 
+% Impact.Leave=true;
+% close(Impact.hd);
+% 
+% % while 1
+% %   try 
+% % %     close(Impact.hd);
+% %     closereq;
+% %     break;
+% %   catch
+% %   end
+% % end
+% 
+% %%
+% fcut=Impact.fcut;
+% refch=Impact.refch;
+% t=Y{1}(end,:);t=t-t(1);dt=t(2)-t(1);
+% [ny,nt]=size(Y{1}(1:end-1,:));
+%     
+% %% Align hits
+% Mx=max(abs(Y{1}(refch,:))); PWidth=sum(abs(Y{1}(refch,:)>.1*Mx));
+% for I=1:length(Y)
+%   [~,mxind]=max(abs(Y{I}(refch,:)));
+%   Y{I}=circshift(Y{I}',-mxind+PWidth)';
+% end  
+% 
+% J=0;ytot=zeros(ny,nt);ylong=[];
+% for I=1:length(Y)
+%   if SetAct(I)
+%     J=J+1;
+%     yts{J}=timeseries(Y{I}(1:(end-1),:),t,'Name',['Y' int2str(J)]);
+%     ytot=ytot+Y{I}(1:(end-1),:);
+%     ylong=[ylong Y{I}(1:(end-1),:)];
+%   end  
+% end
+% 
+% %% Eliminate negative contribution to impact force
+% uhit=ytot(refch,:); uhit=uhit-median(uhit);
+% maxu=max(uhit); minu=min(uhit);
+% if maxu<abs(minu);%% Negative impact pulse
+%   uhit(uhit>0)=0;
+% else% Positive impact pulse
+%   uhit(uhit<0)=0;
+% end    
+% ytot(refch,:)=uhit;
+% 
+% TS=timeseries(ytot,t,'Name','Y');
+% UserDataTS.refch=refch;
+% UserDataTS.Y=yts;
+% TS.UserData=UserDataTS;
+% 
+% respch=setdiff(1:ny,refch);
+% 
+% %% Window
+% W=(2*cos(pi*[0:nt-1]/(nt-1))-1)/2;
+% for I=1:ny
+%   ytot(I,:)=W.*ytot(I,:);
+% end   
+% 
+% if ~isempty(ytot)
+%   [F,f] = tfestimate(ytot(refch,:)',ytot(respch,:)',nt,0,nt,1/dt);
+%   indf=find(f<=fcut);
+%   FRF(:,1,:)=F(indf,:).';
+%   FRD=frd(FRF,2*pi*f(indf));
+%   Cxy = mscohere(ylong(refch,:)',ylong(respch,:)',nt,0,nt,1/dt);
+%   UserDataFRD.Coherence(:,1,:) = Cxy(indf,:)';
+%   FRD.UserData=UserDataFRD;
+% end  
+% 
+% FRD.InputUnit=Impact.Metadata.Sensor.Unit(refch);
+% FRD.OutputUnit=Impact.Metadata.Sensor.Unit(respch);
+% 
+% switch Impact.Metadata.Sensor.Dof{refch}
+%   case 'X+'
+%     FRD.InputName=[Impact.Metadata.Sensor.Dir{refch} '.1'];
+%   case 'X-'
+%     FRD.InputName=['-' Impact.Metadata.Sensor.Dir{refch} '.1'];
+%   case 'Y+'
+%     FRD.InputName=[Impact.Metadata.Sensor.Dir{refch} '.2'];
+%   case 'Y-'
+%     FRD.InputName=['-' Impact.Metadata.Sensor.Dir{refch} '.2'];
+%   case 'Z+'
+%     FRD.InputName=[Impact.Metadata.Sensor.Dir{refch} '.3'];
+%   case 'Z-'
+%     FRD.InputName=['-' Impact.Metadata.Sensor.Dir{refch} '.3'];
+%   otherwise
+%     FRD.InputName=Impact.Metadata.Sensor.Label(refch);      
+% end
+% 
+% for I=1:length(respch)
+%   switch Impact.Metadata.Sensor.Dof{respch(I)}
+%     case 'X+'
+%       FRD.OutputName{I}=[Impact.Metadata.Sensor.Dir{respch(I)} '.1'];
+%     case 'X-'
+%       FRD.OutputName{I}=['-' Impact.Metadata.Sensor.Dir{respch(I)} '.1'];
+%     case 'Y+'
+%       FRD.OutputName{I}=[Impact.Metadata.Sensor.Dir{respch(I)} '.2'];
+%     case 'Y-'
+%       FRD.OutputName{I}=['-' Impact.Metadata.Sensor.Dir{respch(I)} '.2'];
+%     case 'Z+'
+%       FRD.OutputName{I}=[Impact.Metadata.Sensor.Dir{respch(I)} '.3'];
+%     case 'Z-'
+%       FRD.OutputName{I}=['-' Impact.Metadata.Sensor.Dir{respch(I)} '.3'];
+%     otherwise
+%       FRD.OutputName{I}=char(Impact.Metadata.Sensor.Label(respch(I)));      
+%   end
+% end    
+%     
+% Impact.FRD=FRD;
+% Impact.TS=TS;
+% 
+% % Impact.Leave=true;
+% % closereq;
+% end

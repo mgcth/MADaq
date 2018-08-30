@@ -22,16 +22,16 @@ function [cc,yr,yc,yl,A,ind]=harmcoeff2(y,Ts,f,opt)
 if nargin<4,opt=[];end
 if ~isfield(opt,'o'),opt.o=false;end
 if isfield(opt,'A');
-  A=opt.A;
+    A=opt.A;
 else
-  t=0:Ts:Ts*(size(y,2)-1);
-  w=2*pi*f;
-  for I=length(f):-1:1
-    A(:,2*I-1)=cos(w(I)*t);
-    A(:,2*I)  =sin(w(I)*t);
-  end
-  A(:,end+1)=1;
-  A(:,end+1)=t;
+    t=0:Ts:Ts*(size(y,2)-1);
+    w=2*pi*f;
+    for I=length(f):-1:1
+        A(:,2*I-1)=cos(w(I)*t);
+        A(:,2*I)  =sin(w(I)*t);
+    end
+    A(:,end+1)=1;
+    A(:,end+1)=t;
 end
 
 % -- Do regression and reconstruction
@@ -39,21 +39,21 @@ c=A\y';
 cc=c(1:2:end-2,:)-1i*c(2:2:end-2,:);
 [~,ind]=sort(sum(abs(cc),2),'descend');
 if opt.o
-  error('Sorry. Single frequency regression code not updated')
-  yr=0*y;
-  for I=1:length(ind)
-    a=A(:,2*ind(I)-1+[0 1]);  % Extracts all rows and 2 cols, i.e. A(:,[ind(I)+0 ind(I)+1])
-    c2=a\y';
-    cc(ind(I),:)=c2(1,:)-1i*c2(2,:);
-    yc(:,:,ind(I))=(a*c2)';
-    % yc(:,:,I)=(a*c2)';
-    yr=yr+(a*c2)';
-    yl(:,:,I)=y-(a*c2)';
-    y=y-(a*c2)';
-  end
-  %yl=y;
+    error('Sorry. Single frequency regression code not updated')
+    yr=0*y;
+    for I=1:length(ind)
+        a=A(:,2*ind(I)-1+[0 1]);  % Extracts all rows and 2 cols, i.e. A(:,[ind(I)+0 ind(I)+1])
+        c2=a\y';
+        cc(ind(I),:)=c2(1,:)-1i*c2(2,:);
+        yc(:,:,ind(I))=(a*c2)';
+        % yc(:,:,I)=(a*c2)';
+        yr=yr+(a*c2)';
+        yl(:,:,I)=y-(a*c2)';
+        y=y-(a*c2)';
+    end
+    %yl=y;
 else
-  yc=[];
-  yr=(A*c)';
-  yl=y-yr;
+    yc=[];
+    yr=(A*c)';
+    yl=y-yr;
 end

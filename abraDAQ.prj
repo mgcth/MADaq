@@ -1,0 +1,105 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="443018167" file="C:\Users\ThomasA\Box Sync\matlab\toolbox\abraDAQ\abraDAQ.prj" location="C:\Users\ThomasA\Box Sync\matlab\toolbox\abraDAQ" name="abraDAQ" target="target.mlapps" target-name="Package App">
+    <param.appname>abraDAQ</param.appname>
+    <param.authnamewatermark>Thomas Abrahamsson &amp; Mladen Gibanica</param.authnamewatermark>
+    <param.email>thomas.abrahamsson@chalmers.se</param.email>
+    <param.company>Chalmers University of Technology</param.company>
+    <param.icon>${PROJECT_ROOT}\abraDAQ_resources\icon_24.png</param.icon>
+    <param.icons>
+      <file>${PROJECT_ROOT}\abraDAQ_resources\icon_48.png</file>
+      <file>${PROJECT_ROOT}\abraDAQ_resources\icon_24.png</file>
+      <file>${PROJECT_ROOT}\abraDAQ_resources\icon_16.png</file>
+    </param.icons>
+    <param.summary>DAQ software for vibration testing</param.summary>
+    <param.description>DAQ software for vibration testing supporting National Instruments and Data Translation hardware.</param.description>
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms />
+    <param.output>C:\Users\ThomasA\Box Sync\matlab\toolbox\abraDAQ</param.output>
+    <param.guid>2ca54434-0df1-4b80-8d2a-34f5ae88fa17</param.guid>
+    <unset>
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\abraDAQ.m</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\abraDAQ.fig</file>
+      <file>${PROJECT_ROOT}\functions\abradaq_chirp.m</file>
+      <file>${PROJECT_ROOT}\functions\abradaq_noise.m</file>
+      <file>${PROJECT_ROOT}\functions\allocateMemory.m</file>
+      <file>${PROJECT_ROOT}\functions\celleditcallback.m</file>
+      <file>${PROJECT_ROOT}\functions\currentState.m</file>
+      <file>${PROJECT_ROOT}\functions\data2WS.m</file>
+      <file>${PROJECT_ROOT}\functions\impact\ImpactTest.m</file>
+      <file>${PROJECT_ROOT}\functions\impact\PlotHits.m</file>
+      <file>${PROJECT_ROOT}\functions\impact\PlotHitsPost.m</file>
+      <file>${PROJECT_ROOT}\functions\impactTest_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\loadButton_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\monitor\closePreview.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine\harmcoeff2.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine\mac.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine\magphase.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine\simostationarityengine.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine\startMultisine.m</file>
+      <file>${PROJECT_ROOT}\functions\multisine_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\openPubList.m</file>
+      <file>${PROJECT_ROOT}\functions\oscilloscope\oscilloscopeFeed.m</file>
+      <file>${PROJECT_ROOT}\functions\oscilloscope\startOscilloscope.m</file>
+      <file>${PROJECT_ROOT}\functions\Oscilloscope_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\periodic\startPeriodic.m</file>
+      <file>${PROJECT_ROOT}\functions\periodic_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\report\abraDAQ_report.m</file>
+      <file>${PROJECT_ROOT}\functions\saveButton_Callback.m</file>
+      <file>${PROJECT_ROOT}\functions\startInitialisation.m</file>
+      <file>${PROJECT_ROOT}\functions\wlogspace.m</file>
+      <file>${PROJECT_ROOT}\functions\xcovMat.m</file>
+      <file>${PROJECT_ROOT}\functions\xls2cell.m</file>
+      <file>${PROJECT_ROOT}\GetDoubleFromFile.m</file>
+      <file>${PROJECT_ROOT}\PassDoubleThruFile.m</file>
+      <file>${PROJECT_ROOT}\Stimulus.fig</file>
+      <file>${PROJECT_ROOT}\Stimulus.m</file>
+    </fileset.depfun>
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="C:\Users\ThomasA\Box Sync\matlab\toolbox" name="abraDAQ" optional="false">C:\Users\ThomasA\Box Sync\matlab\toolbox\abraDAQ</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2017a</root>
+      <toolboxes>
+        <toolbox name="matlabcoder" />
+      </toolboxes>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.2</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>

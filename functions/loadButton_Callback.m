@@ -16,28 +16,27 @@ set(handles.startButton, 'String', 'Loading!','BackGround',[1 0 0]);
 
 % Columns in the two tables
 COLUMNSinINPUTTABLE = 14;
-COLUMNSinOUTPUTTABLE = 14;
+COLUMNSinOUTPUTTABLE = 2;
 
 error = false;
-loadFile = false;
+loadFile = false; 
 directory = [handles.homePath, '\conf'];
 selection = '';
 raw = {};
 
+if ~isfield(handles,'DaqReset')
+  handles.DaqReset=false;
+end
+
 %   Input dialog for menuAbout selection
 while (~loadFile)
-    d = dir(directory);
-    str = {d.name};
-    %[select, status] = listdlg( 'PromptString','Select a file:',...
-    %    'SelectionMode','single',...
-    %    'ListString',str);
-    %drawnow; pause(0.1);                       %   Prevent MatLab from hanging
-    
-    %selection = [directory, '\', d(select).name];
-    %type = exist(selection, 'file');
-    
-    [fileName,pathName] = uigetfile('conf/*.conf','Select the load file');
-%     selection = string([pathName, fileName]);
+    if handles.DaqReset
+        pathName=tempdir;
+        fileName='Temporary.conf';
+        handles.DaqReset=false;
+    else
+      [fileName,pathName] = uigetfile('conf/*.conf','Select the load file');
+    end
     selection = [pathName fileName];
     type = exist(selection, 'file');
     
@@ -45,9 +44,6 @@ while (~loadFile)
         
         if (type == 2)      %   File
             loadFile = true;
-            
-            % load
-            %disp(['Selection: ', selection]);
             try
                 [num, txt, raw] = xlsread(selection);
             catch e
@@ -60,7 +56,6 @@ while (~loadFile)
             end
         elseif (type == 7)  %   Directory
             directory = selection;
-            %disp(['Dir: ', directory]);
         end
         
     else    % cancel operation
@@ -96,24 +91,14 @@ if (~error)
     
     %   Get measurement settings
     if (strcmp(raw{7,1}, '##'))
-        if (raw{9,1})
-            %set(handles.monitor, 'Value', 1);
-            monitor_Callback(hObject, eventdata, handles)
-        elseif (raw{9,2})
-            %set(handles.dataLogg, 'Value', 1);
-            dataLogg_Callback(hObject, eventdata, handles)
-        elseif (raw{9,3})
-            %set(handles.impactTest, 'Value', 1);
+        if (raw{9,3})
             impactTest_Callback(hObject, eventdata, handles)
         elseif (raw{9,4})
-            %set(handles.periodic, 'Value', 1);
             periodic_Callback(hObject, eventdata, handles)
-        elseif (raw{9,5})
-            %set(handles.steppedSine, 'Value', 1);
-            steppedSine_Callback(hObject, eventdata, handles)
         elseif (raw{9,6})
-            %set(handles.multisine, 'Value', 1);
             multisine_Callback(hObject, eventdata, handles)
+        elseif (raw{9,7})
+            Oscilloscope_Callback(hObject, eventdata, handles)
         end
         
         % Load currentState as a vector (rows after each other)
@@ -129,21 +114,10 @@ if (~error)
         end
         % End currentState load
     end
-    
-    % Load Tester Info
-    set(handles.autoReport, 'Value', raw{10,1});
-    tmpTesterInfo{1} = raw{10,2};
-    tmpTesterInfo{2} = raw{10,3};
-    tmpTesterInfo{3} = raw{10,4};
-    handles.autoReport.UserData.TesterInfo = tmpTesterInfo;
-    
     % Get channels
     [n, m] = size(raw);
-    
     a=cell(n,1);
-    for i = 1:n
-        a{i} = raw{i,1};
-    end
+    for i = 1:n, a{i} = raw{i,1}; end
     
     inputIndex = find(strcmp(a,'###'));
     outputIndex = find(strcmp(a,'### ###'));
@@ -167,179 +141,52 @@ if (~error)
     handles.channelsTable.CellEditCallback={@celleditcallback,rawCells};
     %%% END
     
-    for i = inputIndex + 1:outputIndex - 1
-        
+    for i = inputIndex + 1:outputIndex - 1        
         %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
-        temp = cell(1, 13);
-        
+        temp = cell(1, 13);        
         temp{1, 1} = raw{i, 1};     %   Active
-        temp{1, 2} = raw{i, 2};     %   Referense
-        
+        temp{1, 2} = raw{i, 2};     %   Referense        
         if (ischar(raw{i, 3}))      %   Channel
             temp{1, 3} = raw{i, 3};
-        else
-            temp{1, 3} = '';
-        end
-        
+        else, temp{1, 3} = ''; end        
         if (ischar(raw{i, 4}))      %   Label
             temp{1, 4} = raw{i, 4};
-        else
-            temp{1, 4} = '';
-        end
-        
+        else, temp{1, 4} = ''; end       
         if (ischar(raw{i, 5}))      %   Coupling (AC/DC)
             temp{1, 5} = raw{i, 5};
-        else
-            temp{1, 5} = '';
-        end
-        
+        else, temp{1, 5} = ''; end     
         if (ischar(raw{i, 6}))      %   Type (Voltage/IEPE)
             temp{1, 6} = raw{i, 6};
-        else
-            temp{1, 6} = '';
-        end
-        
-        temp{1, 7} = raw{i, 7};     %   Voltage
-        
+        else, temp{1, 6} = ''; end       
+        temp{1, 7} = raw{i, 7};     %   Voltage      
         if (ischar(raw{i, 8}))      %   Manufacturer
             temp{1, 8} = raw{i, 8};
-        else
-            temp{1, 8} = '';
-        end
-        
-        temp{1, 9} = raw{i, 9};     %   Manufacturer ID
-        
-        temp{1, 10} = raw{i, 10};     %   Serial number
-        
-        temp{1, 11} = raw{i, 11};   %   Sensitivity
-        
+        else, temp{1, 8} = ''; end        
+        temp{1, 9} = raw{i, 9};     %   Manufacturer ID       
+        temp{1, 10} = raw{i, 10};     %   Serial number      
+        temp{1, 11} = raw{i, 11};   %   Sensitivity       
         if (ischar(raw{i, 12}))     %   Units
             temp{1, 12} = raw{i, 12};
-        else
-            temp{1, 12} = '';
-        end
-        
+        else, temp{1, 12} = ''; end       
         if (ischar(raw{i, 13}))     %   Dof
             temp{1, 13} = raw{i, 13};
-        else
-            temp{1, 13} = '';
-        end
-        
-        if (ischar(raw{i, 14}))     %   Direction
-            temp{1, 14} = raw{i, 14};
-        else
-            temp{1, 14} = '';
-        end
-        
-        %                 if (ischar(raw{i, 3}))      %   Signal type
-        %                     temp{1, 3} = raw{i, 3};
-        %                 else
-        %                     temp{1, 3} = '';
-        %                 end
-        
-        %                 if (ischar(raw{i, 7}))      %   Transducer type
-        %                     temp{1, 7} = raw{i, 7};
-        %                 else
-        %                     temp{1, 7} = '';
-        %                 end
-        
+        else, temp{1, 13} = ''; end
+        try, temp{1, 14} = num2str(raw{i, 14});catch, temp{1, 14}='';end % Node
         dataIn(i - inputIndex, :) = temp(1, :);
-        %dataIn(i - inputIndex, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
-        %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
-        %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
-    end
-    
-    for i = outputIndex + 1:n
-        
+    end  
+    for i = outputIndex + 1:n        
         %   Copy data and check for NaNs in inappropiate places (Hint: No NaNs in string elements)
-        temp = cell(1, 13);
-        
+        temp = cell(1, 2);      
         temp{1, 1} = raw{i, 1};     %   Active
-        temp{1, 2} = raw{i, 2};     %   Referense
-        
-        if (ischar(raw{i, 3}))      %   Channel
-            temp{1, 3} = raw{i, 3};
-        else
-            temp{1, 3} = '';
-        end
-        
-        if (ischar(raw{i, 4}))      %   Label
-            temp{1, 4} = raw{i, 4};
-        else
-            temp{1, 4} = '';
-        end
-        
-        if (ischar(raw{i, 5}))      %   Coupling
-            temp{1, 5} = raw{i, 5};
-        else
-            temp{1, 5} = '';
-        end
-        
-        if (ischar(raw{i, 6}))      %   Type (Voltage/IEPE)
-            temp{1, 6} = raw{i, 6};
-        else
-            temp{1, 6} = '';
-        end
-        
-        temp{1, 7} = raw{i, 7};     %   Voltage
-        
-        if (ischar(raw{i, 8}))      %   Manufacturer
-            temp{1, 8} = raw{i, 8};
-        else
-            temp{1, 8} = '';
-        end
-        
-        temp{1, 9} = raw{i, 9};     %  Model
-        
-        if ~ischar(raw{i,10})
-            raw{i,10}=num2str(raw{i,10});
-        end
-        temp{1, 10} = raw{i, 10};     %   Serial number
-        
-        temp{1, 11} = raw{i, 11};   %   Sensitivity
-        
-        if (ischar(raw{i, 12}))     %   Units
-            temp{1, 12} = raw{i, 12};
-        else
-            temp{1, 12} = '';
-        end
-        
-        if (ischar(raw{i, 13}))     %   Dof
-            temp{1, 13} = raw{i, 13};
-        else
-            temp{1, 13} = '';
-        end
-        
-        if (ischar(raw{i, 14}))      %   Direction
-            temp{1, 14} = raw{i, 14};
-        else
-            temp{1, 14} = '';
-        end
-        
-        %                 if (ischar(raw{i, 3}))      %   Signal type
-        %                     temp{1, 3} = raw{i, 3};
-        %                 else
-        %                     temp{1, 3} = '';
-        %                 end
-        
-        %                 if (ischar(raw{i, 7}))      %   Transducer type
-        %                     temp{1, 7} = raw{i, 7};
-        %                 else
-        %                     temp{1, 7} = '';
-        %                 end
-        
+        if (ischar(raw{i, 2}))      %   Channel
+            temp{1, 2} = raw{i, 2};
+        else, temp{1, 2} = ''; end       
         dataOut(i - outputIndex, :) = temp(1, :);
-        %dataOut(i - outputIndex, :) = { raw{i, 1}, raw{i, 2}, raw{i, 3}, raw{i, 4}, ...
-        %                    raw{i, 5}, raw{i, 6}, raw{i, 7}, raw{i, 8}, ...
-        %                    raw{i, 9}, raw{i, 10}, raw{i, 11}, raw{i, 12}};
     end
-    
     set(handles.channelsTable, 'data', dataIn);
-    set(handles.outputTable, 'data', dataOut);
-    
+    set(handles.outputTable, 'data', dataOut);    
     %   Update status bar
     set(handles.statusStr, 'String', [selection, ' is now loaded ...']);
     set(handles.startButton, 'String', 'Start measurement','BackGround',[0 1 0]);
-
     guidata(hObject, handles);
 end
