@@ -36,7 +36,7 @@ ChNames=CHdata(:,4);
 ChNames=ChNames(find(ACT));
 RefName=ChNames(refch);
 ChCal=cell2mat(impact.Metadata.Sensor.Sensitivity);
-ChCal=[ChCal 1];% Unity scaling for time
+%ChCal=[ChCal 1];% Unity scaling for time % Mladen commented out 2018-04-01
 
 
 %%                                              Initiate data transfer file
@@ -97,6 +97,7 @@ if ~isempty(impact.session.Channels) && ~isempty(impact.channelInfo.reference)
 %     end  
     RefLabel=impact.Metadata.TestSettings{5,2};
     [frdsys,tssys]=ImpactTest(ChNames,ChCal,refch,RefLabel,fcut,FadeTime);
+    impact.Metadata.Coherence = frdsys.UserData.Coherence;
     dataOut{1} = data2WS(2,frdsys,impact);
     dataOut{2} = data2WS(3,tssys,impact);
     

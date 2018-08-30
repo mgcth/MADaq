@@ -7,9 +7,9 @@ Hz2kHz = 0.001;
 % Update status bar
 if handles.CalibrateButton.Value
   set(handles.statusStr, 'String', 'Calibrating ...');
-else
+else    
   set(handles.statusStr, 'String', 'Setting up system ...');
-end
+end  
 drawnow();
 
 % Get channel data
@@ -66,12 +66,12 @@ sessionObject.Metadata.TestTitles{4} = get(handles.title4, 'String');
 
 % Measurement type and options. Check which test
 if handles.CalibrateButton.Value
-
+    
 elseif handles.Oscilloscope.Value == 1 % if oscilloscope
     sessionObject.Metadata.TestType = 'Oscilloscope';
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
     sessionObject.Metadata.TestSettings{1,2} = get(handles.fun1,'String');
-
+    
 elseif get(handles.impactTest,'Value') == 1 % if impactTest
     sessionObject.Metadata.TestType = 'Impact test';
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -84,9 +84,9 @@ elseif get(handles.impactTest,'Value') == 1 % if impactTest
     sessionObject.Metadata.TestSettings{4,2} = get(handles.fun4,'String');
     sessionObject.Metadata.TestSettings{5,1} = get(handles.fun5Text,'String');
     sessionObject.Metadata.TestSettings{5,2} = get(handles.fun5,'String');
-
+    
 elseif get(handles.periodic,'Value') == 1 % if periodic Test
-    sessionObject.Metadata.TestType = 'Periodic input';
+    sessionObject.Metadata.TestType = 'Periodic input';    
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
     sessionObject.Metadata.TestSettings{1,2} = get(handles.fun1,'String');
     sessionObject.Metadata.TestSettings{2,1} = get(handles.fun2Text,'String');
@@ -101,8 +101,7 @@ elseif get(handles.periodic,'Value') == 1 % if periodic Test
     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
     sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
     sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
-
-
+    
 % elseif get(handles.steppedSine,'Value') == 1 % if steppedsine Test
 %     sessionObject.Metadata.TestType = 'Stepped sine input';
 %     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -119,7 +118,7 @@ elseif get(handles.periodic,'Value') == 1 % if periodic Test
 %     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
 %     sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
 %     sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
-
+    
 elseif handles.multisine.Value == 1 % if multisine Test
     sessionObject.Metadata.TestType = 'Multisine input';
     sessionObject.Metadata.TestSettings{1,1} = get(handles.fun1Text,'String');
@@ -136,7 +135,7 @@ elseif handles.multisine.Value == 1 % if multisine Test
     sessionObject.Metadata.TestSettings{6,2} = get(handles.fun6,'String');
     sessionObject.Metadata.TestSettings{7,1} = get(handles.fun7Text,'String');
     sessionObject.Metadata.TestSettings{7,2} = get(handles.fun7,'String');
-
+    
 end
 
 % Add input channels
@@ -155,15 +154,15 @@ for i = activated
     channelData.type = dataIn{i, 6};
     channelData.voltage = dataIn{i, 7};
     channelData.sensitivity = dataIn{i, 11};
-
+    
     % Check if channel is ok, if so, then add channel to monitor
     configOk =  channelData.active && ...
                 ~isnan(channelData.voltage) && ...
-                ~isnan(channelData.sensitivity);
+                ~isnan(channelData.sensitivity);    
     if (configOk)
         %   Add channel to session
         chan = textscan(channelData.channel, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
-
+        
         tic
         % piece of shit code, but i blame Mathworks for a poor
         % implementation too (or is it NI?)
@@ -178,7 +177,7 @@ for i = activated
             elseif strcmp(channelData.coupling, 'DC')
                 analogChan.Coupling = 'DC';
             end
-
+            
             jj = 1;
             channelNumber = [];
         else
@@ -194,7 +193,7 @@ for i = activated
                     for jjj=1:length(channelNumber)
                       sessionObject.session.addAnalogInputChannel(cardName, channelNumber(jjj), 'IEPE');
                     end
-
+                                        
                     % Start with the next set
                     cardName = chan{1}{1, 1};
                     if strcmp(channelData.type, 'Voltage')
@@ -203,34 +202,34 @@ for i = activated
                             sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
                         end
                         analogChan = sessionObject.session.addAnalogInputChannel(chan{1}{1, 1}, chan{1}{1, 2}, 'Voltage');
-
+                        
                         if strcmp(channelData.coupling, 'AC')
                             analogChan.Coupling = 'AC';
                         elseif strcmp(channelData.coupling, 'DC')
                             analogChan.Coupling = 'DC';
                         end
-
+                        
                         jj = 1;
                         channelNumber = [];
                     else
                         jj = 1;
                         channelNumber = [];
                         tmpSlotNumber = regexp(chan{1}{1, 2},'\d','match');
-                        channelNumber(jj) = str2num([tmpSlotNumber{:}]);
+                        channelNumber(jj) = str2num([tmpSlotNumber{:}]);                       
                     end
                 end
-
+                
             end
         end
         jj = jj + 1;
-
+        
         % If the last card make an addition
         if i == activated(end)
             if ~isempty(channelNumber)
                 sessionObject.session.addAnalogInputChannel(cardName, channelNumber, 'IEPE');
             end
         end
-
+        
         times(j) = toc;
         % Setup header
         sessionObject.Metadata.Sensor.Index{j} = i;
@@ -252,10 +251,10 @@ for i = activated
         sessionObject.Metadata.Sensor.Unit{j} = dataIn{i, 12};
         sessionObject.Metadata.Sensor.Dof{j} = dataIn{i, 13};
         sessionObject.Metadata.Sensor.Dir{j} = dataIn{i, 14};
-
+                
         % Increment channels counter
         j = j + 1;
-
+        
         % Update status bar
         set(handles.statusStr, 'String', ['Added sensor ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
         drawnow(); pause(0.1);
@@ -264,13 +263,13 @@ end
 
 for i = 1:length(activated)
     channelData.coupling = dataIn{activated(i), 5};
-
+    
     if strcmp(channelData.coupling, 'AC')
         sessionObject.session.Channels(i).Coupling = 'AC';
     elseif strcmp(channelData.coupling, 'DC')
         sessionObject.session.Channels(i).Coupling = 'DC';
     end
-
+    
 end
 
 %%                                                      Add output channels
@@ -284,15 +283,15 @@ if ~handles.CalibrateButton.Value
     j = 1;
     for i = 1:mm
 %         channelDataOut.coupling = dataOut{i,5};
-
+        
         if dataOut{i,1} == 1
             sessionObject.channelInfo.ao = sessionObject.channelInfo.ao+1;
             chan = textscan(dataOut{i,2}, '%s%s', 'Delimiter', '/', 'CollectOutput', 1);
             sessionObject.session.addAnalogOutputChannel(char(chan{1}(1)), 0, 'Voltage');
-
+                        
             % Increment channels counter
             j = j + 1;
-
+            
             % Update status bar
             set(handles.statusStr, 'String', ['Added output ', num2str(j-1), ' of ', num2str(length(activated)), ' ...']);
             drawnow(); pause(0.1);
@@ -300,32 +299,32 @@ if ~handles.CalibrateButton.Value
         end
     end
   end
-end
+end  
 
 %%                          Check if any channels were added to the session
 if (isempty(sessionObject.session.Channels))
     msgbox('No channels in session, might be because no channels have been activated yet.','No channels in session');
     sessionObject.session.release();
     delete(sessionObject.session);
-
+    
     set(handles.statusStr, 'String', 'Measurement failed ...');
     drawnow();
-
+    
 else
-    if get(handles.periodic,'Value') == 1
+    if get(handles.periodic,'Value') == 1  
         % Allocate memory for measurement
         allocateMemory(handles);
     end
-
+    
     if handles.CalibrateButton.Value
       set(handles.statusStr, 'String', 'Calibration in progress ...');
-    else
+    else    
       set(handles.statusStr, 'String', 'Measurement in progress ...');
-    end
+    end  
     drawnow();
-
+    
 %% Sync and reject alias if low freqency
-    try sessionObject.session.AutoSyncDSA = true; catch, end
+    try sessionObject.session.AutoSyncDSA = true; catch, end   
     try
         lowFreq = f < 1000;
         for i = 1:length(sessionObject.session.Channels)
@@ -338,9 +337,9 @@ else
 %       disp(['SyncDSA: ', num2str(sessionObject.session.AutoSyncDSA), ' - Aliasrejection: ', num2str(lowFreq)]);
 %     catch
 %       disp('SyncDSA not available on this unit');
-%     end
+%     end  
 end
 
 if abs(PrescribedRate-sessionObject.session.Rate)>1
   disp(['Rate has changed from prescribed rate at: ' int2str(PrescribedRate) ' into: ' int2str(sessionObject.session.Rate)])
-end
+end  

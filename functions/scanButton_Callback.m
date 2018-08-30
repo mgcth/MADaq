@@ -14,6 +14,8 @@ function scanButton_Callback(hObject, eventdata, handles)
 % Waitbar
 WB=waitbar(0,'Searching hardware');
 
+% Load sensors in lab
+
 % Get available devices
 daq.reset;
 devices = daq.getDevices;

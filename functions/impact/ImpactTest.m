@@ -3,6 +3,7 @@ function [FRD,TS]=ImpactTest(ChNames,ChCal,refch,RefName,fcut,FadeTime)
 global Impact
 Impact.refch=refch;
 Impact.fcut=fcut;
+Impact.ChCal = ChCal; % Mladen 2018-04-01
 
 %%                                                         Initial settings
 if isfield(Impact,'Trained')

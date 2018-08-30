@@ -12,18 +12,14 @@ function [t,u]=abradaq_chirp(f0,t1,f1,Ts)
 
 % if nargin<4
 %   Fs=51200;Ts=1/Fs;
-% end
-%
+% end  
+% 
 % t = 0:Ts:t1;
 % u = chirp(t,f0,t1,f1);
 
-%if nargin<4
-%  Fs=51200;Ts=1/Fs;
-%end
-
-%N = t1/Ts;
-%t = (0:N-1)*Ts;
-%u = chirp(t,f0,t1,f1);
+% if nargin<4
+%   Fs=51200;Ts=1/Fs;
+% end
 
 N = t1/Ts;
 t = (0:N-1)*Ts;

@@ -55,20 +55,30 @@ TS.UserData=UserDataTS;
 
 respch=setdiff(1:ny,refch);
 
+
 %% Window
-W=(2*cos(pi*[0:nt-1]/(nt-1))-1)/2;
+W=(cos(pi*[0:nt-1]/(nt-1))+1)/2;
 for I=1:ny
   ytot(I,:)=W.*ytot(I,:);
 end   
 
+%% Fix calibration, mladen 2018-04-01
+respcal = Impact.ChCal(respch);
+refcal = Impact.ChCal(refch);
+ytot_resp = ytot(respch,:)'*diag(respcal);
+ytot_ref = ytot(refch,:)'*diag(refcal);
+%% END
+
 if ~isempty(ytot)
-  [F,f] = tfestimate(ytot(refch,:)',ytot(respch,:)',nt,0,nt,1/dt);
+  %[F,f] = tfestimate(ytot(refch,:)',ytot(respch,:)',nt,0,nt,1/dt);
+  [F,f] = tfestimate(ytot_ref, ytot_resp,nt,0,nt,1/dt); % Mladen 2018-04-01
   indf=find(f<=fcut);
   FRF(:,1,:)=F(indf,:).';
   FRD=frd(FRF,2*pi*f(indf));
   Cxy = mscohere(ylong(refch,:)',ylong(respch,:)',nt,0,nt,1/dt);
-  UserDataFRD.Coherence(:,1,:) = Cxy(indf,:)';
-  FRD.UserData=UserDataFRD;
+  %UserDataFRD.Coherence(:,1,:) = Cxy(indf,:)'; % Mladen 2018-04-01
+  %FRD.UserData=UserDataFRD; % Mladen 2018-04-01
+  FRD.UserData.Coherence(:,1,:) = Cxy(indf,:)'; % Mladen 2018-04-01
 end  
 
 FRD.InputUnit=Impact.Metadata.Sensor.Unit(refch);
