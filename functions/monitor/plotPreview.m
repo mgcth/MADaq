@@ -1,6 +1,7 @@
 function plotPreview(src, event)
 % Handles the plotting for the preview
 
+
 global handles_
 
 preview = getappdata(0, 'previewStruct');

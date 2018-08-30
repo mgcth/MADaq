@@ -6,7 +6,10 @@ function [FH,SPH,PBH,TBH]=CalSensFig
 
 FH=figure;
 
-FH.Position=[20 300 800 600];
+
+SC=get(0,'ScreenSize');
+FH.Position=[25 SC(4)-650 800 600]; 
+% FH.Position=[20 300 800 600];
 FH.NumberTitle='off';
 FH.MenuBar='none';
 FH.Resize='off';
