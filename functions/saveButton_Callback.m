@@ -15,7 +15,13 @@ global currentState
 %fileName = inputdlg('Enter name of the file to save', 'Save configuration');
 %drawnow; pause(0.1);                       %   Prevent MatLab from hanging
 
-[fileName,pathName] = uiputfile('conf/*.conf','Save configuration to file');
+if nargin==1
+  handles=hObject;
+  pathName=tempdir;
+  fileName='temporary.conf';
+else  
+  [fileName,pathName] = uiputfile('conf/*.conf','Save configuration to file');
+end
 
 if (~isempty(fileName))
     dataIn = get(handles.channelsTable, 'data');
@@ -47,13 +53,14 @@ if (~isempty(fileName))
         end
     end
     % End currentState save
-    output{9, 1} = get(handles.monitor, 'Value');
-    output{9, 2} = get(handles.dataLogg, 'Value');
+%     output{9, 1} = get(handles.monitor, 'Value');
+%     output{9, 2} = get(handles.dataLogg, 'Value');
     output{9, 3} = get(handles.impactTest, 'Value');
     output{9, 4} = get(handles.periodic, 'Value');
-    output{9, 5} = get(handles.steppedSine, 'Value');
+%     output{9, 5} = get(handles.steppedSine, 'Value');
     output{9, 6} = get(handles.multisine, 'Value');
-    output{10, 1} = get(handles.autoReport, 'Value');
+    output{9, 7} = get(handles.Oscilloscope, 'Value');
+%     output{10, 1} = get(handles.autoReport, 'Value');
     try,output{10, 2} = handles.autoReport.UserData.TesterInfo{1};catch,end
     try,output{10, 3} = handles.autoReport.UserData.TesterInfo{2};catch,end
     try,output{10, 4} = handles.autoReport.UserData.TesterInfo{3};catch,end
@@ -89,21 +96,22 @@ if (~isempty(fileName))
     j = 1;
     for i = m + 1 + 1:m + 1 + mm
         output{offset + i, 1} = dataOut{j, 1};     %   Active
-        output{offset + i, 2} = dataOut{j, 2};     %   Referense
-        output{offset + i, 3} = dataOut{j, 3};     %   Channel
-        %output{10 + i, 4} = dataOut{j, 4};        %   Signal
-        output{offset + i, 4} = dataOut{j, 4};     %   Label
-        output{offset + i, 5} = dataOut{j, 5};     %   Coupling
-        output{offset + i, 6} = dataOut{j, 6};     %   Type (Voltage/IEPE)
-        output{offset + i, 7} = dataOut{j, 7};     %   Voltage
-        %output{10 + i, 7} = dataOut{j, 7};        %   Transducer type
-        output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer
-        output{offset + i, 9} = dataOut{j, 9};     %   Manufacturer ID
-        output{offset + i, 10} = dataOut{j, 10};   %   Serial number
-        output{offset + i, 11} = dataOut{j, 11};   %   Sensitivity
-        output{offset + i, 12} = dataOut{j, 12};   %   Units
-        output{offset + i, 13} = dataOut{j, 13};   %   Dof
-        output{offset + i, 14} = dataOut{j, 14};   %   Direction
+        output{offset + i, 2} = dataOut{j, 2};     %   Channel
+%         output{offset + i, 2} = dataOut{j, 2};     %   Referense
+%         output{offset + i, 3} = dataOut{j, 3};     %   Channel
+%         %output{10 + i, 4} = dataOut{j, 4};        %   Signal
+%         output{offset + i, 4} = dataOut{j, 4};     %   Label
+%         output{offset + i, 5} = dataOut{j, 5};     %   Coupling
+%         output{offset + i, 6} = dataOut{j, 6};     %   Type (Voltage/IEPE)
+%         output{offset + i, 7} = dataOut{j, 7};     %   Voltage
+%         %output{10 + i, 7} = dataOut{j, 7};        %   Transducer type
+%         output{offset + i, 8} = dataOut{j, 8};     %   Manufacturer
+%         output{offset + i, 9} = dataOut{j, 9};     %   Manufacturer ID
+%         output{offset + i, 10} = dataOut{j, 10};   %   Serial number
+%         output{offset + i, 11} = dataOut{j, 11};   %   Sensitivity
+%         output{offset + i, 12} = dataOut{j, 12};   %   Units
+%         output{offset + i, 13} = dataOut{j, 13};   %   Dof
+%         output{offset + i, 14} = dataOut{j, 14};   %   Direction
         j = j + 1;
     end
     
@@ -114,7 +122,11 @@ if (~isempty(fileName))
             delete(file);
         end
         xlswrite(file, output);
-        set(handles.statusStr, 'String', [file, ' was saved to the disk ...']);
+        if nargin==1
+          set(handles.statusStr, 'String','DAQ was reset.');
+        else    
+          set(handles.statusStr, 'String', [file, ' was saved to the disk ...']);
+        end
     catch e
         errorMsg = {'An error occured, try again.'; ...
             ['Exception: ', e.identifier]};

@@ -36,7 +36,7 @@ function varargout = abraDAQ(varargin)
 % Created: 02-05-2013
 % Revision: 24-02-2015 1.3 minor bug changes
 
-% Last Modified by GUIDE v2.5 10-May-2016 09:32:30
+% Last Modified by GUIDE v2.5 27-Nov-2017 16:59:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,15 @@ end
 % End initialization code - DO NOT EDIT
 
 warning off;
+
+if 0; % Inactive code that makes Matlab's Application builder see the code
+  ImpactTest;
+  startOscilloscope;
+  startMultisine;
+  startPeriodic;
+  abraDAQ_report;
+  getTEDS;
+end  
 
 
 % --- Executes just before abraDAQ is made visible.
@@ -107,13 +116,15 @@ currentState{1,1} = 'Default (20)';
 %Logging
 currentState{2,1} = 'Default (20)';currentState{2,2} = 'Default (60)';
 %Impact
-currentState{3,1} = 'Default (20)';currentState{3,2} = 'Default (20)';currentState{3,4} = 'Default (1000)';currentState{3,5} = 'None';
+currentState{3,1} = 'Default (20)';currentState{3,2} = 'Default (5)';currentState{3,4} = 'Default (1000)';currentState{3,5} = 'None';
 %Periodic
 currentState{4,1} = 'Default (20)';currentState{4,2} = 'Default (20)';currentState{4,4} = 'Default (10)';currentState{4,5} = 'Default (1)';
 %Stepped sine
 currentState{5,1} = 'Default (20)';currentState{5,4} = 'Default (10)';currentState{5,5} = 'Default (0.99)';currentState{5,6} = 'Default (0.95)';currentState{5,7} = 'Default (20)';
 %Multisine
 currentState{6,1} = 'Default (20)';currentState{6,4} = 'Default (10)';currentState{6,5} = 'Default (0.99)';currentState{6,6} = 'Default (0.95)';currentState{6,7} = 'Default (20)';
+%Oscilloscope
+currentState{7,1} = 'Default (5)';
 set(handles.fun2Text,'visible','off')
 set(handles.fun2,'visible','off')
 set(handles.fun3Text,'visible','off')
@@ -131,8 +142,8 @@ set(handles.fun8,'visible','off')
 set(handles.fun9Text,'visible','off')
 set(handles.fun9,'visible','off')
 
-SensorsInLabFile=[handles.homePath filesep 'conf' filesep 'SensorsInLab.xlsx'];
-set(handles.sensorDataBaseText,'String',['( Sensor data from: ' SensorsInLabFile ')']);
+% SensorsInLabFile=[handles.homePath filesep 'conf' filesep 'SensorsInLab.xlsx'];
+% set(handles.sensorDataBaseText,'String',['( Sensor data from: ' SensorsInLabFile ')']);
 
 if verLessThan('daq','3.7')
     h=warndlg('Your Data Acquisition Toolbox might be too old','Toolbox Check');
@@ -143,6 +154,7 @@ end
 % UIWAIT makes abraDAQ wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+try, delete('IMPACT.mat'), catch, end
 
 % --- Outputs from this function are returned to the command line.
 function varargout = abraDAQ_OutputFcn(hObject, eventdata, handles)
@@ -221,17 +233,17 @@ end
 
 
 function title4_Callback(hObject, eventdata, handles)
-% hObject    handle to title4 (see GCBO)
+% hObject    handle to title3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of title4 as text
-%        str2double(get(hObject,'String')) returns contents of title4 as a double
+% Hints: get(hObject,'String') returns contents of title3 as text
+%        str2double(get(hObject,'String')) returns contents of title3 as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function title4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to title4 (see GCBO)
+% hObject    handle to title3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -342,14 +354,14 @@ for i = 1:n
 end
 
 
-% --- Executes on button press in clearButton.
-function clearButton_Callback(hObject, eventdata, handles)
-% hObject    handle to clearButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-data = cell(0, 0);
-set(handles.channelsTable, 'data', data);
+% % --- Executes on button press in clearButton.
+% function clearButton_Callback(hObject, eventdata, handles)
+% % hObject    handle to clearButton (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% data = cell(0, 0);
+% set(handles.channelsTable, 'data', data);
 
 
 % --------------------------------------------------------------------
@@ -364,7 +376,10 @@ function menuItemAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to menuItemAbout (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-h = msgbox('abraDAQ National Instruments MATLAB Data Acquisition and Experimental Modal Analysis library version 0.5. Developed at Chalmers University of Technology and University of Southern Denmark.');
+h = msgbox(['abraDAQ v0.5. Data Acquisition and Experimental Modal Analysis ' ...
+            'software. Supports National Instruments and Data ' ...
+            'Translation hardware. Developed at Chalmers University of ' ...
+            'Technology and University of Southern Denmark.']);
 
 
 % --------------------------------------------------------------------
@@ -392,10 +407,10 @@ Hz2kHz = 0.001;
 freq = str2double(get(handles.fun1,'String')) * kHz2Hz;
 
 % Check if the hardware info is stored
-if ~exist('devices')
-    daq.reset;
+% if ~exist('devices')
+%     daq.reset;
     devices = daq.getDevices;
-end
+% end
 
 % Find the rate limit of all the devices
 numberDevices = length(devices);
@@ -662,3 +677,74 @@ function write2UFF_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of write2UFF
+
+
+% % --- Executes on button press in Oscilloscope.
+% function Oscilloscope_Callback(hObject, eventdata, handles)
+% % hObject    handle to Oscilloscope (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hint: get(hObject,'Value') returns toggle state of Oscilloscope
+
+
+% --- Executes on button press in EditSensorDB.
+function EditSensorDB_Callback(hObject, eventdata, handles)
+% hObject    handle to EditSensorDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+SensorsInLabFile=[handles.homePath filesep 'conf' filesep 'SensorsInLab.xlsx'];
+try
+  winopen(SensorsInLabFile);
+catch
+  uiwait(msgbox('Cannot open Excel file for editing since it appears that Excel is missing in this system. However, file is now opened for inspection.','Excel file open error'));
+  open(SensorsInLabFile);
+end    
+
+
+% --- Executes on button press in DropTestButton.
+function DropTestButton_Callback(hObject, eventdata, handles)
+% hObject    handle to DropTestButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of DropTestButton
+
+
+% --- Executes on button press in MultiLvlNonlin.
+function MultiLvlNonlin_Callback(hObject, eventdata, handles)
+% hObject    handle to MultiLvlNonlin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of MultiLvlNonlin
+
+
+% --- Executes on button press in MultiPhaseNonlin.
+function MultiPhaseNonlin_Callback(hObject, eventdata, handles)
+% hObject    handle to MultiPhaseNonlin (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of MultiPhaseNonlin
+
+
+% --- Executes on button press in ResetDAQ.
+function ResetDAQ_Callback(hObject, eventdata, handles)
+% hObject    handle to ResetDAQ (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%%         Save current configuration before making reset
+saveButton_Callback(handles);
+
+%% Reset and clear
+save HANDLES hObject eventdata handles
+daq.reset;
+clear all
+load HANDLES
+delete HANDLES.mat
+handles.DaqReset=true;
+
+%% Load configuration again
+loadButton_Callback(hObject, eventdata, handles);

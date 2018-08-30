@@ -15,12 +15,13 @@ global currentState
 % Hint: get(hObject,'Value') returns toggle state of periodic
 val = get(hObject,'Value');
 if (val)
-    set(handles.monitor, 'Value', 0);
-    set(handles.dataLogg, 'Value', 0);
+%     set(handles.monitor, 'Value', 0);
+%     set(handles.dataLogg, 'Value', 0);
     set(handles.impactTest, 'Value', 0);
     set(handles.periodic, 'Value', 1);
-    set(handles.steppedSine, 'Value', 0);
+%     set(handles.steppedSine, 'Value', 0);
     set(handles.multisine, 'Value', 0);
+    set(handles.Oscilloscope, 'Value', 0);
     
     set(handles.fun1,'string',currentState{4,1})
     set(handles.fun2Text,'visible','on')

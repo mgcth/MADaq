@@ -13,23 +13,25 @@ function calibrateButton_Callback(hObject, eventdata, handles)
 %% Initiate
 hObject.BackgroundColor=[.94 .94 .94];
 
-%   Get state of session if existing
-calibrat = getappdata(0, 'previewStruct');
-try     running = ~isempty(preview) && preview.session.IsRunning;
-catch,  running = false;
-end
-if (~running)
+% %   Get state of session if existing
+% calibrat = getappdata(0, 'previewStruct');
+% try     running = ~isempty(preview) && preview.session.IsRunning;
+% catch,  running = false;
+% end
+% if (~running)
     % Initialise the test setup
 	calibrat = startInitialisation(hObject, eventdata, handles);
-end    
+% end 
+
 calibrat.session.DurationInSeconds=10;%          Collect 10s data each time
 Ts=1/calibrat.session.Rate;
 
 %                    Get info about channnels including calibration setting
 CHdata = get(handles.channelsTable, 'data');
 Ych=find(cell2mat(CHdata(:,1)));
-for I=1:length(Ych),Ycal(I)=calibrat.channelData(I).sensitivity;end
+% for I=1:length(Ych),Ycal(I)=calibrat.channelData(I).sensitivity;end
 % ycal=diag(cell2mat(CHdata(Ych,11)));
+Ycal=cell2mat(calibrat.Metadata.Sensor.Sensitivity);
 
 %% Get calibrator data
 prompt = {'Calibration frequency [Hz]: ________________________', ...
