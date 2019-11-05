@@ -2,6 +2,8 @@
 
 National Instruments MATLAB Data Acquisition and Experimental Modal Analysis library.
 
+**Note:** This library is experimental, and the working code has been left as is from the last experiments.
+
 ## Measurement functions:
 - Monitor sensor activity
 - Data logging
